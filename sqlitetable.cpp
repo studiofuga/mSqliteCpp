@@ -4,6 +4,7 @@
 #include <sqlite3.h>
 
 #include <sstream>
+#include <iostream>
 
 using namespace sqlite;
 
@@ -13,13 +14,20 @@ SQLiteTable::SQLiteTable(std::shared_ptr<SQLiteStorage> db, std::string name)
 
 }
 
-bool SQLiteTable::create()
+std::shared_ptr<SQLiteStorage> SQLiteTable::db()
 {
-    auto db = this->db();
+    auto db = mdb.lock();
 
-    std::ostringstream ss;
-    ss << "CREATE TABLE " << name() << " (" << getCreateDefinition() << ");";
-    auto query = ss.str();
+    if (db == nullptr)
+        throw std::logic_error("Operation on an orphaned Table!");
+    return db;
+}
+
+bool SQLiteTable::createFromSQLString(std::string query)
+{
+    std::cout <<  "Executing: " << query << "\n";
+
+    auto db = this->db();
 
     sqlite3_stmt *s;
     if (sqlite3_prepare(db->handle(), query.c_str(), query.size(), &s, nullptr) != SQLITE_OK)
@@ -30,15 +38,6 @@ bool SQLiteTable::create()
     }
 
     return true;
-}
-
-std::shared_ptr<SQLiteStorage> SQLiteTable::db()
-{
-    auto db = mdb.lock();
-
-    if (db == nullptr)
-        throw std::logic_error("Operation on an orphaned Table!");
-    return db;
 }
 
 SQLiteTable::~SQLiteTable() noexcept = default;

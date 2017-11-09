@@ -10,6 +10,7 @@ using namespace std;
 int main()
 {
     auto db = std::make_shared<SQLiteStorage>("output.db");
+    db->open();
 
     auto testTable = std::make_tuple(
         makeFieldDef("Id", FieldType::Integer()), //FieldAttribute::AutoIncrement),
@@ -20,9 +21,9 @@ int main()
 
     cout << "Build String: \n" << sqlite::buildSqlCreateString(testTable);
 
-#if 0
     auto table = SQLiteTable::create(db, "sample", testTable);
 
+#if 0
     struct Record {
         int id;
         std::string name;

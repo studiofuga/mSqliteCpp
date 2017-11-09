@@ -33,17 +33,14 @@ public:
 class SQLiteStorage
 {
     std::string dbPath;
-    std::list<std::shared_ptr<SQLiteTable>> tables;
 
     sqlite3 *mDb = nullptr;
 public:
-    SQLiteStorage(std::string path);
+    explicit SQLiteStorage(std::string path);
     ~SQLiteStorage() noexcept;
 
     bool open();
     bool close();
-
-    bool addTable (std::shared_ptr<SQLiteTable>);
 
     sqlite3 *handle();
 };

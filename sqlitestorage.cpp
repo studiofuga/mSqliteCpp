@@ -32,28 +32,6 @@ bool SQLiteStorage::close()
     return true;
 }
 
-bool SQLiteStorage::addTable(std::shared_ptr<SQLiteTable> table)
-{
-    std::string qry {"SELECT name FROM sqlite_master WHERE type='table' AND name=?1;"};
-    sqlite3_stmt *stmt;
-    if (sqlite3_prepare(mDb, qry.c_str(), qry.size(), &stmt, nullptr) != SQLITE_OK)
-        throw SQLiteException(mDb);
-
-    auto name = table->name();
-    if (sqlite3_bind_text(stmt, 1, name.c_str(), name.size(), 0) != SQLITE_OK)
-        throw SQLiteException(mDb);
-
-    if (sqlite3_step(stmt) == SQLITE_DONE) {
-        // table doesn't exist.
-        if (!table->create()) {
-            return false;
-        }
-    }
-
-    tables.push_back(std::move(table));
-    return true;
-}
-
 sqlite3 *SQLiteStorage::handle()
 {
     return mDb;
