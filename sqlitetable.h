@@ -25,7 +25,8 @@ template <size_t I = 0, typename ...Ts>
 inline std::string buildSqlCreateString(std::tuple<Ts...> &def, typename std::enable_if<I < sizeof...(Ts)>::type * = 0)
 {
     auto & field = std::get<I>(def);
-    return field.name() + " " + field.sqlType() + (I == sizeof...(Ts)-1 ? "" : ",") + "\n" +
+    return field.name() + " " + field.sqlType() + field.sqlAttributes()
+           + (I == sizeof...(Ts)-1 ? "" : ",") + "\n" +
                                                                                     buildSqlCreateString<I+1, Ts...>(def);
 };
 

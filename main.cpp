@@ -13,7 +13,7 @@ int main()
     db->open();
 
     auto testTable = std::make_tuple(
-        makeFieldDef("Id", FieldType::Integer()), //FieldAttribute::AutoIncrement),
+        makeFieldDef("Id", FieldType::Integer()).primaryKey().autoincrement(),
         makeFieldDef("name", FieldType::Text()),
         makeFieldDef("x", FieldType::Real()),
         makeFieldDef("y", FieldType::Real())
@@ -42,4 +42,13 @@ int main()
 
     Record r2 = { 1, "uno", 0, 1000};
     table.insert (testTable, std::make_tuple(r2.id, r2.name, r2.x, r2.y));
+
+    try {
+        r2.id = 0;
+        r2.name = "aaaa";
+        table.insert (testTable, std::make_tuple(r2.id, r2.name, r2.x, r2.y));
+    } catch (sqlite::SQLiteException &x) {
+        //
+        std::cout << "Got exception, it was expected! " << x.what() << "\n";
+    }
 }

@@ -11,8 +11,11 @@ struct Text{};
 struct Blob{};
 }
 
-enum class FieldAttribute : int{
-    AutoIncrement = 0x01
+enum FieldAttribute : int{
+    PrimaryKey = 0x01,
+    NotNull = 0x02,
+    Unique = 0x04,
+    AutoIncrement = 0x08
 };
 
 template <typename FIELDTYPE>
@@ -28,6 +31,38 @@ public:
     std::string name() const { return fieldName; }
     inline std::string sqlType() const {
         static_assert(sizeof(FIELDTYPE) == 0, "Generic version of sqlType is undefined");
+    }
+
+    inline std::string sqlAttributes() const {
+        std::ostringstream ss;
+
+        if (attributes & FieldAttribute::PrimaryKey)
+            ss << " PRIMARY KEY";
+        if (attributes & FieldAttribute::AutoIncrement)
+            ss << " AUTOINCREMENT";
+        if (attributes & FieldAttribute::NotNull)
+            ss << " NOT NULL";
+        if (attributes & FieldAttribute::Unique)
+            ss << " UNIQUE";
+
+        return ss.str();
+    }
+
+    FieldDef<FIELDTYPE> &primaryKey() {
+        attributes |= FieldAttribute::PrimaryKey;
+        return *this;
+    }
+    FieldDef<FIELDTYPE> &notNull() {
+        attributes |= FieldAttribute::NotNull;
+        return *this;
+    }
+    FieldDef<FIELDTYPE> &unique() {
+        attributes |= FieldAttribute::Unique;
+        return *this;
+    }
+    FieldDef<FIELDTYPE> &autoincrement() {
+        attributes |= FieldAttribute::AutoIncrement;
+        return *this;
     }
 };
 
