@@ -21,19 +21,25 @@ int main()
 
     cout << "Build String: \n" << sqlite::buildSqlCreateString(testTable);
 
+    try {
+        db->dropTable("sample");
+    } catch (sqlite::SQLiteException &) { // ignore errors
+    }
+
     auto table = SQLiteTable::create(db, "sample", testTable);
 
-#if 0
     struct Record {
         int id;
         std::string name;
-        float x,y;
+        double x,y;
     };
 
     Record record = {
-        0, "first", 1.1, -1.98
+        0, "first", 1.16f, -1.98f
     };
 
     table.insert (testTable, std::make_tuple(record.id, record.name, record.x, record.y));
-#endif
+
+    Record r2 = { 1, "uno", 0, 1000};
+    table.insert (testTable, std::make_tuple(r2.id, r2.name, r2.x, r2.y));
 }

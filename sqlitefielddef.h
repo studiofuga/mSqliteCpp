@@ -27,7 +27,7 @@ public:
 
     std::string name() const { return fieldName; }
     inline std::string sqlType() const {
-        static_assert(sizeof(FIELDTYPE) == 0, "Only specializations of GetGlobal can be used");
+        static_assert(sizeof(FIELDTYPE) == 0, "Generic version of sqlType is undefined");
     }
 };
 

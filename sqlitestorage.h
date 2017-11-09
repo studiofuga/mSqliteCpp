@@ -43,6 +43,8 @@ public:
     bool close();
 
     sqlite3 *handle();
+
+    bool dropTable(std::string table);
 };
 
 } // ns sqlite

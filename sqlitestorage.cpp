@@ -36,3 +36,14 @@ sqlite3 *SQLiteStorage::handle()
 {
     return mDb;
 }
+
+bool SQLiteStorage::dropTable(std::string table)
+{
+    std::ostringstream ss;
+    ss << "DROP TABLE " << table << ";";
+    auto r = sqlite3_exec(mDb, ss.str().c_str(), nullptr, nullptr, nullptr);
+    if (r != SQLITE_OK)
+        throw SQLiteException(mDb);
+
+    return true;
+}
