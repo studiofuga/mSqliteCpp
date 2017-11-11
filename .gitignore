@@ -110,3 +110,11 @@ crashlytics.properties
 crashlytics-build.properties
 fabric.properties
 
+.idea/misc.xml
+.idea/modules.xml
+.idea/*.iml
+.idea/vcs.xml
+
+###
+
+tests/googletest

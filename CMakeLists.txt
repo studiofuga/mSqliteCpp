@@ -22,3 +22,5 @@ set(SOURCE_FILES
 add_library(msqlitecpp SHARED ${SOURCE_FILES})
 
 target_link_libraries(msqlitecpp sqlite3)
+
+add_subdirectory(tests)
