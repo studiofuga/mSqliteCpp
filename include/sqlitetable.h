@@ -88,6 +88,7 @@ protected:
     }
 
 public:
+    SQLiteTable() {};
     SQLiteTable(std::shared_ptr<SQLiteStorage> db, std::string name);
     virtual ~SQLiteTable() noexcept;
 
