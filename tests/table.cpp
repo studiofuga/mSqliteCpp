@@ -53,6 +53,22 @@ public:
         SQLiteTable::insert(std::make_tuple(mName, mValue), std::make_tuple(record.name, record.value));
     }
 
+    std::vector<Record> selectAll() {
+        std::vector<Record> r;
+        /*
+        auto qfld = std::make_tuple(mName, mValue);
+        SQLiteTable::query<decltype(mName),decltype(mValue),std::string, int>
+                (qfld, [&r](std::tuple<std::string, int> res) {
+            r.push_back(Record{std::get<0>(res), std::get<1>(res)});
+        });*/
+
+
+        SQLiteTable::query(std::make_tuple(mName, mValue), [&r](std::string name, int value) {
+            r.push_back(Record{name, value});
+        });
+
+        return r;
+    }
 };
 
 TEST(table, subclassing)
@@ -66,4 +82,7 @@ TEST(table, subclassing)
     ASSERT_NO_THROW(myTable.create());
     ASSERT_NO_THROW(myTable.insert(MyTable::Record{"First", 2000}));
     ASSERT_NO_THROW(myTable.insert(MyTable::Record{"Second", 0}));
+
+    std::vector<MyTable::Record> r = myTable.selectAll();
+    ASSERT_EQ(r.size(), 2);
 }

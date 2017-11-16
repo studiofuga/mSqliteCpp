@@ -20,6 +20,11 @@ public:
             throw SQLiteException(mDb->handle());
     }
 
+    ~Statement() {
+        if (stmt != nullptr)
+            sqlite3_finalize(stmt);
+    }
+
     sqlite3_stmt *handle() const { return stmt; }
     std::shared_ptr<SQLiteStorage> db() const { return mDb; }
 };
@@ -63,11 +68,31 @@ void SQLiteTable::bindValue(SQLiteTable::Statement *stmt, int idx, int value)
 }
 
 template<>
+void SQLiteTable::getValue(SQLiteTable::Statement *stmt, int idx, int &value)
+{
+    if (sqlite3_column_type(stmt->handle(), idx) != SQLITE_INTEGER)
+        throw std::runtime_error("Not a SQLITE_INTEGER type column");
+
+    value = sqlite3_column_int(stmt->handle(), idx);
+}
+
+template<>
 void SQLiteTable::bindValue(SQLiteTable::Statement *stmt, int idx, std::string value)
 {
     auto r = sqlite3_bind_text(stmt->handle(), idx, value.c_str(), value.size(), SQLITE_TRANSIENT);
     if (r != SQLITE_OK)
         throw SQLiteException(stmt->db()->handle());
+}
+
+template<>
+void SQLiteTable::getValue(SQLiteTable::Statement *stmt, int idx, std::string &value)
+{
+    if (sqlite3_column_type(stmt->handle(), idx) != SQLITE_TEXT)
+        throw std::runtime_error("Not a SQLITE_TEXT type column");
+
+    auto sptr = sqlite3_column_text(stmt->handle(), idx);
+    auto len = sqlite3_column_bytes(stmt->handle(), idx);
+    value = std::string(sptr, sptr + len);
 }
 
 template<>
@@ -88,9 +113,24 @@ std::shared_ptr<SQLiteTable::Statement> SQLiteTable::newStatement(std::string qu
 bool SQLiteTable::execute(SQLiteTable::Statement *stmt)
 {
     auto r = sqlite3_step(stmt->handle());
-    if (r != SQLITE_DONE)
+
+    if (r != SQLITE_ROW && r != SQLITE_DONE)
         throw SQLiteException(stmt->db()->handle());
     return true;
+}
+
+bool SQLiteTable::hasData(Statement *stmt) const
+{
+    auto r = sqlite3_step(stmt->handle());
+    if (r != SQLITE_DONE && r != SQLITE_ROW)
+        SQLiteException::throwIfNotOk(r, stmt->db()->handle());
+
+    return r == SQLITE_ROW;
+}
+
+int SQLiteTable::columnCount(Statement *stmt) const
+{
+    return sqlite3_column_count(stmt->handle());
 }
 
 SQLiteTable::~SQLiteTable() noexcept = default;

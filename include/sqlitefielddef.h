@@ -1,14 +1,16 @@
 #ifndef SQLITEFIELDDEF_H
 #define SQLITEFIELDDEF_H
 
+#include <string>
+#include <vector>
+
 namespace sqlite {
 
 namespace FieldType {
-struct Null {};
-struct Integer {};
-struct Real{};
-struct Text{};
-struct Blob{};
+struct Integer { using rawtype = int; };
+struct Real{ using rawtype = double; };
+struct Text{ using rawtype = std::string; };
+struct Blob{ using rawtype = std::vector<uint8_t>; };
 }
 
 enum FieldAttribute : int{
@@ -25,6 +27,11 @@ private:
     int attributes = 0;
 
 public:
+    using Type = FIELDTYPE;
+    using RawType = typename Type::rawtype;
+
+    auto rawType() -> RawType { return {}; }
+
     explicit FieldDef (std::string name)
         : fieldName(std::move(name)) {}
 

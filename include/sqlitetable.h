@@ -6,6 +6,9 @@
 #include <tuple>
 #include <sstream>
 
+#include <stdexcept>
+
+#include "sqlitestorage.h"
 #include "sqlitefielddef.h"
 
 namespace sqlite {
@@ -69,7 +72,6 @@ protected:
         std::ostringstream ss;
         ss << "?" << (I+1) << (I == sizeof...(Ts)-1 ? "" : ",") << buildSqlInsertValuesListPlaceholder<I+1, Ts...>(def);
         return ss.str();
-     //   return std::string("?") + (I == sizeof...(Ts)-1 ? "" : ",") + buildSqlInsertValuesListPlaceholder<I+1, Ts...>(def);
     }
 
     template <typename T>
@@ -87,6 +89,31 @@ protected:
         bindAllValues<I+1,Ts...>(stmt, values);
     }
 
+    template <typename T>
+    void getValue(Statement *stmt, int idx, T &value) {
+        static_assert(sizeof(T) == 0, "Generic version of bindValue is undefined");
+    }
+
+    template <typename T>
+    T getValueR(Statement *stmt, int idx) {
+        T t;
+        getValue(stmt, idx, t);
+        return t;
+    }
+
+    template <size_t I, typename ...Ts>
+    void getAllValues(Statement *stmt, std::tuple<Ts...> &values, typename std::enable_if<I == sizeof...(Ts)>::type * = 0)
+    {
+    }
+
+    template <size_t I, typename ...Ts>
+    void getAllValues(Statement *stmt, std::tuple<Ts...> &values, typename std::enable_if<I < sizeof...(Ts)>::type * = 0)
+    {
+        getValue(stmt, I+1, std::get<I>(values));
+        getAllValues<I+1, Ts...>(stmt, values);
+    }
+
+
 public:
     SQLiteTable() {};
     SQLiteTable(std::shared_ptr<SQLiteStorage> db, std::string name);
@@ -101,12 +128,14 @@ public:
                                        << buildSqlCreateString(def) << ");";
         return createFromSQLString(ss.str());
     }
-    //virtual bool update() = 0;
 
     std::string name() const { return mName; }
 
     std::shared_ptr<Statement> newStatement(std::string query);
     bool execute(Statement *stmt);
+
+    bool hasData(Statement *stmt) const;
+    int columnCount(Statement *stmt) const;
 
     template <typename ...Ts, typename ...Us>
     bool insert (std::tuple<Ts...> def, std::tuple<Us...> values) {
@@ -116,10 +145,36 @@ public:
                                       << ") VALUES ("
                                       << buildSqlInsertValuesListPlaceholder<0>(values)
                                       << ");";
+
         auto stmt = newStatement(ss.str());
         bindAllValues<0>(stmt.get(), values);
         return execute(stmt.get());
     }
+
+    template <typename ...Ts, typename F, std::size_t... Is>
+    void getValuesAndCall(Statement *stmt, F resultFeedbackFunc, Ts... value) {
+
+    };
+
+    template <typename ...Ts, typename F, std::size_t... Is>
+    void query_impl(std::tuple<Ts...> def, F resultFeedbackFunc, std::index_sequence<Is...> idx) {
+        std::ostringstream ss;
+        ss << "SELECT " << buildSqlInsertFieldList<0>(def) << " FROM " << mName <<";";
+        auto stmt = newStatement(ss.str());
+
+        while (hasData(stmt.get())) {
+            auto nColumns = columnCount(stmt.get());
+            if (nColumns != sizeof...(Ts))
+                throw std::runtime_error("Column count differs from data size");
+
+            resultFeedbackFunc(getValueR<decltype (std::get<Is>(def).rawType())>(stmt.get(), Is)...);
+        }
+    };
+
+    template <typename ...Ts, typename F>
+    void query(std::tuple<Ts...> def, F resultFeedbackFunc) {
+        query_impl(def, resultFeedbackFunc, std::make_index_sequence<sizeof...(Ts)>{});
+    };
 
     template <typename ...Ts>
     static SQLiteTable create (std::shared_ptr<SQLiteStorage> db, std::string name, std::tuple<Ts...> def) {
@@ -140,7 +195,13 @@ template <>
 void SQLiteTable::bindValue<int> (SQLiteTable::Statement *stmt, int idx, int value);
 
 template <>
+void SQLiteTable::getValue<int> (SQLiteTable::Statement *stmt, int idx, int &value);
+
+template <>
 void SQLiteTable::bindValue<std::string> (SQLiteTable::Statement *stmt, int idx, std::string value);
+
+template <>
+void SQLiteTable::getValue<std::string> (SQLiteTable::Statement *stmt, int idx, std::string &value);
 
 template <>
 void SQLiteTable::bindValue<double> (SQLiteTable::Statement *stmt, int idx, double value);
