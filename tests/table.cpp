@@ -29,6 +29,34 @@ TEST(table, creation)
     ASSERT_TRUE(db->tableExists("sample"));
 }
 
+TEST(table, query)
+{
+    auto db = std::make_shared<SQLiteStorage>(":memory:");
+
+    ASSERT_NO_THROW(db->open());
+    ASSERT_FALSE(db->tableExists("do-not-exists"));
+
+    auto fldId = makeFieldDef("id", FieldType::Integer()).primaryKey().autoincrement();
+    auto fldName = makeFieldDef("name", FieldType::Text());
+    auto fldCount = makeFieldDef("count", FieldType::Integer());
+    auto testTable = std::make_tuple(
+            fldId,
+            fldName,
+            fldCount
+    );
+
+    SQLiteTable table;
+    ASSERT_NO_THROW(table = SQLiteTable::create(db, "sample", testTable));
+
+    auto tb = std::make_tuple(fldName, fldCount);
+    ASSERT_NO_THROW(table.insert(tb, std::make_tuple(std::string{"first"}, 0)));
+    ASSERT_NO_THROW(table.insert(tb, std::make_tuple(std::string{"second"}, 100)));
+
+    int r = 0;
+    ASSERT_NO_THROW(table.query(tb, [&r](std::string name, int value) { ++r; }));
+    ASSERT_EQ(r, 2);
+}
+
 class MyTable : public SQLiteTable {
 private:
     FieldDef<FieldType::Integer> mId = makeFieldDef("id", FieldType::Integer()).primaryKey().autoincrement();
@@ -55,14 +83,6 @@ public:
 
     std::vector<Record> selectAll() {
         std::vector<Record> r;
-        /*
-        auto qfld = std::make_tuple(mName, mValue);
-        SQLiteTable::query<decltype(mName),decltype(mValue),std::string, int>
-                (qfld, [&r](std::tuple<std::string, int> res) {
-            r.push_back(Record{std::get<0>(res), std::get<1>(res)});
-        });*/
-
-
         SQLiteTable::query(std::make_tuple(mName, mValue), [&r](std::string name, int value) {
             r.push_back(Record{name, value});
         });
