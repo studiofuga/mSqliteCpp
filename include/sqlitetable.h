@@ -114,6 +114,34 @@ protected:
     }
 
 
+    template <size_t I, typename ...Ts>
+    std::string buildSqlWhereClause(std::tuple<Ts...> &where, typename std::enable_if<I == sizeof...(Ts)>::type * = 0)
+    {
+        (void)where;
+        return std::string();
+    }
+
+    template <size_t I, typename ...Ts>
+    std::string buildSqlWhereClause(std::tuple<Ts...> &where, typename std::enable_if<I < sizeof...(Ts)>::type * = 0)
+    {
+        auto &field = std::get<I>(where);
+        std::ostringstream ss;
+        ss << field.field().name() << "=?" << (I+1) << (I == sizeof...(Ts)-1 ? "" : " AND ") << buildSqlWhereClause<I+1, Ts...>(where);
+        return ss.str();
+    }
+
+    template <typename ...Ts, typename ...Us, std::size_t... Is>
+    auto valuesFromAssignedFields_impl(const std::tuple<Ts...> &fields, std::index_sequence<Is...>)
+    {
+        return std::make_tuple(std::get<Is>(fields).value()...);
+    };
+
+    template <typename ...Ts, typename ...Us>
+    auto valuesFromAssignedFields(const std::tuple<Ts...> &fields)
+    {
+        return valuesFromAssignedFields_impl(fields, std::make_index_sequence<sizeof...(Ts)>{});
+    };
+
 public:
     SQLiteTable() {};
     SQLiteTable(std::shared_ptr<SQLiteStorage> db, std::string name);
@@ -174,6 +202,29 @@ public:
     template <typename ...Ts, typename F>
     void query(std::tuple<Ts...> def, F resultFeedbackFunc) {
         query_impl(def, resultFeedbackFunc, std::make_index_sequence<sizeof...(Ts)>{});
+    };
+
+    template <typename ...Ts, typename ...Us, typename F, std::size_t... Is>
+    void query_impl(std::tuple<Ts...> def, std::tuple<Us...> where, F resultFeedbackFunc, std::index_sequence<Is...> idx) {
+        std::ostringstream ss;
+        ss << "SELECT " << buildSqlInsertFieldList<0>(def) << " FROM " << mName <<
+           " WHERE " << buildSqlWhereClause<0>(where) << ";";
+        auto stmt = newStatement(ss.str());
+        auto values = valuesFromAssignedFields(where);
+        bindAllValues<0>(stmt.get(), values);
+
+        while (hasData(stmt.get())) {
+            auto nColumns = columnCount(stmt.get());
+            if (nColumns != sizeof...(Ts))
+                throw std::runtime_error("Column count differs from data size");
+
+            resultFeedbackFunc(getValueR<decltype (std::get<Is>(def).rawType())>(stmt.get(), Is)...);
+        }
+    };
+
+    template <typename ...Ts, typename ...Us, typename F>
+    void query(std::tuple<Ts...> def, std::tuple<Us...> where, F resultFeedbackFunc) {
+        query_impl(def, where, resultFeedbackFunc, std::make_index_sequence<sizeof...(Ts)>{});
     };
 
     template <typename ...Ts>

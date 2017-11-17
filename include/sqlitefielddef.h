@@ -21,6 +21,22 @@ enum FieldAttribute : int{
 };
 
 template <typename FIELDTYPE>
+class FieldDef;
+
+template <typename FIELDTYPE>
+class AssignedField {
+private:
+    FieldDef<FIELDTYPE> &mField;
+    typename FIELDTYPE::rawtype mValue;
+public:
+    AssignedField(FieldDef<FIELDTYPE> &fld, typename FIELDTYPE::rawtype val)
+            : mField(fld), mValue(val) {}
+
+    const FieldDef<FIELDTYPE> &field() const { return mField; }
+    const typename FIELDTYPE::rawtype &value() const { return mValue; }
+};
+
+template <typename FIELDTYPE>
 class FieldDef {
 private:
     std::string fieldName;
@@ -70,6 +86,10 @@ public:
     FieldDef<FIELDTYPE> &autoincrement() {
         attributes |= FieldAttribute::AutoIncrement;
         return *this;
+    }
+
+    AssignedField<FIELDTYPE> set(typename FieldDef<FIELDTYPE>::RawType value) {
+        return AssignedField<FIELDTYPE>(*this, value);
     }
 };
 

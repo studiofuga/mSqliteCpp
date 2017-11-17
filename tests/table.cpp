@@ -55,6 +55,11 @@ TEST(table, query)
     int r = 0;
     ASSERT_NO_THROW(table.query(tb, [&r](std::string name, int value) { ++r; }));
     ASSERT_EQ(r, 2);
+
+    r = 0;
+    auto where = std::make_tuple(fldCount.set(100));
+    ASSERT_NO_THROW(table.query(tb, where, [&r](std::string name, int value) { ++r; }));
+    ASSERT_EQ(r, 1);
 }
 
 class MyTable : public SQLiteTable {
