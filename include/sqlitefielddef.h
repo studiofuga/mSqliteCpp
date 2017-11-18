@@ -88,7 +88,7 @@ public:
         return *this;
     }
 
-    AssignedField<FIELDTYPE> set(typename FieldDef<FIELDTYPE>::RawType value) {
+    AssignedField<FIELDTYPE> assign(typename FieldDef<FIELDTYPE>::RawType value) {
         return AssignedField<FIELDTYPE>(*this, value);
     }
 };

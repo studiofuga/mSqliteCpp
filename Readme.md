@@ -52,7 +52,7 @@ Examples can be found in the `tests` directory. Below are a few examples:
 
 ```
     auto tb = std::make_tuple(fldName, fldCount);
-    auto where = std::make_tuple(fldCount.set(100));
+    auto where = std::make_tuple(fldCount.assign(100));
     int cnt = 0;
     table.query(tb, where, [&r](std::string name, int value) { ++cnt; }));
 ```

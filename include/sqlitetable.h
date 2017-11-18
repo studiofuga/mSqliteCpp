@@ -33,9 +33,11 @@ inline std::string buildSqlCreateString(std::tuple<Ts...> &def, typename std::en
                                                                                     buildSqlCreateString<I+1, Ts...>(def);
 };
 
+/// @brief A Database Table object
 class SQLiteTable
 {
 public:
+    /// @brief an opaque type to handle SQLite statements.
     class Statement;
 
 private:
@@ -44,6 +46,8 @@ private:
 
 protected:
 
+    // ** Create a "INSERT" SQL statement from a tuple of fields definition
+
     template <size_t I, typename ...Ts>
     std::string buildSqlInsertFieldList(std::tuple<Ts...> &def, typename std::enable_if<I == sizeof...(Ts)>::type * = 0)
     {
@@ -51,6 +55,7 @@ protected:
         return std::string();
     }
 
+    /// @brief builds a Field list part of a SQL Insert statement
     template <size_t I, typename ...Ts>
     std::string buildSqlInsertFieldList(std::tuple<Ts...> &def, typename std::enable_if<I < sizeof...(Ts)>::type * = 0)
     {
@@ -65,6 +70,7 @@ protected:
         return std::string();
     }
 
+    /// @brief builds a Values part of a SQL Insert statement
     template <size_t I, typename ...Ts>
     std::string buildSqlInsertValuesListPlaceholder(std::tuple<Ts...> &def, typename std::enable_if<I < sizeof...(Ts)>::type * = 0)
     {
@@ -74,15 +80,19 @@ protected:
         return ss.str();
     }
 
+    /// @brief Binds a value to a placeholder in an SQL Statement
     template <typename T>
     void bindValue(Statement *stmt, int idx, T value) {
         static_assert(sizeof(T) == 0, "Generic version of bindValue is undefined");
     }
 
+    /// @brief Binds all the values in an SQL statement (End recursion version)
     template <size_t I, typename ...Ts>
     void bindAllValues (Statement *stmt, std::tuple<Ts...> &values, typename std::enable_if<I == sizeof...(Ts)>::type * = 0) {
         (void) values; (void)stmt;
     }
+
+    /// @brief Binds all the values in an SQL statement
     template <size_t I, typename ...Ts>
     void bindAllValues (Statement *stmt, std::tuple<Ts...> &values, typename std::enable_if<I < sizeof...(Ts)>::type * = 0) {
         bindValue(stmt, I+1, std::get<I>(values));
@@ -143,7 +153,7 @@ protected:
     };
 
 public:
-    SQLiteTable() {};
+    SQLiteTable() = default;
     SQLiteTable(std::shared_ptr<SQLiteStorage> db, std::string name);
     virtual ~SQLiteTable() noexcept;
 
@@ -178,11 +188,6 @@ public:
         bindAllValues<0>(stmt.get(), values);
         return execute(stmt.get());
     }
-
-    template <typename ...Ts, typename F, std::size_t... Is>
-    void getValuesAndCall(Statement *stmt, F resultFeedbackFunc, Ts... value) {
-
-    };
 
     template <typename ...Ts, typename F, std::size_t... Is>
     void query_impl(std::tuple<Ts...> def, F resultFeedbackFunc, std::index_sequence<Is...> idx) {
