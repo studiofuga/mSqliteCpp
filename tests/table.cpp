@@ -52,9 +52,12 @@ TEST(table, query)
     ASSERT_NO_THROW(table.insert(tb, std::make_tuple(std::string{"first"}, 0)));
     ASSERT_NO_THROW(table.insert(tb, std::make_tuple(std::string{"second"}, 100)));
 
+    // Alternative signature for insert
+    ASSERT_NO_THROW(table.insert(fldName.assign("third"), fldCount.assign(250)));
+
     int r = 0;
     ASSERT_NO_THROW(table.query(tb, [&r](std::string name, int value) { ++r; }));
-    ASSERT_EQ(r, 2);
+    ASSERT_EQ(r, 3);
 
     r = 0;
     auto where = std::make_tuple(fldCount.assign(100));

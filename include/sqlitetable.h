@@ -189,6 +189,17 @@ public:
         return execute(stmt.get());
     }
 
+    template <typename ...Ts, std::size_t...Is>
+    bool insert_assign_impl(std::tuple<Ts...> fieldAndValue, std::index_sequence<Is...>) {
+        return insert (std::make_tuple(std::get<Is>(fieldAndValue).field()...),
+                       std::make_tuple(std::get<Is>(fieldAndValue).value()...));
+    }
+
+    template <typename ...Ts>
+    bool insert(Ts... fieldAndValue) {
+        return insert_assign_impl (std::make_tuple(fieldAndValue...), std::make_index_sequence<sizeof...(Ts)>{});
+    }
+
     template <typename ...Ts, typename F, std::size_t... Is>
     void query_impl(std::tuple<Ts...> def, F resultFeedbackFunc, std::index_sequence<Is...> idx) {
         std::ostringstream ss;
