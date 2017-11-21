@@ -10,6 +10,7 @@
 
 #include "sqlitestorage.h"
 #include "sqlitefielddef.h"
+#include <iostream>
 
 namespace sqlite {
 
@@ -80,6 +81,32 @@ protected:
         return ss.str();
     }
 
+    template <size_t I,typename ...Ts>
+    std::string buildSqlUpdateColumnStatement(std::tuple<Ts...> nm, typename std::enable_if<I == sizeof...(Ts)>::type * = 0) {
+        return std::string();
+    }
+
+    template <size_t I,typename ...Ts>
+    std::string buildSqlUpdateColumnStatement(std::tuple<Ts...> nm, typename std::enable_if<I < sizeof...(Ts)>::type * = 0)
+    {
+        std::ostringstream ss;
+        ss << std::get<I>(nm).name() << "=?" << (I+1) << (I+1 == sizeof...(Ts) ? "" : ",") << buildSqlUpdateColumnStatement<I+1>(nm);
+        return ss.str();
+    }
+
+    /// @brief builds the fields part of an update statement  (UPDATE tablename SET field=? ....)
+    template <typename ...Ts>
+    std::string buildSqlUpdateColumnsStatement_impl(std::tuple<Ts...> def) {
+        std::ostringstream ss;
+        ss << buildSqlUpdateColumnStatement<0>(def);
+        return ss.str();
+    }
+
+    template <typename ...Ts>
+    std::string buildSqlUpdateColumnsStatement(std::tuple<Ts...> def) {
+        return buildSqlUpdateColumnsStatement_impl(def);
+    }
+
     /// @brief Binds a value to a placeholder in an SQL Statement
     template <typename T>
     void bindValue(Statement *stmt, int idx, T value) {
@@ -87,16 +114,16 @@ protected:
     }
 
     /// @brief Binds all the values in an SQL statement (End recursion version)
-    template <size_t I, typename ...Ts>
+    template <size_t I, size_t Start = 0, typename ...Ts>
     void bindAllValues (Statement *stmt, std::tuple<Ts...> &values, typename std::enable_if<I == sizeof...(Ts)>::type * = 0) {
         (void) values; (void)stmt;
     }
 
     /// @brief Binds all the values in an SQL statement
-    template <size_t I, typename ...Ts>
+    template <size_t I, size_t Start = 0, typename ...Ts>
     void bindAllValues (Statement *stmt, std::tuple<Ts...> &values, typename std::enable_if<I < sizeof...(Ts)>::type * = 0) {
-        bindValue(stmt, I+1, std::get<I>(values));
-        bindAllValues<I+1,Ts...>(stmt, values);
+        bindValue(stmt, I+Start+1, std::get<I>(values));
+        bindAllValues<I+1,Start, Ts...>(stmt, values);
     }
 
     template <typename T>
@@ -124,19 +151,19 @@ protected:
     }
 
 
-    template <size_t I, typename ...Ts>
+    template <size_t I, size_t Start = 0, typename ...Ts>
     std::string buildSqlWhereClause(std::tuple<Ts...> &where, typename std::enable_if<I == sizeof...(Ts)>::type * = 0)
     {
         (void)where;
         return std::string();
     }
 
-    template <size_t I, typename ...Ts>
+    template <size_t I, size_t Start = 0, typename ...Ts>
     std::string buildSqlWhereClause(std::tuple<Ts...> &where, typename std::enable_if<I < sizeof...(Ts)>::type * = 0)
     {
         auto &field = std::get<I>(where);
         std::ostringstream ss;
-        ss << field.field().name() << "=?" << (I+1) << (I == sizeof...(Ts)-1 ? "" : " AND ") << buildSqlWhereClause<I+1, Ts...>(where);
+        ss << field.field().name() << "=?" << (I+Start+1) << (I == sizeof...(Ts)-1 ? "" : " AND ") << buildSqlWhereClause<I+1, Start, Ts...>(where);
         return ss.str();
     }
 
@@ -241,6 +268,34 @@ public:
     template <typename ...Ts, typename ...Us, typename F>
     void query(std::tuple<Ts...> def, std::tuple<Us...> where, F resultFeedbackFunc) {
         query_impl(def, where, resultFeedbackFunc, std::make_index_sequence<sizeof...(Ts)>{});
+    };
+
+    template <typename ...Ts, typename ...Vs, typename ...Us, std::size_t...Is>
+    void update_impl(std::tuple<Ts...> def, std::tuple<Vs...> values, std::tuple<Us...> where, std::index_sequence<Is...>) {
+        std::ostringstream ss;
+        ss << "UPDATE " << mName << " SET "
+                                 << buildSqlUpdateColumnsStatement(def)
+                                 << " WHERE " << buildSqlWhereClause<0,sizeof...(Ts)>(where)
+                                              << ";";
+
+        //std::cout << ss .str() << "\n";
+
+        auto stmt = newStatement(ss.str());
+        auto avalues = valuesFromAssignedFields(where);
+        bindAllValues<0>(stmt.get(), values);
+        bindAllValues<0,sizeof...(Ts)>(stmt.get(), avalues);
+        execute(stmt.get());
+    };
+
+    template <typename ...Ts, typename ...Us, std::size_t...Is>
+    void update_impl(std::tuple<Ts...> def, std::tuple<Us...> where, std::index_sequence<Is...> is) {
+        update_impl(std::make_tuple(std::get<Is>(def).field()...),
+                    std::make_tuple(std::get<Is>(def).value()...), where, is);
+    };
+
+    template <typename ...Ts, typename ...Us>
+    void update(std::tuple<Ts...> def, std::tuple<Us...> where) {
+        update_impl(def, where, std::make_index_sequence<sizeof...(Ts)>{});
     };
 
     template <typename ...Ts>
