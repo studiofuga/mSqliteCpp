@@ -3,6 +3,7 @@
 
 #include <string>
 #include <vector>
+#include <sstream>
 
 namespace sqlite {
 
@@ -105,6 +106,7 @@ inline std::string FieldDef<FieldType::Real>::sqlType() const { return "REAL"; }
 
 template <typename FIELDTYPE>
 inline FieldDef<FIELDTYPE> makeFieldDef(std::string name, FIELDTYPE type) {
+    (void)type;
     return FieldDef<FIELDTYPE>(name);
 }
 

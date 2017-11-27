@@ -22,6 +22,7 @@ using TableDef = std::tuple<FieldDef<FIELDTYPE>...>;
 template <size_t I, typename ...Ts>
 inline std::string buildSqlCreateString(std::tuple<Ts...> &def, typename std::enable_if<I == sizeof...(Ts)>::type * = 0)
 {
+    (void)def;
     return std::string();
 };
 
@@ -75,7 +76,6 @@ protected:
     template <size_t I, typename ...Ts>
     std::string buildSqlInsertValuesListPlaceholder(std::tuple<Ts...> &def, typename std::enable_if<I < sizeof...(Ts)>::type * = 0)
     {
-        auto &field = std::get<I>(def);
         std::ostringstream ss;
         ss << "?" << (I+1) << (I == sizeof...(Ts)-1 ? "" : ",") << buildSqlInsertValuesListPlaceholder<I+1, Ts...>(def);
         return ss.str();
@@ -83,6 +83,7 @@ protected:
 
     template <size_t I,typename ...Ts>
     std::string buildSqlUpdateColumnStatement(std::tuple<Ts...> nm, typename std::enable_if<I == sizeof...(Ts)>::type * = 0) {
+        (void)nm;
         return std::string();
     }
 
@@ -110,6 +111,7 @@ protected:
     /// @brief Binds a value to a placeholder in an SQL Statement
     template <typename T>
     void bindValue(Statement *stmt, int idx, T value) {
+        (void)stmt; (void)idx; (void)value;
         static_assert(sizeof(T) == 0, "Generic version of bindValue is undefined");
     }
 
@@ -128,6 +130,7 @@ protected:
 
     template <typename T>
     void getValue(Statement *stmt, int idx, T &value) {
+        (void)stmt; (void)idx; (void)value;
         static_assert(sizeof(T) == 0, "Generic version of bindValue is undefined");
     }
 
@@ -141,6 +144,7 @@ protected:
     template <size_t I, typename ...Ts>
     void getAllValues(Statement *stmt, std::tuple<Ts...> &values, typename std::enable_if<I == sizeof...(Ts)>::type * = 0)
     {
+        (void)stmt; (void)values;
     }
 
     template <size_t I, typename ...Ts>
@@ -228,7 +232,7 @@ public:
     }
 
     template <typename ...Ts, typename F, std::size_t... Is>
-    void query_impl(std::tuple<Ts...> def, F resultFeedbackFunc, std::index_sequence<Is...> idx) {
+    void query_impl(std::tuple<Ts...> def, F resultFeedbackFunc, std::index_sequence<Is...>) {
         std::ostringstream ss;
         ss << "SELECT " << buildSqlInsertFieldList<0>(def) << " FROM " << mName <<";";
         auto stmt = newStatement(ss.str());
@@ -248,7 +252,7 @@ public:
     };
 
     template <typename ...Ts, typename ...Us, typename F, std::size_t... Is>
-    void query_impl(std::tuple<Ts...> def, std::tuple<Us...> where, F resultFeedbackFunc, std::index_sequence<Is...> idx) {
+    void query_impl(std::tuple<Ts...> def, std::tuple<Us...> where, F resultFeedbackFunc, std::index_sequence<Is...>) {
         std::ostringstream ss;
         ss << "SELECT " << buildSqlInsertFieldList<0>(def) << " FROM " << mName <<
            " WHERE " << buildSqlWhereClause<0>(where) << ";";
