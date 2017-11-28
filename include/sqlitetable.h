@@ -30,6 +30,25 @@ private:
     std::string mName;
 
 protected:
+    template <typename T>
+    std::string sqlFieldCreateSpec(const std::vector<T> &fields) const {
+        std::ostringstream ss;
+        auto i = std::begin(fields);
+        auto e = std::end(fields);
+        while (i != e) {
+            ss << sqlFieldCreateSpec(*i);
+            ++i;
+            if (i != e)
+                ss << ",\n";
+        }
+        return ss.str();
+    }
+
+    template <typename T>
+    std::string sqlFieldCreateSpec(T field) const {
+        return field.name() + " " + field.sqlType() + field.sqlAttributes();
+    }
+
     template <size_t I, typename ...Ts>
     inline std::string buildSqlCreateString(std::tuple<Ts...> &def, typename std::enable_if<I == sizeof...(Ts)>::type * = 0)
     {
@@ -41,7 +60,7 @@ protected:
     inline std::string buildSqlCreateString(std::tuple<Ts...> &def, typename std::enable_if<I < sizeof...(Ts)>::type * = 0)
     {
         auto & field = std::get<I>(def);
-        return field.name() + " " + field.sqlType() + field.sqlAttributes()
+        return sqlFieldCreateSpec(field)
                + (I == sizeof...(Ts)-1 ? "" : ",") + "\n" +
                buildSqlCreateString<I+1, Ts...>(def);
     };

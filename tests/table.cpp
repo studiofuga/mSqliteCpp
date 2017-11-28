@@ -121,3 +121,28 @@ TEST(table, subclassing)
     std::vector<MyTable::Record> r = myTable.selectAll();
     ASSERT_EQ(r.size(), 2);
 }
+
+TEST(table, DynamicCreate)
+{
+    auto db = std::make_shared<SQLiteStorage>(":memory:");
+
+    ASSERT_NO_THROW(db->open());
+
+    std::vector<FieldDef<FieldType::Integer>> dynFields {
+            makeFieldDef("c1", FieldType::Integer()),
+            makeFieldDef("c2", FieldType::Integer()),
+            makeFieldDef("c3", FieldType::Integer()),
+            makeFieldDef("total", FieldType::Integer())
+    };
+
+    auto testTable = std::make_tuple(
+            makeFieldDef("id", FieldType::Integer()).primaryKey().autoincrement(),
+            makeFieldDef("name", FieldType::Text()),
+            dynFields
+    );
+
+    SQLiteTable table;
+    ASSERT_NO_THROW(table = SQLiteTable::create(db, "sample", testTable));
+
+    ASSERT_NO_THROW(table.query(std::make_tuple(dynFields[0], dynFields[1]), [](int, int) { }));
+}
