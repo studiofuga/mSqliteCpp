@@ -78,7 +78,7 @@ private:
     FieldDef<FieldType::Text> mName = makeFieldDef("name", FieldType::Text());
     FieldDef<FieldType::Integer> mValue = makeFieldDef("value", FieldType::Integer());
 public:
-    MyTable(std::shared_ptr<SQLiteStorage> db)
+    explicit MyTable(std::shared_ptr<SQLiteStorage> db)
             : SQLiteTable(db, "records")
     {
     }

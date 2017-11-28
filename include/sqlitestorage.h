@@ -7,6 +7,7 @@
 #include <memory>
 #include <stdexcept>
 #include <list>
+#include <thread>
 
 namespace sqlite {
 class SQLiteTable;
@@ -37,9 +38,12 @@ public:
 
 class SQLiteStorage
 {
+    mutable std::mutex mMutex;
     std::string dbPath;
 
     sqlite3 *mDb = nullptr;
+
+    bool mOnTransaction = false;
 public:
     explicit SQLiteStorage(std::string path);
     ~SQLiteStorage() noexcept;
@@ -51,6 +55,11 @@ public:
 
     bool dropTable(std::string table);
     bool tableExists(std::string table);
+
+    bool isOngoingTransaction() const { std::unique_lock<std::mutex> l(mMutex); return mOnTransaction; }
+    bool startTransaction();
+    bool commitTransaction();
+    bool abortTransaction();
 };
 
 } // ns sqlite

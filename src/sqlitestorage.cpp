@@ -65,3 +65,39 @@ bool SQLiteStorage::tableExists(std::string table)
     }
     return true;
 }
+
+bool SQLiteStorage::startTransaction()
+{
+    std::unique_lock<std::mutex> l(mMutex);
+    if (mOnTransaction)
+        return false;
+
+    auto r = sqlite3_exec(mDb, "BEGIN TRANSACTION;", nullptr, nullptr, nullptr);
+    SQLiteException::throwIfNotOk(r, mDb);
+    mOnTransaction = true;
+    return true;
+}
+
+bool SQLiteStorage::commitTransaction()
+{
+    std::unique_lock<std::mutex> l(mMutex);
+    if (!mOnTransaction)
+        return false;
+
+    auto r = sqlite3_exec(mDb, "COMMIT TRANSACTION;", nullptr, nullptr, nullptr);
+    SQLiteException::throwIfNotOk(r, mDb);
+    mOnTransaction = false;
+    return true;
+}
+
+bool SQLiteStorage::abortTransaction()
+{
+    std::unique_lock<std::mutex> l(mMutex);
+    if (!mOnTransaction)
+        return false;
+
+    auto r = sqlite3_exec(mDb, "ROLLBACK TRANSACTION;", nullptr, nullptr, nullptr);
+    SQLiteException::throwIfNotOk(r, mDb);
+    mOnTransaction = false;
+    return true;
+}

@@ -16,6 +16,8 @@ set(SOURCE_FILES
         include/sqlitestorage.h
         src/sqlitetable.cpp
         include/sqlitetable.h
+        src/sqlitetransaction.cpp
+        include/sqlitetransaction.h
         )
 
 
