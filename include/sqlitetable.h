@@ -18,23 +18,6 @@ class SQLiteStorage;
 template <typename ...FIELDTYPE>
 using TableDef = std::tuple<FieldDef<FIELDTYPE>...>;
 
-
-template <size_t I, typename ...Ts>
-inline std::string buildSqlCreateString(std::tuple<Ts...> &def, typename std::enable_if<I == sizeof...(Ts)>::type * = 0)
-{
-    (void)def;
-    return std::string();
-};
-
-template <size_t I = 0, typename ...Ts>
-inline std::string buildSqlCreateString(std::tuple<Ts...> &def, typename std::enable_if<I < sizeof...(Ts)>::type * = 0)
-{
-    auto & field = std::get<I>(def);
-    return field.name() + " " + field.sqlType() + field.sqlAttributes()
-           + (I == sizeof...(Ts)-1 ? "" : ",") + "\n" +
-                                                                                    buildSqlCreateString<I+1, Ts...>(def);
-};
-
 /// @brief A Database Table object
 class SQLiteTable
 {
@@ -47,6 +30,21 @@ private:
     std::string mName;
 
 protected:
+    template <size_t I, typename ...Ts>
+    inline std::string buildSqlCreateString(std::tuple<Ts...> &def, typename std::enable_if<I == sizeof...(Ts)>::type * = 0)
+    {
+        (void)def;
+        return std::string();
+    };
+
+    template <size_t I = 0, typename ...Ts>
+    inline std::string buildSqlCreateString(std::tuple<Ts...> &def, typename std::enable_if<I < sizeof...(Ts)>::type * = 0)
+    {
+        auto & field = std::get<I>(def);
+        return field.name() + " " + field.sqlType() + field.sqlAttributes()
+               + (I == sizeof...(Ts)-1 ? "" : ",") + "\n" +
+               buildSqlCreateString<I+1, Ts...>(def);
+    };
 
     // ** Create a "INSERT" SQL statement from a tuple of fields definition
 
