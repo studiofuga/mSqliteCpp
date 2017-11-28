@@ -83,3 +83,21 @@ TEST_F (TransactionTest, abort)
     ASSERT_NO_THROW(table.query(std::make_tuple(fldName), [&r](std::string name) { ++r; }));
     ASSERT_EQ(r, 0);
 }
+
+TEST_F (TransactionTest, nestedTransactions)
+{
+    SQLiteTable table(db(), "test3");
+
+    ASSERT_NO_THROW(table.create(std::make_tuple(fldId, fldName)));
+
+    SQLiteTransaction transaction(db());
+    ASSERT_NO_THROW(table.insert(fldName.assign("aaaa")));
+    SQLiteTransaction nestedTransaction(db());
+    ASSERT_NO_THROW(table.insert(fldName.assign("bbbb")));
+    nestedTransaction.commit();
+    transaction.abort();
+
+    int r = 0;
+    ASSERT_NO_THROW(table.query(std::make_tuple(fldName), [&r](std::string name) { ++r; }));
+    ASSERT_EQ(r, 0);
+}
