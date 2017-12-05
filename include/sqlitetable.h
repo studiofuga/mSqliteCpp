@@ -1,6 +1,8 @@
 #ifndef SQLITETABLE_H
 #define SQLITETABLE_H
 
+#include "msqlitecpp.h"
+
 #include <string>
 #include <memory>
 #include <tuple>
@@ -19,7 +21,7 @@ template <typename ...FIELDTYPE>
 using TableDef = std::tuple<FieldDef<FIELDTYPE>...>;
 
 /// @brief A Database Table object
-class SQLiteTable
+class EXPORT SQLiteTable
 {
 public:
     /// @brief an opaque type to handle SQLite statements.
@@ -188,13 +190,13 @@ protected:
         return ss.str();
     }
 
-    template <typename ...Ts, typename ...Us, std::size_t... Is>
+    template <typename ...Ts, std::size_t... Is>
     auto valuesFromAssignedFields_impl(const std::tuple<Ts...> &fields, std::index_sequence<Is...>)
     {
         return std::make_tuple(std::get<Is>(fields).value()...);
     };
 
-    template <typename ...Ts, typename ...Us>
+    template <typename ...Ts>
     auto valuesFromAssignedFields(const std::tuple<Ts...> &fields)
     {
         return valuesFromAssignedFields_impl(fields, std::make_index_sequence<sizeof...(Ts)>{});
@@ -335,19 +337,19 @@ protected:
 };
 
 template <>
-void SQLiteTable::bindValue<int> (SQLiteTable::Statement *stmt, int idx, int value);
+void EXPORT SQLiteTable::bindValue<int> (SQLiteTable::Statement *stmt, int idx, int value);
 
 template <>
-void SQLiteTable::getValue<int> (SQLiteTable::Statement *stmt, int idx, int &value);
+void EXPORT SQLiteTable::getValue<int> (SQLiteTable::Statement *stmt, int idx, int &value);
 
 template <>
-void SQLiteTable::bindValue<std::string> (SQLiteTable::Statement *stmt, int idx, std::string value);
+void EXPORT SQLiteTable::bindValue<std::string> (SQLiteTable::Statement *stmt, int idx, std::string value);
 
 template <>
-void SQLiteTable::getValue<std::string> (SQLiteTable::Statement *stmt, int idx, std::string &value);
+void EXPORT SQLiteTable::getValue<std::string> (SQLiteTable::Statement *stmt, int idx, std::string &value);
 
 template <>
-void SQLiteTable::bindValue<double> (SQLiteTable::Statement *stmt, int idx, double value);
+void EXPORT SQLiteTable::bindValue<double> (SQLiteTable::Statement *stmt, int idx, double value);
 
 
 template <typename ...FIELDTYPE>

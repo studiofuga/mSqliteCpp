@@ -5,6 +5,8 @@
 #ifndef SQLITE_SQLITETRANSACTION_H
 #define SQLITE_SQLITETRANSACTION_H
 
+#include "msqlitecpp.h"
+
 #include <memory>
 
 namespace sqlite {
@@ -24,7 +26,7 @@ namespace sqlite {
      * This also means that if the first transaction is aborted, all the inner transactions will be lost too. same if
      * the first transaction is committed and the inner transactions are aborted. No Exception is thrown !
      */
-    class SQLiteTransaction {
+    class EXPORT SQLiteTransaction {
     public:
         enum class DestructorAction { Commit, Abort };
 

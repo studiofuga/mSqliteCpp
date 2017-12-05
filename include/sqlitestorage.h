@@ -1,18 +1,20 @@
 #ifndef SQLITERESULTSTORAGE_H
 #define SQLITERESULTSTORAGE_H
 
-#include <sqlite3.h>
+#include "msqlitecpp.h"
+#include "sqlite3.h"
 
 #include <string>
 #include <memory>
 #include <stdexcept>
 #include <list>
 #include <thread>
+#include <mutex>
 
 namespace sqlite {
 class SQLiteTable;
 
-class SQLiteException : public std::runtime_error {
+class EXPORT SQLiteException : public std::runtime_error {
     std::string mErrmsg;
     int mCode;
 public:
@@ -36,7 +38,7 @@ public:
     }
 };
 
-class SQLiteStorage
+class EXPORT SQLiteStorage
 {
     mutable std::mutex mMutex;
     std::string dbPath;
