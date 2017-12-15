@@ -110,6 +110,7 @@ crashlytics.properties
 crashlytics-build.properties
 fabric.properties
 
+.idea/
 .idea/misc.xml
 .idea/modules.xml
 .idea/*.iml
