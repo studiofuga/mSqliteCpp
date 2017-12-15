@@ -341,6 +341,11 @@ public:
         return table;
     }
 
+    template <typename ...Ts>
+    static SQLiteTable create (std::shared_ptr<SQLiteStorage> db, std::string name, Ts... def) {
+        return create(db, name, std::make_tuple(def...));
+    }
+
 protected:
     std::shared_ptr<SQLiteStorage> db();
     // helper functions here

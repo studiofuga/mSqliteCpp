@@ -36,6 +36,15 @@ TEST_F(table, creation)
     ASSERT_TRUE(db->tableExists("sample"));
 }
 
+TEST_F(table, creationWithoutTuple)
+{
+    SQLiteTable table;
+    ASSERT_NO_THROW(table = SQLiteTable::create(db, "sample",
+                                                makeFieldDef("id", FieldType::Integer()).primaryKey().autoincrement(),
+                                                makeFieldDef("name", FieldType::Text())
+    ));
+}
+
 TEST_F(table, query)
 {
     ASSERT_FALSE(db->tableExists("do-not-exists"));
