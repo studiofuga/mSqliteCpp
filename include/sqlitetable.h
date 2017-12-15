@@ -202,6 +202,69 @@ protected:
         return valuesFromAssignedFields_impl(fields, std::make_index_sequence<sizeof...(Ts)>{});
     };
 
+    // impl
+    template <typename ...Ts, std::size_t...Is>
+    bool insert_assign_impl(std::tuple<Ts...> fieldAndValue, std::index_sequence<Is...>) {
+        return insert (std::make_tuple(std::get<Is>(fieldAndValue).field()...),
+                       std::make_tuple(std::get<Is>(fieldAndValue).value()...));
+    }
+
+    template <typename ...Ts, typename F, std::size_t... Is>
+    void query_impl(std::tuple<Ts...> def, F resultFeedbackFunc, std::index_sequence<Is...>) {
+        std::ostringstream ss;
+        ss << "SELECT " << buildSqlInsertFieldList<0>(def) << " FROM " << mName <<";";
+        auto stmt = newStatement(ss.str());
+
+        while (hasData(stmt.get())) {
+            auto nColumns = columnCount(stmt.get());
+            if (nColumns != sizeof...(Ts))
+                throw std::runtime_error("Column count differs from data size");
+
+            resultFeedbackFunc(getValueR<decltype (std::get<Is>(def).rawType())>(stmt.get(), Is)...);
+        }
+    };
+
+    template <typename ...Ts, typename ...Us, typename F, std::size_t... Is>
+    void query_impl(std::tuple<Ts...> def, std::tuple<Us...> where, F resultFeedbackFunc, std::index_sequence<Is...>) {
+        std::ostringstream ss;
+        ss << "SELECT " << buildSqlInsertFieldList<0>(def) << " FROM " << mName <<
+           " WHERE " << buildSqlWhereClause<0>(where) << ";";
+        auto stmt = newStatement(ss.str());
+        auto values = valuesFromAssignedFields(where);
+        bindAllValues<0>(stmt.get(), values);
+
+        while (hasData(stmt.get())) {
+            auto nColumns = columnCount(stmt.get());
+            if (nColumns != sizeof...(Ts))
+                throw std::runtime_error("Column count differs from data size");
+
+            resultFeedbackFunc(getValueR<decltype (std::get<Is>(def).rawType())>(stmt.get(), Is)...);
+        }
+    };
+
+    template <typename ...Ts, typename ...Vs, typename ...Us, std::size_t...Is>
+    void update_impl(std::tuple<Ts...> def, std::tuple<Vs...> values, std::tuple<Us...> where, std::index_sequence<Is...>) {
+        std::ostringstream ss;
+        ss << "UPDATE " << mName << " SET "
+           << buildSqlUpdateColumnsStatement(def)
+           << " WHERE " << buildSqlWhereClause<0,sizeof...(Ts)>(where)
+           << ";";
+
+        //std::cout << ss .str() << "\n";
+
+        auto stmt = newStatement(ss.str());
+        auto avalues = valuesFromAssignedFields(where);
+        bindAllValues<0>(stmt.get(), values);
+        bindAllValues<0,sizeof...(Ts)>(stmt.get(), avalues);
+        execute(stmt.get());
+    };
+
+    template <typename ...Ts, typename ...Us, std::size_t...Is>
+    void update_impl(std::tuple<Ts...> def, std::tuple<Us...> where, std::index_sequence<Is...> is) {
+        update_impl(std::make_tuple(std::get<Is>(def).field()...),
+                    std::make_tuple(std::get<Is>(def).value()...), where, is);
+    };
+
 public:
     SQLiteTable() = default;
     SQLiteTable(std::shared_ptr<SQLiteStorage> db, std::string name);
@@ -250,81 +313,19 @@ public:
         return execute(stmt.get());
     }
 
-    template <typename ...Ts, std::size_t...Is>
-    bool insert_assign_impl(std::tuple<Ts...> fieldAndValue, std::index_sequence<Is...>) {
-        return insert (std::make_tuple(std::get<Is>(fieldAndValue).field()...),
-                       std::make_tuple(std::get<Is>(fieldAndValue).value()...));
-    }
-
     template <typename ...Ts>
     bool insert(Ts... fieldAndValue) {
         return insert_assign_impl (std::make_tuple(fieldAndValue...), std::make_index_sequence<sizeof...(Ts)>{});
     }
-
-    template <typename ...Ts, typename F, std::size_t... Is>
-    void query_impl(std::tuple<Ts...> def, F resultFeedbackFunc, std::index_sequence<Is...>) {
-        std::ostringstream ss;
-        ss << "SELECT " << buildSqlInsertFieldList<0>(def) << " FROM " << mName <<";";
-        auto stmt = newStatement(ss.str());
-
-        while (hasData(stmt.get())) {
-            auto nColumns = columnCount(stmt.get());
-            if (nColumns != sizeof...(Ts))
-                throw std::runtime_error("Column count differs from data size");
-
-            resultFeedbackFunc(getValueR<decltype (std::get<Is>(def).rawType())>(stmt.get(), Is)...);
-        }
-    };
 
     template <typename ...Ts, typename F>
     void query(std::tuple<Ts...> def, F resultFeedbackFunc) {
         query_impl(def, resultFeedbackFunc, std::make_index_sequence<sizeof...(Ts)>{});
     };
 
-    template <typename ...Ts, typename ...Us, typename F, std::size_t... Is>
-    void query_impl(std::tuple<Ts...> def, std::tuple<Us...> where, F resultFeedbackFunc, std::index_sequence<Is...>) {
-        std::ostringstream ss;
-        ss << "SELECT " << buildSqlInsertFieldList<0>(def) << " FROM " << mName <<
-           " WHERE " << buildSqlWhereClause<0>(where) << ";";
-        auto stmt = newStatement(ss.str());
-        auto values = valuesFromAssignedFields(where);
-        bindAllValues<0>(stmt.get(), values);
-
-        while (hasData(stmt.get())) {
-            auto nColumns = columnCount(stmt.get());
-            if (nColumns != sizeof...(Ts))
-                throw std::runtime_error("Column count differs from data size");
-
-            resultFeedbackFunc(getValueR<decltype (std::get<Is>(def).rawType())>(stmt.get(), Is)...);
-        }
-    };
-
     template <typename ...Ts, typename ...Us, typename F>
     void query(std::tuple<Ts...> def, std::tuple<Us...> where, F resultFeedbackFunc) {
         query_impl(def, where, resultFeedbackFunc, std::make_index_sequence<sizeof...(Ts)>{});
-    };
-
-    template <typename ...Ts, typename ...Vs, typename ...Us, std::size_t...Is>
-    void update_impl(std::tuple<Ts...> def, std::tuple<Vs...> values, std::tuple<Us...> where, std::index_sequence<Is...>) {
-        std::ostringstream ss;
-        ss << "UPDATE " << mName << " SET "
-                                 << buildSqlUpdateColumnsStatement(def)
-                                 << " WHERE " << buildSqlWhereClause<0,sizeof...(Ts)>(where)
-                                              << ";";
-
-        //std::cout << ss .str() << "\n";
-
-        auto stmt = newStatement(ss.str());
-        auto avalues = valuesFromAssignedFields(where);
-        bindAllValues<0>(stmt.get(), values);
-        bindAllValues<0,sizeof...(Ts)>(stmt.get(), avalues);
-        execute(stmt.get());
-    };
-
-    template <typename ...Ts, typename ...Us, std::size_t...Is>
-    void update_impl(std::tuple<Ts...> def, std::tuple<Us...> where, std::index_sequence<Is...> is) {
-        update_impl(std::make_tuple(std::get<Is>(def).field()...),
-                    std::make_tuple(std::get<Is>(def).value()...), where, is);
     };
 
     template <typename ...Ts, typename ...Us>
