@@ -217,6 +217,17 @@ public:
         return createFromSQLString(ss.str());
     }
 
+    template <typename ...Ts>
+    void createIndex (std::string name, std::tuple<Ts...> fields) {
+        std::ostringstream ss;
+        ss << "CREATE INDEX " << name << " ON " << mName << " ("
+                                                         << buildSqlInsertFieldList<0>(fields)
+                                                         << ");";
+        auto stmt = newStatement(ss.str());
+        execute(stmt.get());
+    }
+
+
     std::string name() const { return mName; }
 
     std::shared_ptr<Statement> newStatement(std::string query);

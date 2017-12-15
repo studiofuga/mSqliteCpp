@@ -13,8 +13,8 @@ class table : public ::testing::Test {
 protected:
     std::shared_ptr<SQLiteStorage> db;
 public:
-    table() {
-        auto db = std::make_shared<SQLiteStorage>(":memory:");
+    void SetUp() override {
+        db = std::make_shared<SQLiteStorage>(":memory:");
         ASSERT_NO_THROW(db->open());
     }
 };
@@ -141,4 +141,24 @@ TEST_F(table, DynamicCreate)
     ASSERT_NO_THROW(table = SQLiteTable::create(db, "sample", testTable));
 
     ASSERT_NO_THROW(table.query(std::make_tuple(dynFields[0], dynFields[1]), [](int, int) { }));
+}
+
+TEST_F(table, IndexCreate)
+{
+    auto fldName = makeFieldDef("name", FieldType::Text());
+    auto fldX = makeFieldDef("x", FieldType::Real());
+    auto fldY = makeFieldDef("y", FieldType::Real());
+    auto testTable = std::make_tuple(
+            makeFieldDef("id", FieldType::Integer()).primaryKey().autoincrement(),
+            fldName,
+            makeFieldDef("count", FieldType::Integer()),
+            fldX,
+            fldY
+    );
+
+    SQLiteTable table;
+    ASSERT_NO_THROW(table = SQLiteTable::create(db, "sample", testTable));
+
+    ASSERT_NO_THROW(table.createIndex ("name", std::make_tuple(fldName)));
+    ASSERT_NO_THROW(table.createIndex ("coords", std::make_tuple(fldX, fldY)));
 }
