@@ -29,10 +29,10 @@ class FieldDef;
 template <typename FIELDTYPE>
 class AssignedField {
 private:
-    FieldDef<FIELDTYPE> &mField;
+    const FieldDef<FIELDTYPE> &mField;
     typename FIELDTYPE::rawtype mValue;
 public:
-    AssignedField(FieldDef<FIELDTYPE> &fld, typename FIELDTYPE::rawtype val)
+    AssignedField(const FieldDef<FIELDTYPE> &fld, typename FIELDTYPE::rawtype val)
             : mField(fld), mValue(val) {}
 
     const FieldDef<FIELDTYPE> &field() const { return mField; }
@@ -91,7 +91,7 @@ public:
         return *this;
     }
 
-    AssignedField<FIELDTYPE> assign(typename FieldDef<FIELDTYPE>::RawType value) {
+    AssignedField<FIELDTYPE> assign(typename FieldDef<FIELDTYPE>::RawType value) const {
         return AssignedField<FIELDTYPE>(*this, value);
     }
 };
