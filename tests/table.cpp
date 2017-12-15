@@ -9,11 +9,18 @@
 
 using namespace sqlite;
 
-TEST(table, creation)
-{
-    auto db = std::make_shared<SQLiteStorage>(":memory:");
+class table : public ::testing::Test {
+protected:
+    std::shared_ptr<SQLiteStorage> db;
+public:
+    table() {
+        auto db = std::make_shared<SQLiteStorage>(":memory:");
+        ASSERT_NO_THROW(db->open());
+    }
+};
 
-    ASSERT_NO_THROW(db->open());
+TEST_F(table, creation)
+{
     ASSERT_FALSE(db->tableExists("do-not-exists"));
 
     auto testTable = std::make_tuple(
@@ -29,11 +36,8 @@ TEST(table, creation)
     ASSERT_TRUE(db->tableExists("sample"));
 }
 
-TEST(table, query)
+TEST_F(table, query)
 {
-    auto db = std::make_shared<SQLiteStorage>(":memory:");
-
-    ASSERT_NO_THROW(db->open());
     ASSERT_FALSE(db->tableExists("do-not-exists"));
 
     auto fldId = makeFieldDef("id", FieldType::Integer()).primaryKey().autoincrement();
@@ -106,12 +110,8 @@ public:
     }
 };
 
-TEST(table, subclassing)
+TEST_F(table, subclassing)
 {
-    auto db = std::make_shared<SQLiteStorage>(":memory:");
-
-    ASSERT_NO_THROW(db->open());
-
     MyTable myTable(db);
 
     ASSERT_NO_THROW(myTable.create());
@@ -122,12 +122,8 @@ TEST(table, subclassing)
     ASSERT_EQ(r.size(), 2);
 }
 
-TEST(table, DynamicCreate)
+TEST_F(table, DynamicCreate)
 {
-    auto db = std::make_shared<SQLiteStorage>(":memory:");
-
-    ASSERT_NO_THROW(db->open());
-
     std::vector<FieldDef<FieldType::Integer>> dynFields {
             makeFieldDef("c1", FieldType::Integer()),
             makeFieldDef("c2", FieldType::Integer()),
