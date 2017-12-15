@@ -369,11 +369,6 @@ template <>
 void EXPORT SQLiteTable::bindValue<double> (SQLiteTable::Statement *stmt, int idx, double value);
 
 
-template <typename ...FIELDTYPE>
-inline TableDef<FIELDTYPE...> makeTableDef()
-{
-}
-
 } // ns sqlite
 
 #endif // SQLITETABLE_H
