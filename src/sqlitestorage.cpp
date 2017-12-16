@@ -52,17 +52,12 @@ bool SQLiteStorage::dropTable(std::string table)
 
 bool SQLiteStorage::tableExists(std::string table)
 {
-    SQLiteStatement stmt(this, "SELECT name FROM sqlite_master WHERE type='table' AND name=?;");
-    auto r = sqlite3_bind_text(stmt.handle(), 1, table.c_str(), table.length(), SQLITE_TRANSIENT);
-    SQLiteException::throwIfNotOk(r,mDb);
+    SQLiteStatement stmt(shared_from_this(), "SELECT name FROM sqlite_master WHERE type='table' AND name=?;");
+    stmt.bind(1, table);
 
-    r = sqlite3_step(stmt.handle());
-    if (r == SQLITE_DONE) {
-        return false;
-    } else if (r != SQLITE_ROW) {
-        SQLiteException::throwIfNotOk(r, mDb);
-    }
-    return true;
+    bool found = false;
+    stmt.execute([&found] { found = true; return true; });
+    return found;
 }
 
 bool SQLiteStorage::startTransaction()
@@ -100,3 +95,4 @@ bool SQLiteStorage::abortTransaction()
     mOnTransaction = false;
     return true;
 }
+

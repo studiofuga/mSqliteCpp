@@ -15,26 +15,16 @@
 namespace sqlite {
 
     class SQLiteStatement {
-        SQLiteStorage *mDb;
-        sqlite3_stmt *stmt = nullptr;
+        struct Impl;
+
+        std::unique_ptr<Impl> p;
     public:
-        explicit SQLiteStatement(SQLiteStorage *db,
-                                 std::string sql) :
-                mDb(db)
-        {
-            auto r = sqlite3_prepare_v2(mDb->handle(), sql.c_str(), -1, &stmt, nullptr);
-            if (r != SQLITE_OK)
-                throw SQLiteException(mDb->handle());
-        }
+        explicit SQLiteStatement(std::shared_ptr<SQLiteStorage> db, std::string sql);
+        ~SQLiteStatement();
 
-        ~SQLiteStatement() {
-            if (stmt != nullptr)
-                sqlite3_finalize(stmt);
-        }
+        void bind(int idx, std::string value);
 
-        sqlite3_stmt *handle() const { return stmt; }
-
-        SQLiteStorage *db() const { return mDb; }
+        bool execute(std::function<bool()>);
     };
 
 } // ns sqlite

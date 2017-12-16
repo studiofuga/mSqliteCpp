@@ -38,7 +38,7 @@ public:
     }
 };
 
-class EXPORT SQLiteStorage
+class EXPORT SQLiteStorage : public std::enable_shared_from_this<SQLiteStorage>
 {
     mutable std::mutex mMutex;
     std::string dbPath;
