@@ -1,6 +1,8 @@
 #include "sqlitestorage.h"
 #include "sqlitetable.h"
 
+#include "sqlitestatement.h"
+
 using namespace sqlite;
 
 SQLiteStorage::SQLiteStorage(std::string path)
@@ -50,14 +52,11 @@ bool SQLiteStorage::dropTable(std::string table)
 
 bool SQLiteStorage::tableExists(std::string table)
 {
-    sqlite3_stmt *stmt;
-    auto r = sqlite3_prepare_v2(mDb, "SELECT name FROM sqlite_master WHERE type='table' AND name=?;", -1, &stmt, nullptr);
+    SQLiteStatement stmt(this, "SELECT name FROM sqlite_master WHERE type='table' AND name=?;");
+    auto r = sqlite3_bind_text(stmt.handle(), 1, table.c_str(), table.length(), SQLITE_TRANSIENT);
     SQLiteException::throwIfNotOk(r,mDb);
 
-    r = sqlite3_bind_text(stmt, 1, table.c_str(), table.length(), SQLITE_TRANSIENT);
-    SQLiteException::throwIfNotOk(r,mDb);
-
-    r = sqlite3_step(stmt);
+    r = sqlite3_step(stmt.handle());
     if (r == SQLITE_DONE) {
         return false;
     } else if (r != SQLITE_ROW) {

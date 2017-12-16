@@ -20,6 +20,7 @@ set(SOURCE_FILES
         include/sqlitetable.h
         src/sqlitetransaction.cpp
         include/sqlitetransaction.h
+        include/sqlitestatement.h
         )
 
 add_definitions(-DBUILD_MSQLITECPP)
