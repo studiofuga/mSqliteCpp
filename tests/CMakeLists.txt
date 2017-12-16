@@ -14,6 +14,7 @@ include_directories(${gtest_SOURCE_DIR}/include ${gtest_SOURCE_DIR})
 add_executable(runTests
         table.cpp
         transactions.cpp
+        issues.cpp
         )
 
 # Standard linking to gtest stuff.
