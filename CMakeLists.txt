@@ -13,6 +13,7 @@ include_directories(
 )
 
 set(SOURCE_FILES
+        include/msqlitecpp.h
         include/sqlitefielddef.h
         src/sqlitestorage.cpp
         include/sqlitestorage.h
