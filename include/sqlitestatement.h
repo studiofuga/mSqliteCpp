@@ -11,6 +11,7 @@
 #include <string>
 
 #include <sqlite3.h>
+#include "sqlitefielddef.h"
 
 namespace sqlite {
 
@@ -23,8 +24,18 @@ namespace sqlite {
         ~SQLiteStatement();
 
         void bind(int idx, std::string value);
+        void bind(int idx, int value);
+        void bind(int idx, double value);
+
+        int getIntValue(int idx);
+        double getDoubleValue(int idx);
+        std::string getStringValue(int idx);
+
+        FieldType::Type columnType(int idx);
+        int columnCount();
 
         bool execute(std::function<bool()>);
+        bool execute();
     };
 
 } // ns sqlite

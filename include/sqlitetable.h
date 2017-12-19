@@ -17,16 +17,14 @@
 namespace sqlite {
 
 class SQLiteStorage;
+class SQLiteStatement;
+
 template <typename ...FIELDTYPE>
 using TableDef = std::tuple<FieldDef<FIELDTYPE>...>;
 
 /// @brief A Database Table object
 class EXPORT SQLiteTable
 {
-public:
-    /// @brief an opaque type to handle SQLite statements.
-    class Statement;
-
 private:
     std::weak_ptr<SQLiteStorage> mdb;
     std::string mName;
@@ -129,45 +127,45 @@ protected:
 
     /// @brief Binds a value to a placeholder in an SQL Statement
     template <typename T>
-    void bindValue(Statement *stmt, int idx, T value) {
+    void bindValue(SQLiteStatement *stmt, int idx, T value) {
         (void)stmt; (void)idx; (void)value;
         static_assert(sizeof(T) == 0, "Generic version of bindValue is undefined");
     }
 
     /// @brief Binds all the values in an SQL statement (End recursion version)
     template <size_t I, size_t Start = 0, typename ...Ts>
-    void bindAllValues (Statement *stmt, std::tuple<Ts...> &values, typename std::enable_if<I == sizeof...(Ts)>::type * = 0) {
+    void bindAllValues (SQLiteStatement *stmt, std::tuple<Ts...> &values, typename std::enable_if<I == sizeof...(Ts)>::type * = 0) {
         (void) values; (void)stmt;
     }
 
     /// @brief Binds all the values in an SQL statement
     template <size_t I, size_t Start = 0, typename ...Ts>
-    void bindAllValues (Statement *stmt, std::tuple<Ts...> &values, typename std::enable_if<I < sizeof...(Ts)>::type * = 0) {
+    void bindAllValues (SQLiteStatement *stmt, std::tuple<Ts...> &values, typename std::enable_if<I < sizeof...(Ts)>::type * = 0) {
         bindValue(stmt, I+Start+1, std::get<I>(values));
         bindAllValues<I+1,Start, Ts...>(stmt, values);
     }
 
     template <typename T>
-    void getValue(Statement *stmt, int idx, T &value) {
+    void getValue(SQLiteStatement *stmt, int idx, T &value) {
         (void)stmt; (void)idx; (void)value;
         static_assert(sizeof(T) == 0, "Generic version of bindValue is undefined");
     }
 
     template <typename T>
-    T getValueR(Statement *stmt, int idx) {
+    T getValueR(SQLiteStatement *stmt, int idx) {
         T t;
         getValue(stmt, idx, t);
         return t;
     }
 
     template <size_t I, typename ...Ts>
-    void getAllValues(Statement *stmt, std::tuple<Ts...> &values, typename std::enable_if<I == sizeof...(Ts)>::type * = 0)
+    void getAllValues(SQLiteStatement *stmt, std::tuple<Ts...> &values, typename std::enable_if<I == sizeof...(Ts)>::type * = 0)
     {
         (void)stmt; (void)values;
     }
 
     template <size_t I, typename ...Ts>
-    void getAllValues(Statement *stmt, std::tuple<Ts...> &values, typename std::enable_if<I < sizeof...(Ts)>::type * = 0)
+    void getAllValues(SQLiteStatement *stmt, std::tuple<Ts...> &values, typename std::enable_if<I < sizeof...(Ts)>::type * = 0)
     {
         getValue(stmt, I+1, std::get<I>(values));
         getAllValues<I+1, Ts...>(stmt, values);
@@ -293,11 +291,11 @@ public:
 
     std::string name() const { return mName; }
 
-    std::shared_ptr<Statement> newStatement(std::string query);
-    bool execute(Statement *stmt);
+    std::shared_ptr<SQLiteStatement> newStatement(std::string query);
+    bool execute(SQLiteStatement *stmt);
 
-    bool hasData(Statement *stmt) const;
-    int columnCount(Statement *stmt) const;
+    bool hasData(SQLiteStatement *stmt) const;
+    int columnCount(SQLiteStatement *stmt) const;
 
     template <typename ...Ts, typename ...Us>
     bool insert (std::tuple<Ts...> def, std::tuple<Us...> values) {
@@ -354,19 +352,19 @@ protected:
 };
 
 template <>
-void EXPORT SQLiteTable::bindValue<int> (SQLiteTable::Statement *stmt, int idx, int value);
+void EXPORT SQLiteTable::bindValue<int> (SQLiteStatement *stmt, int idx, int value);
 
 template <>
-void EXPORT SQLiteTable::getValue<int> (SQLiteTable::Statement *stmt, int idx, int &value);
+void EXPORT SQLiteTable::getValue<int> (SQLiteStatement *stmt, int idx, int &value);
 
 template <>
-void EXPORT SQLiteTable::bindValue<std::string> (SQLiteTable::Statement *stmt, int idx, std::string value);
+void EXPORT SQLiteTable::bindValue<std::string> (SQLiteStatement *stmt, int idx, std::string value);
 
 template <>
-void EXPORT SQLiteTable::getValue<std::string> (SQLiteTable::Statement *stmt, int idx, std::string &value);
+void EXPORT SQLiteTable::getValue<std::string> (SQLiteStatement *stmt, int idx, std::string &value);
 
 template <>
-void EXPORT SQLiteTable::bindValue<double> (SQLiteTable::Statement *stmt, int idx, double value);
+void EXPORT SQLiteTable::bindValue<double> (SQLiteStatement *stmt, int idx, double value);
 
 
 } // ns sqlite

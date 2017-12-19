@@ -14,6 +14,8 @@ struct Integer { using rawtype = int; };
 struct Real{ using rawtype = double; };
 struct Text{ using rawtype = std::string; };
 struct Blob{ using rawtype = std::vector<uint8_t>; };
+
+    enum class Type { Integer, Real, Text, Blob };
 }
 
 enum FieldAttribute : int{

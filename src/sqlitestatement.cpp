@@ -29,8 +29,39 @@ SQLiteStatement::~SQLiteStatement()
 void SQLiteStatement::bind(int idx, std::string value)
 {
     auto db = p->mDb.lock();
-    auto r = sqlite3_bind_text(p->stmt, 1, value.c_str(), value.length(), SQLITE_TRANSIENT);
+    auto r = sqlite3_bind_text(p->stmt, idx, value.c_str(), value.length(), SQLITE_TRANSIENT);
     SQLiteException::throwIfNotOk(r,db->handle());
+}
+
+void SQLiteStatement::bind(int idx, int value)
+{
+    auto db = p->mDb.lock();
+    auto r = sqlite3_bind_int(p->stmt, idx, value);
+    SQLiteException::throwIfNotOk(r,db->handle());
+}
+
+void SQLiteStatement::bind(int idx, double value)
+{
+    auto db = p->mDb.lock();
+    auto r = sqlite3_bind_double(p->stmt, idx, value);
+    SQLiteException::throwIfNotOk(r,db->handle());
+}
+
+int SQLiteStatement::getIntValue(int idx)
+{
+    return sqlite3_column_int(p->stmt, idx);
+}
+
+double SQLiteStatement::getDoubleValue(int idx)
+{
+    return sqlite3_column_double(p->stmt, idx);
+}
+
+std::string SQLiteStatement::getStringValue(int idx)
+{
+    auto sptr = sqlite3_column_text(p->stmt, idx);
+    auto len = sqlite3_column_bytes(p->stmt, idx);
+    return std::string(sptr, sptr + len);
 }
 
 bool SQLiteStatement::execute(std::function<bool()> func)
@@ -44,4 +75,29 @@ bool SQLiteStatement::execute(std::function<bool()> func)
     }
 
     return func();
+}
+
+bool SQLiteStatement::execute()
+{
+    return execute([](){ return true; });
+}
+
+FieldType::Type SQLiteStatement::columnType(int idx)
+{
+    switch (sqlite3_column_type(p->stmt, idx)) {
+        case SQLITE_TEXT:
+            return FieldType::Type::Text;
+        case SQLITE_INTEGER:
+            return FieldType::Type::Integer;
+        case SQLITE_FLOAT:
+            return FieldType::Type::Real;
+        case SQLITE_BLOB:
+            return FieldType::Type::Blob;
+    }
+    throw std::runtime_error("Unhandled sqlite3 type");
+}
+
+int SQLiteStatement::columnCount()
+{
+    return sqlite3_column_count(p->stmt);
 }
