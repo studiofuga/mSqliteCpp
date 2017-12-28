@@ -69,7 +69,7 @@ bool SQLiteStatement::execute(std::function<bool()> func)
     auto db = p->mDb.lock();
     auto r = sqlite3_step(p->stmt);
     if (r == SQLITE_DONE) {
-        return true;
+        return false;
     } else if (r != SQLITE_ROW) {
         SQLiteException::throwIfNotOk(r, db->handle());
     }

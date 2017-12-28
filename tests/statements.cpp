@@ -9,12 +9,19 @@
 
 using namespace sqlite;
 
-TEST(statements, create)
+class Statements : public testing::Test
 {
-    auto db = std::make_shared<SQLiteStorage>(":memory:");
+protected:
+    std::shared_ptr<SQLiteStorage> db;
+public:
+    Statements() {
+        db = std::make_shared<SQLiteStorage>(":memory:");
+        db->open();
+    }
+};
 
-    ASSERT_NO_THROW(db->open());
-
+TEST_F(Statements, create)
+{
     {
         SQLiteStatement stmt(db, "CREATE TABLE sample (id INTEGER, name TEXT, v DOUBLE);");
 
@@ -40,4 +47,28 @@ TEST(statements, create)
         ASSERT_EQ(count, 1);
 
     }
+}
+
+TEST_F(Statements, execute)
+{
+    {
+        SQLiteStatement create_stmt(db, "CREATE TABLE sample (id INTEGER, name TEXT, v DOUBLE);");
+        ASSERT_NO_THROW(create_stmt.execute());
+    }
+
+    {
+        SQLiteStatement insert_stmt(db, "INSERT INTO sample VALUES (1,\"name\",1.5);");
+        ASSERT_NO_THROW(insert_stmt.execute());
+    }
+
+    {
+        SQLiteStatement insert_stmt(db, "INSERT INTO sample VALUES (2,\"name2\",1.5);");
+        ASSERT_NO_THROW(insert_stmt.execute());
+    }
+
+    SQLiteStatement select(db, "SELECT id,v FROM sample;");
+    int count = 0;
+    while (select.execute([&count]() { ++count; return true; }));
+
+    ASSERT_EQ(count, 2);
 }
