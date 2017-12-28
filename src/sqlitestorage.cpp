@@ -24,6 +24,8 @@ bool SQLiteStorage::open()
     if (r != SQLITE_OK) {
         throw SQLiteException(mDb);
     }
+    sqlite3_busy_timeout(mDb, 1000);
+
     return true;
 }
 
