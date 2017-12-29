@@ -26,5 +26,9 @@ TEST(SqlFormatting, select)
     sqlite::statements::Select select("Table", fldId, fldName, fldValue);
 
     ASSERT_EQ(select.string(), "SELECT id,name,value FROM Table;");
+
+    ASSERT_EQ(sqlite::statements::Select("Table", fldId, fldName).groupBy(fldValue).string(),
+              "SELECT id,name FROM Table GROUP BY value;"
+    );
 }
 

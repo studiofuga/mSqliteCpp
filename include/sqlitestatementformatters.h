@@ -36,18 +36,25 @@ namespace sqlite {
         }
 
         class Select {
-            std::string mString;
+            std::string mSelectBase;
+            std::string mGroupBy;
         public:
             template <typename ...F>
             explicit Select (std::string tablename, F... flds) {
                 std::ostringstream ss;
-                ss << "SELECT " << unpackFieldNames(flds...) << " FROM " << tablename << ";";
+                ss << "SELECT " << unpackFieldNames(flds...) << " FROM " << tablename;
 
-                mString = ss.str();
+                mSelectBase = ss.str();
+            }
+
+            template <typename ...F>
+            Select &groupBy(F... flds) {
+                mGroupBy = " GROUP BY " + unpackFieldNames(flds...);
+                return *this;
             }
 
             std::string string() const {
-                return mString;
+                return mSelectBase + mGroupBy + ";";
             }
         };
 
