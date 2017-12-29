@@ -37,6 +37,7 @@ namespace sqlite {
 
         class Select {
             std::string mSelectBase;
+            std::string mWhere;
             std::string mGroupBy;
         public:
             template <typename ...F>
@@ -53,8 +54,13 @@ namespace sqlite {
                 return *this;
             }
 
+            Select &where(std::string condition) {
+                mWhere = " WHERE " + condition;
+                return *this;
+            }
+
             std::string string() const {
-                return mSelectBase + mGroupBy + ";";
+                return mSelectBase + mWhere + mGroupBy + ";";
             }
         };
 

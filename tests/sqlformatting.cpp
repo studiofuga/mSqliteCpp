@@ -51,6 +51,10 @@ TEST(SqlFormatting, select)
 
     ASSERT_EQ(select.string(), "SELECT id,name,value FROM Table;");
 
+    ASSERT_EQ(sqlite::statements::Select("Table", fldId, fldName).where(sqlite::op::eq(fldId)).string(),
+              "SELECT id,name FROM Table WHERE id = ?;"
+    );
+
     ASSERT_EQ(sqlite::statements::Select("Table", fldId, fldName).groupBy(fldValue).string(),
               "SELECT id,name FROM Table GROUP BY value;"
     );
