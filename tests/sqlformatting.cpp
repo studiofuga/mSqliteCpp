@@ -20,6 +20,17 @@ TEST(SqlFormatting, fieldOperators)
     ASSERT_EQ(sqlite::op::max(fldId).name(), "MAX(id)");
 }
 
+TEST(SqlFormatting, relOperators)
+{
+    auto fldId = sqlite::makeFieldDef("id", sqlite::FieldType::Integer());
+    auto fldValue = sqlite::makeFieldDef("value", sqlite::FieldType::Integer());
+
+    ASSERT_EQ(sqlite::op::eq(fldId), "id = ?");
+    ASSERT_EQ(sqlite::op::lt(fldId), "id < ?");
+    ASSERT_EQ(sqlite::op::and_(sqlite::op::lt(fldId),sqlite::op::gt(fldValue)), "id < ? AND value > ?");
+    ASSERT_EQ(sqlite::op::or_(sqlite::op::lt(fldId),sqlite::op::gt(fldId)), "id < ? OR id > ?");
+}
+
 TEST(SqlFormatting, internalUnpack)
 {
     auto fldId = sqlite::makeFieldDef("id", sqlite::FieldType::Integer());

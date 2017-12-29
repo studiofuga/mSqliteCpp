@@ -30,6 +30,57 @@ namespace op {
         return FieldDef<FT>("MAX(" + field.name() + ")");
     }
 
+    template <typename FT>
+    std::string eq(const FieldDef<FT> &field) {
+        return field.name() + " = ?";
+    }
+
+    template <typename FT>
+    std::string ne(const FieldDef<FT> &field) {
+        return field.name() + " <> ?";
+    }
+
+    template <typename FT>
+    std::string lt(const FieldDef<FT> &field) {
+        return field.name() + " < ?";
+    }
+
+    template <typename FT>
+    std::string gt(const FieldDef<FT> &field) {
+        return field.name() + " > ?";
+    }
+
+    template <typename FT>
+    std::string le(const FieldDef<FT> &field) {
+        return field.name() + " <= ?";
+    }
+
+    template <typename FT>
+    std::string ge(const FieldDef<FT> &field) {
+        return field.name() + " >= ?";
+    }
+
+    template <typename FT>
+    std::string between(const FieldDef<FT> &field) {
+        return field.name() + " BETWEEN ?";
+    }
+
+    template <typename FT>
+    std::string like(const FieldDef<FT> &field) {
+        return field.name() + " LIKE ?";
+    }
+
+    std::string and_(const std::string &o1, const std::string &o2) {
+        return o1 + " AND " + o2;
+    }
+
+    std::string or_(const std::string &o1, const std::string &o2) {
+        return o1 + " OR " + o2;
+    }
+
+    std::string not_(const std::string &o1) {
+        return "NOT " + o1;
+    }
 }
 }
 
