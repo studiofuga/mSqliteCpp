@@ -58,7 +58,14 @@ namespace sqlite {
             return details::unpackFieldPlaceholders_impl<0>(std::make_tuple(def...));
         }
 
-        class Select {
+        class StatementFormatter {
+        public:
+            virtual ~StatementFormatter() noexcept = default;
+
+            virtual std::string string() const = 0;
+        };
+
+        class Select : public StatementFormatter {
             std::string mSelectBase;
             std::string mWhere;
             std::string mGroupBy;
@@ -82,12 +89,12 @@ namespace sqlite {
                 return *this;
             }
 
-            std::string string() const {
+            std::string string() const override {
                 return mSelectBase + mWhere + mGroupBy + ";";
             }
         };
 
-        class Insert {
+        class Insert : public StatementFormatter {
             std::string mStatementString;
         public:
             template <typename ...F>
@@ -102,7 +109,7 @@ namespace sqlite {
                 mStatementString = ss.str();
             }
 
-            std::string string() const {
+            std::string string() const override {
                 return mStatementString;
             }
         };

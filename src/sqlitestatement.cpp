@@ -11,19 +11,43 @@ struct SQLiteStatement::Impl {
     sqlite3_stmt *stmt = nullptr;
 };
 
-SQLiteStatement::SQLiteStatement(std::shared_ptr<SQLiteStorage> db, std::string sql)
-        : p(std::make_unique<Impl>())
+SQLiteStatement::SQLiteStatement(std::shared_ptr<SQLiteStorage> db,
+                                 const sqlite::statements::StatementFormatter &stmt)
 {
-    p->mDb = db;
-    auto r = sqlite3_prepare_v2(db->handle(), sql.c_str(), -1, &p->stmt, nullptr);
-    if (r != SQLITE_OK)
-        throw SQLiteException(db->handle());
+    init(db);
+    prepare(stmt.string());
+}
+
+SQLiteStatement::SQLiteStatement(std::shared_ptr<SQLiteStorage> db, std::string sql)
+{
+    init(db);
+    prepare(sql);
+}
+
+SQLiteStatement::SQLiteStatement(std::shared_ptr<SQLiteStorage> db, const char *sql)
+{
+    init(db);
+    prepare(std::string(sql));
 }
 
 SQLiteStatement::~SQLiteStatement()
 {
     if (p->stmt != nullptr)
         sqlite3_finalize(p->stmt);
+}
+
+void SQLiteStatement::init(std::shared_ptr<SQLiteStorage> db)
+{
+    p = (std::make_unique<Impl>());
+    p->mDb = db;
+}
+
+void SQLiteStatement::prepare(std::string sql)
+{
+    auto db = p->mDb.lock();
+    auto r = sqlite3_prepare_v2(db->handle(), sql.c_str(), -1, &p->stmt, nullptr);
+    if (r != SQLITE_OK)
+        throw SQLiteException(db->handle());
 }
 
 void SQLiteStatement::bind(int idx, std::string value)

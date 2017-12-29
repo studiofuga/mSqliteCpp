@@ -12,6 +12,7 @@
 
 #include <sqlite3.h>
 #include "sqlitefielddef.h"
+#include "sqlitestatementformatters.h"
 
 namespace sqlite {
 
@@ -19,8 +20,14 @@ namespace sqlite {
         struct Impl;
 
         std::unique_ptr<Impl> p;
+
+        void init(std::shared_ptr<SQLiteStorage> db);
+        void prepare (std::string sql);
     public:
-        explicit SQLiteStatement(std::shared_ptr<SQLiteStorage> db, std::string sql);
+        explicit SQLiteStatement(std::shared_ptr<SQLiteStorage> dbm, std::string stmt);
+        explicit SQLiteStatement(std::shared_ptr<SQLiteStorage> dbm, const char *stmt);
+        explicit SQLiteStatement(std::shared_ptr<SQLiteStorage> db, const sqlite::statements::StatementFormatter &stmt);
+
         ~SQLiteStatement();
 
         void bind(int idx, std::string value);

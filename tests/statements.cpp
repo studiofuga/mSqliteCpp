@@ -2,6 +2,7 @@
 // Created by Federico Fuga on 19/12/17.
 //
 
+#include <sqlitestatementformatters.h>
 #include "gtest/gtest.h"
 
 #include "sqlitestorage.h"
@@ -46,6 +47,38 @@ TEST_F(Statements, create)
 
         ASSERT_EQ(count, 1);
 
+    }
+}
+
+TEST_F(Statements, createWithStatements)
+{
+    auto fldId = sqlite::makeFieldDef("id", sqlite::FieldType::Integer());
+    auto fldName = sqlite::makeFieldDef("name", sqlite::FieldType::Text());
+    auto fldValue = sqlite::makeFieldDef("value", sqlite::FieldType::Real());
+
+    {
+        SQLiteStatement stmt(db, "CREATE TABLE sample (id INTEGER, name TEXT, value DOUBLE);");
+
+        ASSERT_NO_THROW(stmt.execute([](){ return true; }));
+    }
+
+    {
+        SQLiteStatement stmt(db, "INSERT INTO sample VALUES (?,?,?);");
+
+        ASSERT_NO_THROW(stmt.bind(1, 0));
+        ASSERT_NO_THROW(stmt.bind(2, std::string{"name"}));
+        ASSERT_NO_THROW(stmt.bind(3, 1.5));
+
+        ASSERT_NO_THROW(stmt.execute());
+    }
+
+    {
+        SQLiteStatement stmt(db, sqlite::statements::Select("sample", fldId, fldName, fldValue));
+
+        int count = 0;
+        ASSERT_NO_THROW(stmt.execute([&count]() { ++count; return true;}));
+
+        ASSERT_EQ(count, 1);
     }
 }
 
