@@ -22,7 +22,7 @@ set(SOURCE_FILES
         src/sqlitetransaction.cpp
         include/sqlitetransaction.h
         include/sqlitestatement.h
-        src/sqlitestatement.cpp)
+        src/sqlitestatement.cpp include/sqlitestatementformatters.h)
 
 add_definitions(-DBUILD_MSQLITECPP)
 link_directories(${SQLITE_LIBS_PATH})
