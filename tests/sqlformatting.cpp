@@ -15,6 +15,9 @@ TEST(SqlFormatting, fieldOperators)
     auto sumId = sqlite::op::sum(fldId);
 
     ASSERT_EQ(sumId.name(), "SUM(id)");
+    ASSERT_EQ(sqlite::op::avg(fldId).name(), "AVG(id)");
+    ASSERT_EQ(sqlite::op::min(fldId).name(), "MIN(id)");
+    ASSERT_EQ(sqlite::op::max(fldId).name(), "MAX(id)");
 }
 
 TEST(SqlFormatting, internalUnpack)

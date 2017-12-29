@@ -14,6 +14,22 @@ namespace op {
     FieldDef<FT> sum(FieldDef<FT> field) {
         return FieldDef<FT>("SUM(" + field.name() + ")");
     }
+
+    template <typename FT>
+    FieldDef<FT> avg(FieldDef<FT> field) {
+        return FieldDef<FT>("AVG(" + field.name() + ")");
+    }
+
+    template <typename FT>
+    FieldDef<FT> min(FieldDef<FT> field) {
+        return FieldDef<FT>("MIN(" + field.name() + ")");
+    }
+
+    template <typename FT>
+    FieldDef<FT> max(FieldDef<FT> field) {
+        return FieldDef<FT>("MAX(" + field.name() + ")");
+    }
+
 }
 }
 
