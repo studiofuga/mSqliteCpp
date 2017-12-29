@@ -63,3 +63,14 @@ TEST(SqlFormatting, select)
               "SELECT name,SUM(value) FROM Table;");
 }
 
+TEST(SqlFormattings, insert)
+{
+    auto fldId = sqlite::makeFieldDef("id", sqlite::FieldType::Integer());
+    auto fldName = sqlite::makeFieldDef("name", sqlite::FieldType::Text());
+    auto fldValue = sqlite::makeFieldDef("value", sqlite::FieldType::Real());
+
+    auto i = sqlite::statements::Insert("Table", fldId, fldName, fldValue);
+
+    ASSERT_EQ(i.string(), "INSERT INTO Table(id,name,value) VALUES(?,?,?);");
+}
+
