@@ -5,7 +5,17 @@
 #include <gtest/gtest.h>
 
 #include "sqlitefielddef.h"
+#include "sqlitefieldsop.h"
 #include "sqlitestatementformatters.h"
+
+TEST(SqlFormatting, fieldOperators)
+{
+    auto fldId = sqlite::makeFieldDef("id", sqlite::FieldType::Integer());
+
+    auto sumId = sqlite::op::sum(fldId);
+
+    ASSERT_EQ(sumId.name(), "SUM(id)");
+}
 
 TEST(SqlFormatting, internalUnpack)
 {
@@ -30,5 +40,8 @@ TEST(SqlFormatting, select)
     ASSERT_EQ(sqlite::statements::Select("Table", fldId, fldName).groupBy(fldValue).string(),
               "SELECT id,name FROM Table GROUP BY value;"
     );
+
+    ASSERT_EQ(sqlite::statements::Select("Table", fldName,sqlite::op::sum(fldValue)).string(),
+              "SELECT name,SUM(value) FROM Table;");
 }
 
