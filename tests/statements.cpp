@@ -76,18 +76,12 @@ TEST_F(Statements, createWithStatements)
 
     {
         SQLiteStatement stmt(db, statements::Insert("sample", fldId, fldName, fldValue));
-
-        ASSERT_NO_THROW(stmt.bind(1, 0));
-        ASSERT_NO_THROW(stmt.bind(2, std::string{"name"}));
-        ASSERT_NO_THROW(stmt.bind(3, 1.5));
-
-        ASSERT_NO_THROW(stmt.executeStep());
-    }
-
-    {
-        SQLiteStatement stmt(db, statements::Insert("sample", fldId, fldName, fldValue));
+        stmt.bind(std::make_tuple(0, "first name", -1.1));
+        ASSERT_NO_THROW(stmt.execute());
         stmt.bind(std::make_tuple(1, "second name", 1.1));
-        ASSERT_NO_THROW(stmt.executeStep());
+        ASSERT_NO_THROW(stmt.execute());
+        stmt.bind(std::make_tuple(2, "Third name", 3.1));
+        ASSERT_NO_THROW(stmt.execute());
     }
 
     {
@@ -99,7 +93,7 @@ TEST_F(Statements, createWithStatements)
             return true;
         }));
 
-        ASSERT_EQ(count, 2);
+        ASSERT_EQ(count, 3);
     }
 }
 

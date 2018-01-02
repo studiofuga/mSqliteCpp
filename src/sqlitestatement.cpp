@@ -129,11 +129,13 @@ int SQLiteStatement::columnCount()
 bool SQLiteStatement::execute(std::function<bool()> function)
 {
     while (executeStep(function));
+    sqlite3_reset(p->stmt);
     return true;
 }
 
 bool SQLiteStatement::execute()
 {
     while (executeStep());
+    sqlite3_reset(p->stmt);
     return true;
 }
