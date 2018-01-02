@@ -70,15 +70,15 @@ namespace op {
         return field.name() + " LIKE ?";
     }
 
-    std::string and_(const std::string &o1, const std::string &o2) {
+    inline std::string and_(const std::string &o1, const std::string &o2) {
         return o1 + " AND " + o2;
     }
 
-    std::string or_(const std::string &o1, const std::string &o2) {
+    inline std::string or_(const std::string &o1, const std::string &o2) {
         return o1 + " OR " + o2;
     }
 
-    std::string not_(const std::string &o1) {
+    inline std::string not_(const std::string &o1) {
         return "NOT " + o1;
     }
 }
