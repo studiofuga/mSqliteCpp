@@ -50,21 +50,21 @@ void SQLiteStatement::prepare(std::string sql)
         throw SQLiteException(db->handle());
 }
 
-void SQLiteStatement::bind(int idx, std::string value)
+void SQLiteStatement::bind(size_t idx, std::string value)
 {
     auto db = p->mDb.lock();
     auto r = sqlite3_bind_text(p->stmt, idx, value.c_str(), value.length(), SQLITE_TRANSIENT);
     SQLiteException::throwIfNotOk(r,db->handle());
 }
 
-void SQLiteStatement::bind(int idx, int value)
+void SQLiteStatement::bind(size_t idx, int value)
 {
     auto db = p->mDb.lock();
     auto r = sqlite3_bind_int(p->stmt, idx, value);
     SQLiteException::throwIfNotOk(r,db->handle());
 }
 
-void SQLiteStatement::bind(int idx, double value)
+void SQLiteStatement::bind(size_t idx, double value)
 {
     auto db = p->mDb.lock();
     auto r = sqlite3_bind_double(p->stmt, idx, value);

@@ -63,12 +63,18 @@ TEST_F(Statements, createWithStatements)
     }
 
     {
-        SQLiteStatement stmt(db, "INSERT INTO sample VALUES (?,?,?);");
+        SQLiteStatement stmt(db, statements::Insert("sample", fldId, fldName, fldValue));
 
         ASSERT_NO_THROW(stmt.bind(1, 0));
         ASSERT_NO_THROW(stmt.bind(2, std::string{"name"}));
         ASSERT_NO_THROW(stmt.bind(3, 1.5));
 
+        ASSERT_NO_THROW(stmt.execute());
+    }
+
+    {
+        SQLiteStatement stmt(db, statements::Insert("sample", fldId, fldName, fldValue));
+        stmt.bind(std::make_tuple(0, "name", 1.0));
         ASSERT_NO_THROW(stmt.execute());
     }
 
