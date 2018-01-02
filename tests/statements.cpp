@@ -3,6 +3,7 @@
 //
 
 #include <sqlitestatementformatters.h>
+#include <sqlitefieldsop.h>
 #include "gtest/gtest.h"
 
 #include "sqlitestorage.h"
@@ -94,6 +95,21 @@ TEST_F(Statements, createWithStatements)
         }));
 
         ASSERT_EQ(count, 3);
+    }
+
+    {
+        sqlite::statements::Select select("sample", fldId, fldName, fldValue);
+        select.where(sqlite::op::eq(fldId));
+        SQLiteStatement stmt(db, select);
+
+        stmt.bind(std::make_tuple(1));
+        int count = 0;
+        ASSERT_NO_THROW(stmt.execute([&count, &stmt]() {
+            ++count;
+            return true;
+        }));
+
+        ASSERT_EQ(count, 1);
     }
 }
 
