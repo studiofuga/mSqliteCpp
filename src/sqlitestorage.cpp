@@ -58,7 +58,10 @@ bool SQLiteStorage::tableExists(std::string table)
     stmt.bind(1, table);
 
     bool found = false;
-    stmt.execute([&found] { found = true; return true; });
+    stmt.executeStep([&found] {
+        found = true;
+        return true;
+    });
     return found;
 }
 

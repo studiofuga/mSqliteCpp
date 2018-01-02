@@ -88,7 +88,7 @@ std::string SQLiteStatement::getStringValue(int idx)
     return std::string(sptr, sptr + len);
 }
 
-bool SQLiteStatement::execute(std::function<bool()> func)
+bool SQLiteStatement::executeStep(std::function<bool()> func)
 {
     auto db = p->mDb.lock();
     auto r = sqlite3_step(p->stmt);
@@ -101,9 +101,9 @@ bool SQLiteStatement::execute(std::function<bool()> func)
     return func();
 }
 
-bool SQLiteStatement::execute()
+bool SQLiteStatement::executeStep()
 {
-    return execute([](){ return true; });
+    return executeStep([]() { return true; });
 }
 
 FieldType::Type SQLiteStatement::columnType(int idx)
@@ -126,14 +126,14 @@ int SQLiteStatement::columnCount()
     return sqlite3_column_count(p->stmt);
 }
 
-bool SQLiteStatement::executeLoop(std::function<bool()> function)
+bool SQLiteStatement::execute(std::function<bool()> function)
 {
-    while (execute(function));
+    while (executeStep(function));
     return true;
 }
 
-bool SQLiteStatement::executeLoop()
+bool SQLiteStatement::execute()
 {
-    while (execute());
+    while (executeStep());
     return true;
 }

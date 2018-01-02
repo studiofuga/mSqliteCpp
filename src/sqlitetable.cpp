@@ -83,14 +83,17 @@ std::shared_ptr<SQLiteStatement> SQLiteTable::newStatement(std::string query)
 
 bool SQLiteTable::execute(SQLiteStatement *stmt)
 {
-    stmt->execute([]() { return true; });
+    stmt->executeStep([]() { return true; });
     return true;
 }
 
 bool SQLiteTable::hasData(SQLiteStatement *stmt) const
 {
     bool hasData = false;
-    stmt->execute([&hasData]() { hasData = true; return true; });
+    stmt->executeStep([&hasData]() {
+        hasData = true;
+        return true;
+    });
     return hasData;
 }
 

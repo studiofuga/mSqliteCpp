@@ -26,7 +26,7 @@ TEST_F(Statements, create)
     {
         SQLiteStatement stmt(db, "CREATE TABLE sample (id INTEGER, name TEXT, v DOUBLE);");
 
-        ASSERT_NO_THROW(stmt.execute([](){ return true; }));
+        ASSERT_NO_THROW(stmt.executeStep([]() { return true; }));
     }
 
     {
@@ -36,7 +36,7 @@ TEST_F(Statements, create)
         ASSERT_NO_THROW(stmt.bind(2, std::string{"name"}));
         ASSERT_NO_THROW(stmt.bind(3, 1.5));
 
-        ASSERT_NO_THROW(stmt.execute());
+        ASSERT_NO_THROW(stmt.executeStep());
     }
 
     {
@@ -46,14 +46,17 @@ TEST_F(Statements, create)
         ASSERT_NO_THROW(stmt.bind(2, std::string{"name_1"}));
         ASSERT_NO_THROW(stmt.bind(3, 100.2));
 
-        ASSERT_NO_THROW(stmt.execute());
+        ASSERT_NO_THROW(stmt.executeStep());
     }
 
     {
         SQLiteStatement stmt(db, "SELECT id, name, v FROM sample;");
 
         int count = 0;
-        ASSERT_NO_THROW(stmt.executeLoop([&count]() { ++count; return true;}));
+        ASSERT_NO_THROW(stmt.execute([&count]() {
+            ++count;
+            return true;
+        }));
 
         ASSERT_EQ(count, 2);
     }
@@ -68,7 +71,7 @@ TEST_F(Statements, createWithStatements)
     {
         SQLiteStatement stmt(db, "CREATE TABLE sample (id INTEGER, name TEXT, value DOUBLE);");
 
-        ASSERT_NO_THROW(stmt.execute([](){ return true; }));
+        ASSERT_NO_THROW(stmt.executeStep([]() { return true; }));
     }
 
     {
@@ -78,21 +81,21 @@ TEST_F(Statements, createWithStatements)
         ASSERT_NO_THROW(stmt.bind(2, std::string{"name"}));
         ASSERT_NO_THROW(stmt.bind(3, 1.5));
 
-        ASSERT_NO_THROW(stmt.execute());
+        ASSERT_NO_THROW(stmt.executeStep());
     }
 
     {
         SQLiteStatement stmt(db, statements::Insert("sample", fldId, fldName, fldValue));
         stmt.bind(std::make_tuple(1, "second name", 1.1));
-        ASSERT_NO_THROW(stmt.execute());
+        ASSERT_NO_THROW(stmt.executeStep());
     }
 
     {
         SQLiteStatement stmt(db, sqlite::statements::Select("sample", fldId, fldName, fldValue));
 
         int count = 0;
-        ASSERT_NO_THROW(stmt.executeLoop([&count, &stmt]() { ++count;
-            std::cout << stmt.getStringValue(1) << "\n";
+        ASSERT_NO_THROW(stmt.execute([&count, &stmt]() {
+            ++count;
             return true;
         }));
 
@@ -104,22 +107,25 @@ TEST_F(Statements, execute)
 {
     {
         SQLiteStatement create_stmt(db, "CREATE TABLE sample (id INTEGER, name TEXT, v DOUBLE);");
-        ASSERT_NO_THROW(create_stmt.execute());
+        ASSERT_NO_THROW(create_stmt.executeStep());
     }
 
     {
         SQLiteStatement insert_stmt(db, "INSERT INTO sample VALUES (1,\"name\",1.5);");
-        ASSERT_NO_THROW(insert_stmt.execute());
+        ASSERT_NO_THROW(insert_stmt.executeStep());
     }
 
     {
         SQLiteStatement insert_stmt(db, "INSERT INTO sample VALUES (2,\"name2\",1.5);");
-        ASSERT_NO_THROW(insert_stmt.execute());
+        ASSERT_NO_THROW(insert_stmt.executeStep());
     }
 
     SQLiteStatement select(db, "SELECT id,v FROM sample;");
     int count = 0;
-    while (select.execute([&count]() { ++count; return true; }));
+    while (select.executeStep([&count]() {
+        ++count;
+        return true;
+    }));
 
     ASSERT_EQ(count, 2);
 }
