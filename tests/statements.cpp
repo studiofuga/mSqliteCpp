@@ -40,13 +40,22 @@ TEST_F(Statements, create)
     }
 
     {
+        SQLiteStatement stmt(db, "INSERT INTO sample VALUES (?,?,?);");
+
+        ASSERT_NO_THROW(stmt.bind(1, 1));
+        ASSERT_NO_THROW(stmt.bind(2, std::string{"name_1"}));
+        ASSERT_NO_THROW(stmt.bind(3, 100.2));
+
+        ASSERT_NO_THROW(stmt.execute());
+    }
+
+    {
         SQLiteStatement stmt(db, "SELECT id, name, v FROM sample;");
 
         int count = 0;
-        ASSERT_NO_THROW(stmt.execute([&count]() { ++count; return true;}));
+        ASSERT_NO_THROW(stmt.executeLoop([&count]() { ++count; return true;}));
 
-        ASSERT_EQ(count, 1);
-
+        ASSERT_EQ(count, 2);
     }
 }
 
@@ -74,7 +83,7 @@ TEST_F(Statements, createWithStatements)
 
     {
         SQLiteStatement stmt(db, statements::Insert("sample", fldId, fldName, fldValue));
-        stmt.bind(std::make_tuple(0, "name", 1.0));
+        stmt.bind(std::make_tuple(1, "second name", 1.1));
         ASSERT_NO_THROW(stmt.execute());
     }
 
@@ -82,9 +91,12 @@ TEST_F(Statements, createWithStatements)
         SQLiteStatement stmt(db, sqlite::statements::Select("sample", fldId, fldName, fldValue));
 
         int count = 0;
-        ASSERT_NO_THROW(stmt.execute([&count]() { ++count; return true;}));
+        ASSERT_NO_THROW(stmt.executeLoop([&count, &stmt]() { ++count;
+            std::cout << stmt.getStringValue(1) << "\n";
+            return true;
+        }));
 
-        ASSERT_EQ(count, 1);
+        ASSERT_EQ(count, 2);
     }
 }
 

@@ -14,6 +14,8 @@
 #include "sqlitefielddef.h"
 #include "sqlitestatementformatters.h"
 
+#include <iostream>
+
 namespace sqlite {
 
     class SQLiteStatement {
@@ -31,6 +33,7 @@ namespace sqlite {
         template <size_t I, typename ...Ts>
         void bind_impl(std::tuple<Ts...> t, typename std::enable_if<I < sizeof...(Ts)>::type * = 0) {
             bind(I+1, std::get<I>(t));  // bind are 1-based, index are 0 based
+            std::cout << "Bind: " << I+1 << " => " << std::get<I>(t) << "\n";
             bind_impl<I+1>(t);
         };
     public:
@@ -65,6 +68,9 @@ namespace sqlite {
          */
         bool execute(std::function<bool()> function);
         bool execute();
+
+        bool executeLoop(std::function<bool()> function);
+        bool executeLoop();
     };
 
 } // ns sqlite

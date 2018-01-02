@@ -125,3 +125,15 @@ int SQLiteStatement::columnCount()
 {
     return sqlite3_column_count(p->stmt);
 }
+
+bool SQLiteStatement::executeLoop(std::function<bool()> function)
+{
+    while (execute(function));
+    return true;
+}
+
+bool SQLiteStatement::executeLoop()
+{
+    while (execute());
+    return true;
+}
