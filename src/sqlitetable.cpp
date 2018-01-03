@@ -104,3 +104,9 @@ int SQLiteTable::columnCount(SQLiteStatement *stmt) const
 
 SQLiteTable::~SQLiteTable() noexcept = default;
 
+
+size_t SQLiteTable::getLastRowId()
+{
+    auto db = mdb.lock();
+    return sqlite3_last_insert_rowid(db->handle());
+}

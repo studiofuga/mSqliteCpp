@@ -316,6 +316,17 @@ public:
         return insert_assign_impl (std::make_tuple(fieldAndValue...), std::make_index_sequence<sizeof...(Ts)>{});
     }
 
+    size_t getLastRowId();
+
+    template <typename ...Ts>
+    int insertAndGetRowId(Ts... fieldsAndValue) {
+        // TODO: Lock here
+        if (insert(fieldsAndValue...)) {
+            return getLastRowId();
+        }
+        throw std::runtime_error("Insert failed");
+    }
+
     template <typename ...Ts, typename F>
     void query(std::tuple<Ts...> def, F resultFeedbackFunc) {
         query_impl(def, resultFeedbackFunc, std::make_index_sequence<sizeof...(Ts)>{});
