@@ -6,6 +6,7 @@
 #define SQLITE_SQLITESTATEMENTFORMATTERS_H
 
 #include <sstream>
+#include <tuple>
 
 namespace sqlite {
     namespace statements {
