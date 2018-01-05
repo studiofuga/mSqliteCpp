@@ -71,17 +71,16 @@ TEST_F(Statements, createWithStatements)
 
     {
         SQLiteStatement stmt(db, "CREATE TABLE sample (id INTEGER, name TEXT, value DOUBLE);");
-
-        ASSERT_NO_THROW(stmt.executeStep([]() { return true; }));
+        ASSERT_NO_THROW(stmt.execute());
     }
 
     {
         SQLiteStatement stmt(db, statements::Insert("sample", fldId, fldName, fldValue));
-        stmt.bind(std::make_tuple(0, "first name", -1.1));
+        ASSERT_NO_THROW(stmt.bind(std::make_tuple(0, "first name", -1.1)));
         ASSERT_NO_THROW(stmt.execute());
-        stmt.bind(std::make_tuple(1, "second name", 1.1));
+        ASSERT_NO_THROW(stmt.bind(std::make_tuple(1, "second name", 1.1)));
         ASSERT_NO_THROW(stmt.execute());
-        stmt.bind(std::make_tuple(2, "Third name", 3.1));
+        ASSERT_NO_THROW(stmt.bind(std::make_tuple(2, "Third name", 3.1)));
         ASSERT_NO_THROW(stmt.execute());
     }
 
@@ -113,29 +112,41 @@ TEST_F(Statements, createWithStatements)
     }
 }
 
-TEST_F(Statements, execute)
+
+class SelectStatements : public testing::Test
 {
-    {
-        SQLiteStatement create_stmt(db, "CREATE TABLE sample (id INTEGER, name TEXT, v DOUBLE);");
-        ASSERT_NO_THROW(create_stmt.executeStep());
-    }
+protected:
+    std::shared_ptr<SQLiteStorage> db;
+public:
+    const FieldDef<FieldType::Integer> fldId = sqlite::makeFieldDef("id", sqlite::FieldType::Integer());
+    const FieldDef<FieldType::Text> fldName = sqlite::makeFieldDef("n", sqlite::FieldType::Text());
+    const FieldDef<FieldType::Real> fldValue = sqlite::makeFieldDef("v", sqlite::FieldType::Real());
 
-    {
-        SQLiteStatement insert_stmt(db, "INSERT INTO sample VALUES (1,\"name\",1.5);");
-        ASSERT_NO_THROW(insert_stmt.executeStep());
-    }
+    SelectStatements() {
+        db = std::make_shared<SQLiteStorage>(":memory:");
+        db->open();
 
-    {
-        SQLiteStatement insert_stmt(db, "INSERT INTO sample VALUES (2,\"name2\",1.5);");
-        ASSERT_NO_THROW(insert_stmt.executeStep());
-    }
+        SQLiteStatement create_stmt(db, "CREATE TABLE ex (id INTEGER, n TEXT, v DOUBLE);");
+        create_stmt.executeStep();
 
-    SQLiteStatement select(db, "SELECT id,v FROM sample;");
+        SQLiteStatement stmt(db, statements::Insert("ex", fldId, fldName, fldValue));
+        stmt.bind(std::make_tuple(1, "name1", 2.0));
+        stmt.execute();
+        stmt.bind(std::make_tuple(2, "name2", 4.0));
+        stmt.execute();
+        stmt.bind(std::make_tuple(3, "name3", 6.0));
+        stmt.execute();
+    }
+};
+
+TEST_F(SelectStatements, execute)
+{
+    SQLiteStatement select(db, sqlite::statements::Select("ex", fldId));
     int count = 0;
-    while (select.executeStep([&count]() {
+    select.execute([&count]() {
         ++count;
         return true;
-    }));
+    });
 
-    ASSERT_EQ(count, 2);
+    ASSERT_EQ(count, 3);
 }
