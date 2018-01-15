@@ -5,6 +5,7 @@
 #ifndef SQLITE_SQLITESTATEMENTFORMATTERS_H
 #define SQLITE_SQLITESTATEMENTFORMATTERS_H
 
+#include "sqlitefielddef.h"
 #include <sstream>
 #include <tuple>
 
@@ -92,6 +93,13 @@ namespace sqlite {
 
             std::string string() const override {
                 return mSelectBase + mWhere + mGroupBy + ";";
+            }
+
+            template <typename T>
+            void join(const std::string &tableName, const FieldDef<T> fld1, FieldDef<T> fld2) {
+                std::ostringstream ss;
+                ss << mSelectBase <<  " JOIN " << tableName << " ON " << fld1.name() << " = " << fld2.name();
+                mSelectBase = ss.str();
             }
         };
 

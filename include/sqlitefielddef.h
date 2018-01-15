@@ -114,6 +114,22 @@ inline FieldDef<FIELDTYPE> makeFieldDef(std::string name, FIELDTYPE type) {
     return FieldDef<FIELDTYPE>(name);
 }
 
+template <typename T>
+inline std::string fieldName(const FieldDef<T> &field) {
+    return field.name();
+}
+
+template <typename T>
+inline FieldDef<T> field(const std::string &tablename, const FieldDef<T> &field) {
+    return FieldDef<T>(tablename + "." + field.name());
+}
+
+template <typename T>
+inline FieldDef<T> field(const std::string &schemaname, const std::string &tablename, const FieldDef<T> &field) {
+    return FieldDef<T>(schemaname + "." + tablename + "." + field.name());
+}
+
+
 } // ns sqlite
 
 

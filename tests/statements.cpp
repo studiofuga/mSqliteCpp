@@ -150,3 +150,41 @@ TEST_F(SelectStatements, execute)
 
     ASSERT_EQ(count, 3);
 }
+
+TEST_F(SelectStatements, join)
+{
+    FieldDef<FieldType::Integer> jfldId = sqlite::makeFieldDef("jid", sqlite::FieldType::Integer());
+    FieldDef<FieldType::Text> jfldName = sqlite::makeFieldDef("name", sqlite::FieldType::Text());
+    FieldDef<FieldType::Real> jfldValue = sqlite::makeFieldDef("value", sqlite::FieldType::Real());
+
+    SQLiteStatement create_stmt(db, "CREATE TABLE ex2 (jid INTEGER, name TEXT, value DOUBLE);");
+    create_stmt.execute();
+
+    SQLiteStatement stmt(db, statements::Insert("ex2", jfldId, jfldName, jfldValue));
+    stmt.bind(std::make_tuple(1, "a", -2.0));
+    stmt.execute();
+    stmt.bind(std::make_tuple(2, "b", -4.0));
+    stmt.execute();
+    stmt.bind(std::make_tuple(3, "c", -6.0));
+    stmt.execute();
+
+    {
+        auto s = sqlite::statements::Select("ex", fldId, jfldName, fldValue, jfldValue);
+        s.join("ex2", fldId, field("ex2",jfldId));
+
+        std::vector<int> ids;
+        std::vector<std::string> names;
+        SQLiteStatement stmt(db, s);
+        ASSERT_NO_THROW(stmt.execute([&ids, &names, &stmt]() {
+            ids.push_back(stmt.getIntValue(0));
+            names.push_back(stmt.getStringValue(1));
+            return true;
+        }));
+
+        ASSERT_EQ(ids.size(), 3);
+        ASSERT_EQ(ids[0], 1);
+        ASSERT_EQ(names[0], "a");
+        ASSERT_EQ(names[1], "b");
+        ASSERT_EQ(names[2], "c");
+    }
+}
