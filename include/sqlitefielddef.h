@@ -129,6 +129,10 @@ inline FieldDef<T> field(const std::string &schemaname, const std::string &table
     return FieldDef<T>(schemaname + "." + tablename + "." + field.name());
 }
 
+template <typename U, typename T>
+inline FieldDef<U> cast(const FieldDef<T> &x) {
+    return FieldDef<U>(x.name());
+}
 
 } // ns sqlite
 
