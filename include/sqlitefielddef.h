@@ -59,6 +59,7 @@ public:
     std::string name() const { return fieldName; }
     inline std::string sqlType() const {
         static_assert(sizeof(FIELDTYPE) == 0, "Generic version of sqlType is undefined");
+        return std::string();
     }
 
     inline std::string sqlAttributes() const {
