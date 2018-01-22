@@ -11,6 +11,11 @@ namespace sqlite {
 namespace op {
 
     template <typename FT>
+    FieldDef<FT> count(FieldDef<FT> field) {
+        return FieldDef<FT>("COUNT(" + field.name() + ")");
+    }
+
+    template <typename FT>
     FieldDef<FT> sum(FieldDef<FT> field) {
         return FieldDef<FT>("SUM(" + field.name() + ")");
     }
@@ -80,6 +85,11 @@ namespace op {
 
     inline std::string not_(const std::string &o1) {
         return "NOT " + o1;
+    }
+
+    template <typename FT>
+    inline FieldDef<FT> distinct(const FieldDef<FT> &field) {
+        return FieldDef<FT>("DISTINCT " + field.name());
     }
 }
 }
