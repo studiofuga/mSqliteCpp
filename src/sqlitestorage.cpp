@@ -20,7 +20,7 @@ SQLiteStorage::~SQLiteStorage() noexcept
 
 bool SQLiteStorage::open()
 {
-    auto r = sqlite3_open(dbPath.c_str(), &mDb);
+    auto r = sqlite3_open_v2(dbPath.c_str(), &mDb, SQLITE_OPEN_FULLMUTEX | SQLITE_OPEN_READWRITE | SQLITE_OPEN_CREATE, nullptr);
     if (r != SQLITE_OK) {
         throw SQLiteException(mDb);
     }
