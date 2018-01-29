@@ -8,6 +8,7 @@
 #include <chrono>
 #include <cstdio>
 #include <tuple>
+#include <condition_variable>
 
 using namespace sqlite;
 
