@@ -8,9 +8,14 @@ set(CMAKE_CXX_STANDARD 14)
 
 set(CMAKE_MODULE_PATH ${CMAKE_SOURCE_DIR})
 
+set(CMAKE_ARCHIVE_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/lib)
+set(CMAKE_LIBRARY_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/lib)
+set(CMAKE_RUNTIME_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/bin)
+
 include_directories(
         ${CMAKE_SOURCE_DIR}/include
         ${SQLITE_INCLUDE_DIRS}
+		${CMAKE_SOURCE_DIR}
 )
 
 set(SOURCE_FILES
@@ -26,7 +31,7 @@ set(SOURCE_FILES
         src/sqlitestatement.cpp include/sqlitestatementformatters.h include/sqlitefieldsop.h)
 
 add_definitions(-DBUILD_MSQLITECPP)
-link_directories(${SQLITE_LIBS_PATH})
+link_directories(${CMAKE_SOURCE_DIR})
 
 add_library(msqlitecpp SHARED ${SOURCE_FILES})
 

@@ -2,13 +2,14 @@
 # Testing
 ##############
 
+# Fix problems linking on Windows
+set(gtest_force_shared_crt ON CACHE BOOL "" FORCE)
+
 # This adds another subdirectory, which has 'project(gtest)'.
 add_subdirectory(googletest)
 
-enable_testing()
+#enable_testing()
 
-# Include the gtest library. gtest_SOURCE_DIR is available due to
-# 'project(gtest)' above.
 include_directories(${gtest_SOURCE_DIR}/include ${gtest_SOURCE_DIR})
 
 add_executable(runTests
@@ -17,12 +18,6 @@ add_executable(runTests
         issues.cpp
         statements.cpp sqlformatting.cpp)
 
-# Standard linking to gtest stuff.
-target_link_libraries(runTests gtest gtest_main)
+target_link_libraries(runTests msqlitecpp gtest gtest_main)
 
-# Extra linking for the project.
-target_link_libraries(runTests msqlitecpp)
-
-# This is so you can do 'make test' to see all your tests run, instead of
-# manually running the executable runUnitTests to see those specific tests.
 add_test(NAME tests COMMAND runTests)

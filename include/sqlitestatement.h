@@ -18,7 +18,7 @@
 
 namespace sqlite {
 
-    class SQLiteStatement {
+    class EXPORT SQLiteStatement {
         struct Impl;
 
         std::unique_ptr<Impl> p;
