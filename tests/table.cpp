@@ -3,6 +3,7 @@
 //
 
 #include <gtest/gtest.h>
+#include <sqlitestatement.h>
 
 #include "sqlitestorage.h"
 #include "sqlitetable.h"
@@ -170,4 +171,32 @@ TEST_F(table, IndexCreate)
 
     ASSERT_NO_THROW(table.createIndex ("name", std::make_tuple(fldName)));
     ASSERT_NO_THROW(table.createIndex ("coords", std::make_tuple(fldX, fldY)));
+}
+
+TEST_F(table, InsertWithStatement)
+{
+    auto fldId = makeFieldDef("id", FieldType::Integer()).primaryKey().autoincrement();
+    auto fldName = makeFieldDef("name", FieldType::Text());
+    auto fldCount = makeFieldDef("count", FieldType::Integer());
+
+    auto testTable = std::make_tuple(
+            fldId,
+            fldName,
+            fldCount
+    );
+
+    SQLiteTable table;
+    ASSERT_NO_THROW(table = SQLiteTable::create(db, "sample", testTable));
+
+    auto tb = std::make_tuple(fldName, fldCount);
+    SQLiteTable::PreparedInsert<decltype(fldName), decltype(fldCount)> pInsert;
+    ASSERT_NO_THROW(pInsert = table.prepareInsert(tb));
+
+    ASSERT_NO_THROW(table.insert(pInsert, std::make_tuple(std::string{"A"},1)));
+    ASSERT_NO_THROW(table.insert(pInsert, std::make_tuple(std::string{"B"},2)));
+    ASSERT_NO_THROW(table.insert(pInsert, std::make_tuple(std::string{"C"},3)));
+
+    int r = 0;
+    ASSERT_NO_THROW(table.query(tb, [&r](std::string name, int value) { ++r; }));
+    ASSERT_EQ(r, 3);
 }

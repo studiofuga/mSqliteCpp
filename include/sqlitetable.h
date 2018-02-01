@@ -312,6 +312,31 @@ public:
     }
 
     template <typename ...Ts>
+    struct PreparedInsert {
+        std::shared_ptr<SQLiteStatement> statement;
+        explicit PreparedInsert(std::shared_ptr<SQLiteStatement> stmt = nullptr)
+        : statement(stmt) {}
+    };
+
+    template <typename ...Ts>
+    PreparedInsert<Ts...> prepareInsert(std::tuple<Ts...> def) {
+        std::ostringstream ss;
+        ss << "INSERT INTO " << mName << "("
+           << buildSqlInsertFieldList<0>(def)
+           << ") VALUES ("
+           << buildSqlInsertValuesListPlaceholder<0>(def)
+           << ");";
+
+        return PreparedInsert<Ts...>(newStatement(ss.str()));
+    }
+
+    template <typename ...Ts, typename ...Us>
+    bool insert(PreparedInsert<Ts...> s, std::tuple<Us...> values) {
+        bindAllValues<0>(s.statement.get(), values);
+        return execute(s.statement.get());
+    };
+
+    template <typename ...Ts>
     bool insert(Ts... fieldAndValue) {
         return insert_assign_impl (std::make_tuple(fieldAndValue...), std::make_index_sequence<sizeof...(Ts)>{});
     }
