@@ -11,18 +11,18 @@
 
 using namespace sqlite;
 
-const FieldDef<FieldType::Integer> fldId = makeFieldDef("id", FieldType::Integer()).primaryKey();
-const FieldDef<FieldType::Text> fldName = makeFieldDef("name", FieldType::Text());
-const FieldDef<FieldType::Real> fldReal = makeFieldDef("value", FieldType::Real());
+FieldDef<FieldType::Integer> fldId = makeFieldDef("id", FieldType::Integer()).primaryKey();
+FieldDef<FieldType::Text> fldName = makeFieldDef("name", FieldType::Text());
+FieldDef<FieldType::Real> fldReal = makeFieldDef("value", FieldType::Real());
 
 const int numRows = 120000;
 const int numThreads = 3;
 
 using milli = std::chrono::milliseconds;
 
-void profile_st()
+void profile_st(bool usePreparedStatements)
 {
-    std::cout << "Running Single Thread...\n";
+    std::cout << "Running Single Thread " << (usePreparedStatements ? "(Prepared Statements)" : "") << "\n";
     const std::string dbname = "st.db";
 
     std::remove(dbname.c_str());
@@ -34,8 +34,15 @@ void profile_st()
     auto start = std::chrono::high_resolution_clock::now();
     db->startTransaction();
 
-    for (int i = 0; i < numRows; ++i) {
-        table.insert(fldId.assign(i), fldName.assign("sample"), fldReal.assign(i));
+    if (usePreparedStatements) {
+        auto stmt = table.prepareInsert(std::make_tuple(fldId, fldName, fldReal));
+        for (int i = 0; i < numRows; ++i) {
+            table.insert(stmt, std::make_tuple(i, std::string{"sample"}, (double)i));
+        }
+    } else {
+        for (int i = 0; i < numRows; ++i) {
+            table.insert(fldId.assign(i), fldName.assign("sample"), fldReal.assign(i));
+        }
     }
     db->commitTransaction();
     auto finish = std::chrono::high_resolution_clock::now();
@@ -52,9 +59,15 @@ void insert (int numRows, int firstId, SQLiteTable &table) {
     }
 }
 
-void profile_mt()
+void insert_prepared (SQLiteTable::PreparedInsert<decltype(fldId), decltype(fldName), decltype(fldReal)> stmt, int numRows, int firstId, SQLiteTable &table) {
+    for (int i = 0; i < numRows; ++i) {
+        table.insert(stmt, std::make_tuple(firstId + i, std::string{"sample"}, (double)i));
+    }
+}
+
+void profile_mt(bool usePreparedStatements)
 {
-    std::cout << "Running Multi Thread...\n";
+    std::cout << "Running Multi Thread..." << (usePreparedStatements ? "(Prepared Statements)" : "") << "\n";
     const std::string dbname = "mt.db";
 
     std::remove(dbname.c_str());
@@ -67,9 +80,17 @@ void profile_mt()
     db->startTransaction();
 
     std::vector<std::thread> thr;
-    for (int t = 0; t < numThreads; ++t) {
-        auto nt = std::thread (std::bind(insert, numRows/numThreads, t * numRows/numThreads, table));
-        thr.push_back(std::move(nt));
+    if (usePreparedStatements) {
+        for (int t = 0; t < numThreads; ++t) {
+            SQLiteTable::PreparedInsert<decltype(fldId), decltype(fldName), decltype(fldReal)> stmt = table.prepareInsert(std::make_tuple(fldId, fldName, fldReal));
+            auto nt = std::thread(std::bind(insert_prepared, stmt, numRows / numThreads, t * numRows / numThreads, table));
+            thr.push_back(std::move(nt));
+        }
+    } else {
+        for (int t = 0; t < numThreads; ++t) {
+            auto nt = std::thread(std::bind(insert, numRows / numThreads, t * numRows / numThreads, table));
+            thr.push_back(std::move(nt));
+        }
     }
 
     for (int t = 0; t < numThreads; ++t) {
@@ -90,7 +111,7 @@ void profile_mt()
 
 }
 
-using QEntry = std::tuple<int,std::string,float>;
+using QEntry = std::tuple<int,std::string,double>;
 using Queue = std::list<QEntry>;
 
 void insert_queued (int numRows, int firstId, Queue &queue, std::mutex &m, std::condition_variable &cv ) {
@@ -102,9 +123,9 @@ void insert_queued (int numRows, int firstId, Queue &queue, std::mutex &m, std::
 }
 
 
-void profile_qmt()
+void profile_qmt(bool usePreparedStatements)
 {
-    std::cout << "Running Queued Multi Thread...\n";
+    std::cout << "Running Queued Multi Thread... " << (usePreparedStatements ? "(Prepared Statements)" : "") << "\n";
     const std::string dbname = "qmt.db";
 
     std::remove(dbname.c_str());
@@ -120,8 +141,11 @@ void profile_qmt()
     std::mutex m;
     std::condition_variable cv;
 
-    std::thread qthr([&table, &queue, &m, &cv](){
+    std::thread qthr([&table, &queue, &m, &cv, usePreparedStatements](){
         int n = 0;
+
+        SQLiteTable::PreparedInsert<decltype(fldId), decltype(fldName), decltype(fldReal)> stmt = table.prepareInsert(std::make_tuple(fldId, fldName, fldReal));
+
         do {
             std::unique_lock<std::mutex> lk(m);
             while (queue.empty()) {
@@ -131,7 +155,12 @@ void profile_qmt()
             queue.pop_front();
             lk.unlock();
 
-            table.insert(fldId.assign(std::get<0>(x)), fldName.assign(std::get<1>(x)), fldReal.assign(std::get<2>(x)));
+            if (usePreparedStatements) {
+                table.insert(stmt, std::make_tuple(std::get<0>(x), std::get<1>(x), std::get<2>(x)));
+            } else {
+                table.insert(fldId.assign(std::get<0>(x)), fldName.assign(std::get<1>(x)),
+                             fldReal.assign(std::get<2>(x)));
+            }
             ++n;
         } while (n < numRows);
     });
@@ -174,9 +203,12 @@ void profile_qmt()
 
 int main(int argc, char *argv[])
 {
-    profile_st();
-    profile_mt();
-    profile_qmt();
+    profile_st(false);
+    profile_st(true);
+    profile_mt(false);
+    profile_mt(true);
+    profile_qmt(false);
+    profile_qmt(true);
 
     return 0;
 }
