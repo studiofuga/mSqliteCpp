@@ -117,3 +117,5 @@ fabric.properties
 .idea/vcs.xml
 
 ###
+
+tests/googletest
