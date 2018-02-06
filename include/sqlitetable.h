@@ -336,6 +336,15 @@ public:
         return execute(s.statement.get());
     };
 
+    template <typename ...Ts, typename ...Us>
+    int insertAndGetRowId(PreparedInsert<Ts...> s, std::tuple<Us...> values) {
+        // TODO: Lock here
+        if (insert(s, values)) {
+            return getLastRowId();
+        }
+        throw std::runtime_error("Insert failed");
+    }
+
     template <typename ...Ts>
     bool insert(Ts... fieldAndValue) {
         return insert_assign_impl (std::make_tuple(fieldAndValue...), std::make_index_sequence<sizeof...(Ts)>{});
