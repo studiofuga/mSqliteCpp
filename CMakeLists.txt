@@ -3,6 +3,7 @@ project(sqlite)
 
 OPTION(ENABLE_TEST "Enable Tests" ON)
 OPTION(ENABLE_PROFILER "Enable Profiler" ON)
+OPTION(ENABLE_SQLITE_AMALGAMATION "Compile SQLite Amalgamation" OFF)
 
 set(CMAKE_CXX_STANDARD 14)
 
@@ -28,17 +29,29 @@ set(SOURCE_FILES
         src/sqlitetransaction.cpp
         include/sqlitetransaction.h
         include/sqlitestatement.h
-        src/sqlitestatement.cpp include/sqlitestatementformatters.h include/sqlitefieldsop.h)
+        src/sqlitestatement.cpp include/sqlitestatementformatters.h include/sqlitefieldsop.h
+        )
 
-add_definitions(-DBUILD_MSQLITECPP)
+if (ENABLE_SQLITE_AMALGAMATION)
+    set (SOURCE_FILES ${SOURCE_FILES}
+            ${SQLITE_INCLUDE_DIRS}/sqlite3.c
+        )
+    set (LINK_SHARED STATIC)
+    add_definitions(-DEMBED_MSQLITECPP)
+else (ENABLE_SQLITE_AMALGAMATION)
+    set (SQLITE_LIB sqlite3)
+    add_definitions(-DBUILD_MSQLITECPP)
+    set (LINK_SHARED SHARED)
+endif (ENABLE_SQLITE_AMALGAMATION)
+
 link_directories(${CMAKE_SOURCE_DIR})
 
-add_library(msqlitecpp SHARED ${SOURCE_FILES})
+add_library(msqlitecpp ${LINK_SHARED} ${SOURCE_FILES})
 
-target_link_libraries(msqlitecpp sqlite3)
+target_link_libraries(msqlitecpp ${SQLITE_LIB})
 
 if (ENABLE_TEST)
-add_subdirectory(tests)
+    add_subdirectory(tests)
 endif(ENABLE_TEST)
 
 if (ENABLE_PROFILER)
