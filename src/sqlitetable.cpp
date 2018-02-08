@@ -29,7 +29,7 @@ bool SQLiteTable::createFromSQLString(std::string query)
     auto db = this->db();
 
     sqlite3_stmt *s;
-    if (sqlite3_prepare(db->handle(), query.c_str(), query.size(), &s, nullptr) != SQLITE_OK)
+    if (sqlite3_prepare_v2(db->handle(), query.c_str(), query.size(), &s, nullptr) != SQLITE_OK)
         throw SQLiteException(db->handle());
 
     if (sqlite3_step(s) != SQLITE_DONE) {

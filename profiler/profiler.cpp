@@ -21,10 +21,9 @@ const int numThreads = 3;
 
 using milli = std::chrono::milliseconds;
 
-void profile_st(bool usePreparedStatements)
+void profile_st(std::string dbname, bool usePreparedStatements)
 {
     std::cout << "Running Single Thread " << (usePreparedStatements ? "(Prepared Statements)" : "") << "\n";
-    const std::string dbname = "st.db";
 
     std::remove(dbname.c_str());
     auto db = std::make_shared<SQLiteStorage>(dbname);
@@ -66,10 +65,9 @@ void insert_prepared (SQLiteTable::PreparedInsert<decltype(fldId), decltype(fldN
     }
 }
 
-void profile_mt(bool usePreparedStatements)
+void profile_mt(std::string dbname, bool usePreparedStatements)
 {
     std::cout << "Running Multi Thread..." << (usePreparedStatements ? "(Prepared Statements)" : "") << "\n";
-    const std::string dbname = "mt.db";
 
     std::remove(dbname.c_str());
     auto db = std::make_shared<SQLiteStorage>(dbname);
@@ -124,10 +122,9 @@ void insert_queued (int numRows, int firstId, Queue &queue, std::mutex &m, std::
 }
 
 
-void profile_qmt(bool usePreparedStatements)
+void profile_qmt(std::string dbname, bool usePreparedStatements)
 {
     std::cout << "Running Queued Multi Thread... " << (usePreparedStatements ? "(Prepared Statements)" : "") << "\n";
-    const std::string dbname = "qmt.db";
 
     std::remove(dbname.c_str());
     auto db = std::make_shared<SQLiteStorage>(dbname);
@@ -204,12 +201,18 @@ void profile_qmt(bool usePreparedStatements)
 
 int main(int argc, char *argv[])
 {
-    profile_st(false);
-    profile_st(true);
-    profile_mt(false);
-    profile_mt(true);
-    profile_qmt(false);
-    profile_qmt(true);
+    profile_st("st.db",false);
+	try {
+		profile_st("st_pr.db", true);
+	}
+	catch (SQLiteException &x) {
+		std::cerr << "Failed profile_st(true): " << x.what() << "\n";
+	}
+
+	profile_mt("mt.db", false);
+    profile_mt("mt_pr.db", true);
+    profile_qmt("q.db", false);
+    profile_qmt("q_ptr.db", true);
 
     return 0;
 }
