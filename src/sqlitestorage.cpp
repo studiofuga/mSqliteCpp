@@ -3,6 +3,8 @@
 
 #include "sqlitestatement.h"
 
+#include "utils/make_unique.h"
+
 using namespace sqlite;
 
 SQLiteStorage::SQLiteStorage(std::string path)
@@ -25,6 +27,10 @@ bool SQLiteStorage::open()
         throw SQLiteException(mDb);
     }
     sqlite3_busy_timeout(mDb, 1000);
+
+    mBeginTransaction = utils::make_unique<SQLiteStatement>(shared_from_this(), "BEGIN TRANSACTION;");
+    mCommitTransaction = utils::make_unique<SQLiteStatement>(shared_from_this(), "COMMIT TRANSACTION;");
+    mAbortTransaction = utils::make_unique<SQLiteStatement>(shared_from_this(), "ROLLBACK TRANSACTION;");
 
     return true;
 }
@@ -71,8 +77,7 @@ bool SQLiteStorage::startTransaction()
     if (mOnTransaction)
         return false;
 
-    auto r = sqlite3_exec(mDb, "BEGIN TRANSACTION;", nullptr, nullptr, nullptr);
-    SQLiteException::throwIfNotOk(r, mDb);
+    mBeginTransaction->execute();
     mOnTransaction = true;
     return true;
 }
@@ -83,8 +88,7 @@ bool SQLiteStorage::commitTransaction()
     if (!mOnTransaction)
         return false;
 
-    auto r = sqlite3_exec(mDb, "COMMIT TRANSACTION;", nullptr, nullptr, nullptr);
-    SQLiteException::throwIfNotOk(r, mDb);
+    mCommitTransaction->execute();
     mOnTransaction = false;
     return true;
 }
@@ -95,8 +99,7 @@ bool SQLiteStorage::abortTransaction()
     if (!mOnTransaction)
         return false;
 
-    auto r = sqlite3_exec(mDb, "ROLLBACK TRANSACTION;", nullptr, nullptr, nullptr);
-    SQLiteException::throwIfNotOk(r, mDb);
+    mAbortTransaction->execute();
     mOnTransaction = false;
     return true;
 }

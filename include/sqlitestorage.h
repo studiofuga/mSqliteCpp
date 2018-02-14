@@ -13,6 +13,7 @@
 
 namespace sqlite {
 class SQLiteTable;
+class SQLiteStatement;
 
 class EXPORT SQLiteException : public std::runtime_error {
     std::string mErrmsg;
@@ -46,6 +47,9 @@ class EXPORT SQLiteStorage : public std::enable_shared_from_this<SQLiteStorage>
     sqlite3 *mDb = nullptr;
 
     bool mOnTransaction = false;
+
+    std::unique_ptr<SQLiteStatement> mBeginTransaction, mCommitTransaction, mAbortTransaction;
+
 public:
     explicit SQLiteStorage(std::string path);
     ~SQLiteStorage() noexcept;
