@@ -337,8 +337,7 @@ public:
     };
 
     template <typename ...Ts, typename ...Us>
-    int insertAndGetRowId(PreparedInsert<Ts...> s, std::tuple<Us...> values) {
-        // TODO: Lock here
+    size_t insertAndGetRowId(PreparedInsert<Ts...> s, std::tuple<Us...> values) {
         if (insert(s, values)) {
             return getLastRowId();
         }
@@ -353,8 +352,7 @@ public:
     size_t getLastRowId();
 
     template <typename ...Ts>
-    int insertAndGetRowId(Ts... fieldsAndValue) {
-        // TODO: Lock here
+    size_t insertAndGetRowId(Ts... fieldsAndValue) {
         if (insert(fieldsAndValue...)) {
             return getLastRowId();
         }
