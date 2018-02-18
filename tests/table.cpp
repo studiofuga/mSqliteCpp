@@ -200,3 +200,34 @@ TEST_F(table, InsertWithStatement)
     ASSERT_NO_THROW(table.query(tb, [&r](std::string name, int value) { ++r; }));
     ASSERT_EQ(r, 3);
 }
+
+TEST_F(table, InsertOrUpdate)
+{
+    auto key = makeFieldDef("Key", FieldType::Text()).primaryKey();
+    auto value = makeFieldDef("Value", FieldType::Text());
+
+    auto schema = std::make_tuple(key,value);
+
+    SQLiteTable table;
+    ASSERT_NO_THROW(table = SQLiteTable::create(db, "KeyValue", schema));
+
+
+    SQLiteTable::PreparedInsert<decltype(key), decltype(value)> pInsert;
+    ASSERT_NO_THROW(pInsert = table.prepareInsertOrReplace(schema));
+
+    static const std::string vKey {"Key"};
+    ASSERT_NO_THROW(table.insert(pInsert, std::make_tuple(vKey,"A")));
+
+    int r = 0;
+    std::string v;
+    ASSERT_NO_THROW(table.query(schema, [&r,&v](std::string name, std::string value) { ++r; v = value; }));
+    ASSERT_EQ(r, 1);
+    ASSERT_EQ(v, "A");
+
+    ASSERT_NO_THROW(table.insert(pInsert, std::make_tuple(vKey,"B")));
+    r = 0;
+    ASSERT_NO_THROW(table.query(schema, [&r,&v](std::string name, std::string value) { ++r; v = value; }));
+    ASSERT_EQ(r, 1);
+    ASSERT_EQ(v, "B");
+
+}

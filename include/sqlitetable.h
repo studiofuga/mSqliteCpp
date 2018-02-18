@@ -330,6 +330,18 @@ public:
         return PreparedInsert<Ts...>(newStatement(ss.str()));
     }
 
+    template <typename ...Ts>
+    PreparedInsert<Ts...> prepareInsertOrReplace(std::tuple<Ts...> def) {
+        std::ostringstream ss;
+        ss << "INSERT OR REPLACE INTO " << mName << "("
+           << buildSqlInsertFieldList<0>(def)
+           << ") VALUES ("
+           << buildSqlInsertValuesListPlaceholder<0>(def)
+           << ");";
+
+        return PreparedInsert<Ts...>(newStatement(ss.str()));
+    }
+
     template <typename ...Ts, typename ...Us>
     bool insert(PreparedInsert<Ts...> s, std::tuple<Us...> values) {
         bindAllValues<0>(s.statement.get(), values);
@@ -402,6 +414,9 @@ void EXPORT SQLiteTable::getValue<int> (SQLiteStatement *stmt, int idx, int &val
 
 template <>
 void EXPORT SQLiteTable::bindValue<std::string> (SQLiteStatement *stmt, int idx, std::string value);
+
+template <>
+void EXPORT SQLiteTable::bindValue<char const *> (SQLiteStatement *stmt, int idx, char const *value);
 
 template <>
 void EXPORT SQLiteTable::getValue<std::string> (SQLiteStatement *stmt, int idx, std::string &value);

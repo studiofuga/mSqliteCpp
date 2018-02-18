@@ -62,6 +62,12 @@ void SQLiteTable::bindValue(SQLiteStatement *stmt, int idx, std::string value)
 }
 
 template<>
+void SQLiteTable::bindValue<const char *>(SQLiteStatement *stmt, int idx, char const *value)
+{
+    stmt->bind(idx, value);
+}
+
+template<>
 void SQLiteTable::getValue(SQLiteStatement *stmt, int idx, std::string &value)
 {
     if (stmt->columnType(idx) != FieldType::Type::Text)
