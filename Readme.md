@@ -60,5 +60,14 @@ Examples can be found in the `tests` directory. Below are a few examples:
 ## Building
 At the time of writing, the library depends only from the SQLite C Api library (libsqlite3).
 
+Before compiling, you must clone the googletest directory in `tests/googletest`, or disable testing adding
+`-DENABLE_TEST=OFF` while running cmake.
+
+To clone the googletest, simply run the following command from the command line:
+
+```
+$ git clone https://github.com/google/googletest.git tests/googletest
+```
+
 ## License
 The library is released under the BSD 2-Clause license. See the LICENSE file for details.
