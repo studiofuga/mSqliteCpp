@@ -11,6 +11,12 @@ struct SQLiteStatement::Impl {
     sqlite3_stmt *stmt = nullptr;
 };
 
+
+SQLiteStatement::SQLiteStatement()
+{
+
+}
+
 SQLiteStatement::SQLiteStatement(std::shared_ptr<SQLiteStorage> db,
                                  const sqlite::statements::StatementFormatter &stmt)
 {
@@ -35,6 +41,9 @@ SQLiteStatement::~SQLiteStatement()
     if (p->stmt != nullptr)
         sqlite3_finalize(p->stmt);
 }
+
+SQLiteStatement::SQLiteStatement(SQLiteStatement &&) = default;
+SQLiteStatement &SQLiteStatement::operator =(SQLiteStatement &&) = default;
 
 void SQLiteStatement::init(std::shared_ptr<SQLiteStorage> db)
 {

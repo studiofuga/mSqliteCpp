@@ -36,9 +36,13 @@ namespace sqlite {
             bind_impl<I+1>(t);
         };
     public:
+        explicit SQLiteStatement();
         explicit SQLiteStatement(std::shared_ptr<SQLiteStorage> dbm, std::string stmt);
         explicit SQLiteStatement(std::shared_ptr<SQLiteStorage> dbm, const char *stmt);
         explicit SQLiteStatement(std::shared_ptr<SQLiteStorage> db, const sqlite::statements::StatementFormatter &stmt);
+
+        SQLiteStatement(SQLiteStatement &&);
+        SQLiteStatement &operator =(SQLiteStatement &&);
 
         ~SQLiteStatement();
 
