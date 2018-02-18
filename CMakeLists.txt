@@ -30,7 +30,7 @@ set(SOURCE_FILES
         include/sqlitetransaction.h
         include/sqlitestatement.h
         src/sqlitestatement.cpp include/sqlitestatementformatters.h include/sqlitefieldsop.h
-        )
+        src/utils/make_unique.h)
 
 if (ENABLE_SQLITE_AMALGAMATION)
     set (SOURCE_FILES ${SOURCE_FILES}
