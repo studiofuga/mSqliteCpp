@@ -63,6 +63,18 @@ TEST_F(Statements, create)
     }
 }
 
+TEST_F(Statements, move)
+{
+    {
+        SQLiteStatement stmt(db, "CREATE TABLE sample (id INTEGER, name TEXT, v DOUBLE);");
+
+        ASSERT_NO_THROW(stmt.executeStep([]() { return true; }));
+    }
+
+    SQLiteStatement s;
+    s = std::move(SQLiteStatement(db, "INSERT INTO sample VALUES (?,?,?);"));
+}
+
 TEST_F(Statements, createWithStatements)
 {
     auto fldId = sqlite::makeFieldDef("id", sqlite::FieldType::Integer());

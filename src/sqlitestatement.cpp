@@ -38,7 +38,7 @@ SQLiteStatement::SQLiteStatement(std::shared_ptr<SQLiteStorage> db, const char *
 
 SQLiteStatement::~SQLiteStatement()
 {
-    if (p->stmt != nullptr)
+    if (p != nullptr && p->stmt != nullptr)
         sqlite3_finalize(p->stmt);
 }
 
