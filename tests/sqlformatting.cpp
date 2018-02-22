@@ -3,10 +3,12 @@
 //
 
 #include <gtest/gtest.h>
+#include <sqlitetable.h>
 
 #include "sqlitefielddef.h"
 #include "sqlitefieldsop.h"
 #include "sqlitestatementformatters.h"
+#include "sqlitestatement.h"
 
 TEST(SqlFormatting, fieldOperators)
 {
@@ -43,27 +45,45 @@ TEST(SqlFormatting, internalUnpack)
 
 TEST(SqlFormatting, select)
 {
+    auto db = std::make_shared<sqlite::SQLiteStorage>(":memory:");
+    db->open();
+
     auto fldId = sqlite::makeFieldDef("id", sqlite::FieldType::Integer());
     auto fldName = sqlite::makeFieldDef("name", sqlite::FieldType::Text());
     auto fldValue = sqlite::makeFieldDef("value", sqlite::FieldType::Real());
 
-    sqlite::statements::Select select("Table", fldId, fldName, fldValue);
+    sqlite::SQLiteTable table(db, "tbl");
+    table.create(std::make_tuple(fldId, fldName, fldValue));
 
-    ASSERT_EQ(select.string(), "SELECT id,name,value FROM Table;");
+    {
+        sqlite::statements::Select select("tbl", fldId, fldName, fldValue);
+        ASSERT_EQ(select.string(), "SELECT id,name,value FROM tbl;");
+        ASSERT_NO_THROW(sqlite::SQLiteStatement(db, select));
+    }
 
-    ASSERT_EQ(sqlite::statements::Select("Table", fldId, fldName).where(sqlite::op::eq(fldId)).string(),
-              "SELECT id,name FROM Table WHERE id = ?;"
-    );
+    {
+        auto select = sqlite::statements::Select("tbl", fldId, fldName).where(sqlite::op::eq(fldId));
+        ASSERT_EQ(select.string(), "SELECT id,name FROM tbl WHERE id = ?;");
+        ASSERT_NO_THROW(sqlite::SQLiteStatement(db, select));
+    }
 
-    ASSERT_EQ(sqlite::statements::Select("Table", fldId, fldName).groupBy(fldValue).string(),
-              "SELECT id,name FROM Table GROUP BY value;"
-    );
+    {
+        auto select = sqlite::statements::Select("tbl", fldId, fldName).groupBy(fldValue);
+        ASSERT_EQ(select.string(), "SELECT id,name FROM tbl GROUP BY value;");
+        ASSERT_NO_THROW(sqlite::SQLiteStatement(db, select));
+    }
 
-    ASSERT_EQ(sqlite::statements::Select("Table", fldName,sqlite::op::sum(fldValue)).string(),
-              "SELECT name,SUM(value) FROM Table;");
+    {
+        auto select = sqlite::statements::Select("tbl", fldName, sqlite::op::sum(fldValue));
+        ASSERT_EQ(select.string(),"SELECT name,SUM(value) FROM tbl;");
+        ASSERT_NO_THROW(sqlite::SQLiteStatement(db, select));
+    }
 
-    ASSERT_EQ(sqlite::statements::Select("Table", fldName).distinct().string(),
-              "SELECT DISTINCT name FROM Table;");
+    {
+        auto select = sqlite::statements::Select("tbl", fldName).distinct();
+        ASSERT_EQ(select.string(),"SELECT DISTINCT name FROM tbl;");
+        ASSERT_NO_THROW(sqlite::SQLiteStatement(db, select));
+    }
 }
 
 TEST(SqlFormattings, insert)
