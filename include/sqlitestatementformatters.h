@@ -69,15 +69,22 @@ namespace sqlite {
 
         class Select : public StatementFormatter {
             std::string mSelectBase;
+            std::string mSelectOp;
             std::string mWhere;
             std::string mGroupBy;
         public:
             template <typename ...F>
             explicit Select (std::string tablename, F... flds) {
+                mSelectOp = "SELECT ";
                 std::ostringstream ss;
-                ss << "SELECT " << unpackFieldNames(flds...) << " FROM " << tablename;
+                ss << unpackFieldNames(flds...) << " FROM " << tablename;
 
                 mSelectBase = ss.str();
+            }
+
+            Select &distinct() {
+                mSelectOp = "SELECT DISTINCT ";
+                return *this;
             }
 
             template <typename ...F>
@@ -92,7 +99,9 @@ namespace sqlite {
             }
 
             std::string string() const override {
-                return mSelectBase + mWhere + mGroupBy + ";";
+                std::ostringstream ss;
+                ss << mSelectOp << mSelectBase << mWhere << mGroupBy << ";";
+                return ss.str();
             }
 
             template <typename T>

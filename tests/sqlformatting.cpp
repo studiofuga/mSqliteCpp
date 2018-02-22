@@ -61,6 +61,9 @@ TEST(SqlFormatting, select)
 
     ASSERT_EQ(sqlite::statements::Select("Table", fldName,sqlite::op::sum(fldValue)).string(),
               "SELECT name,SUM(value) FROM Table;");
+
+    ASSERT_EQ(sqlite::statements::Select("Table", fldName).distinct().string(),
+              "SELECT DISTINCT name FROM Table;");
 }
 
 TEST(SqlFormattings, insert)
