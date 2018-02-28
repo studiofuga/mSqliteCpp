@@ -53,8 +53,8 @@ public:
 
     auto rawType() -> RawType { return {}; }
 
-    explicit FieldDef (std::string name)
-        : fieldName(std::move(name)) {}
+    explicit FieldDef (std::string name, int fldattributes = 0)
+        : fieldName(std::move(name)), attributes(fldattributes) {}
 
     std::string name() const { return fieldName; }
     inline std::string sqlType() const {
