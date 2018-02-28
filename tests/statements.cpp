@@ -63,6 +63,46 @@ TEST_F(Statements, create)
     }
 }
 
+TEST_F(Statements, casts)
+{
+    {
+        SQLiteStatement stmt(db, "CREATE TABLE sample (id INTEGER, vint INTEGER, name TEXT, vreal DOUBLE);");
+        ASSERT_NO_THROW(stmt.executeStep([]() { return true; }));
+    }
+
+    long lmax = std::numeric_limits<long>::max();
+    double dmax = std::numeric_limits<double>::max();
+    // long
+    {
+        SQLiteStatement stmt(db, "INSERT INTO sample VALUES (?,?,?,?);");
+
+        ASSERT_NO_THROW(stmt.bind(1, 1));
+        ASSERT_NO_THROW(stmt.bind(2, lmax));
+        ASSERT_NO_THROW(stmt.bind(3, std::string{"name_1"}));
+        ASSERT_NO_THROW(stmt.bind(4, dmax));
+
+        ASSERT_NO_THROW(stmt.executeStep());
+    }
+
+    {
+        SQLiteStatement stmt(db, "SELECT vint, vreal FROM sample WHERE id == ?;");
+
+        stmt.bind(1, 1);
+
+        long lm = 0;
+        double dm = 0;
+        ASSERT_NO_THROW(stmt.execute([&stmt, &lm, &dm]() {
+            lm = stmt.getLongValue(0);
+            dm = stmt.getDoubleValue(1);
+            return true;
+        }));
+
+        ASSERT_EQ(lm, lmax);
+        ASSERT_EQ(dm, dmax);
+    }
+
+}
+
 TEST_F(Statements, move)
 {
     {

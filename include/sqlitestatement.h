@@ -47,6 +47,7 @@ namespace sqlite {
         ~SQLiteStatement();
 
         void bind(size_t idx, std::string value);
+        void bind(size_t idx, long value);
         void bind(size_t idx, int value);
         void bind(size_t idx, double value);
 
@@ -55,6 +56,7 @@ namespace sqlite {
             bind_impl<0>(t);
         }
 
+        long getLongValue(int idx);
         int getIntValue(int idx);
         double getDoubleValue(int idx);
         std::string getStringValue(int idx);

@@ -66,6 +66,13 @@ void SQLiteStatement::bind(size_t idx, std::string value)
     SQLiteException::throwIfNotOk(r,db->handle());
 }
 
+void SQLiteStatement::bind(size_t idx, long value)
+{
+    auto db = p->mDb.lock();
+    auto r = sqlite3_bind_int64(p->stmt, idx, value);
+    SQLiteException::throwIfNotOk(r,db->handle());
+}
+
 void SQLiteStatement::bind(size_t idx, int value)
 {
     auto db = p->mDb.lock();
@@ -78,6 +85,11 @@ void SQLiteStatement::bind(size_t idx, double value)
     auto db = p->mDb.lock();
     auto r = sqlite3_bind_double(p->stmt, idx, value);
     SQLiteException::throwIfNotOk(r,db->handle());
+}
+
+long SQLiteStatement::getLongValue(int idx)
+{
+    return sqlite3_column_int64(p->stmt, idx);
 }
 
 int SQLiteStatement::getIntValue(int idx)
