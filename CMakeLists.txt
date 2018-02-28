@@ -1,4 +1,4 @@
-cmake_minimum_required(VERSION 3.8)
+cmake_minimum_required(VERSION 3.5)
 project(sqlite)
 
 OPTION(ENABLE_TEST "Enable Tests" ON)
@@ -16,7 +16,7 @@ set(CMAKE_RUNTIME_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/bin)
 include_directories(
         ${CMAKE_SOURCE_DIR}/include
         ${SQLITE_INCLUDE_DIRS}
-		${CMAKE_SOURCE_DIR}
+        ${CMAKE_SOURCE_DIR}
 )
 
 set(SOURCE_FILES
