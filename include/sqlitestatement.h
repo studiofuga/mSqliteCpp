@@ -9,6 +9,7 @@
 
 #include <memory>
 #include <string>
+#include <functional>
 
 #include <sqlite3.h>
 #include "sqlitefielddef.h"
