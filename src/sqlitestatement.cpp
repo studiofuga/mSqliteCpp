@@ -66,18 +66,28 @@ void SQLiteStatement::bind(size_t idx, std::string value)
     SQLiteException::throwIfNotOk(r,db->handle());
 }
 
-void SQLiteStatement::bind(size_t idx, long value)
+void SQLiteStatement::bind(size_t idx, uint64_t value)
 {
     auto db = p->mDb.lock();
     auto r = sqlite3_bind_int64(p->stmt, idx, value);
     SQLiteException::throwIfNotOk(r,db->handle());
 }
 
-void SQLiteStatement::bind(size_t idx, int value)
+void SQLiteStatement::bind(size_t idx, int64_t value)
 {
     auto db = p->mDb.lock();
-    auto r = sqlite3_bind_int(p->stmt, idx, value);
+    auto r = sqlite3_bind_int64(p->stmt, idx, value);
     SQLiteException::throwIfNotOk(r,db->handle());
+}
+
+void SQLiteStatement::bind(size_t idx, uint32_t value)
+{
+    bind(idx, static_cast<uint64_t>(value));
+}
+
+void SQLiteStatement::bind(size_t idx, int32_t value)
+{
+    bind(idx, static_cast<int64_t>(value));
 }
 
 void SQLiteStatement::bind(size_t idx, double value)
@@ -87,7 +97,12 @@ void SQLiteStatement::bind(size_t idx, double value)
     SQLiteException::throwIfNotOk(r,db->handle());
 }
 
-long SQLiteStatement::getLongValue(int idx)
+int64_t SQLiteStatement::getLongValue(int idx)
+{
+    return sqlite3_column_int64(p->stmt, idx);
+}
+
+uint64_t SQLiteStatement::getULongValue(int idx)
 {
     return sqlite3_column_int64(p->stmt, idx);
 }
