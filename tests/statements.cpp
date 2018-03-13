@@ -89,7 +89,7 @@ TEST_F(Statements, casts)
         ASSERT_NO_THROW(stmt.executeStep([]() { return true; }));
     }
 
-    long lmax = std::numeric_limits<long>::max();
+    long long lmax = std::numeric_limits<long long>::max();
     double dmax = std::numeric_limits<double>::max();
     // long
     {

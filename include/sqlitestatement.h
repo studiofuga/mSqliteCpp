@@ -48,10 +48,10 @@ namespace sqlite {
         ~SQLiteStatement();
 
         void bind(size_t idx, std::string value);
-        void bind(size_t idx, uint64_t value);
-        void bind(size_t idx, int64_t value);
-        void bind(size_t idx, int32_t value);
-        void bind(size_t idx, uint32_t value);
+        void bind(size_t idx, unsigned long long value);
+        void bind(size_t idx, long long value);
+        void bind(size_t idx, int value);
+        void bind(size_t idx, unsigned int value);
         void bind(size_t idx, double value);
 
         template <typename ...Ts>
