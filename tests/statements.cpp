@@ -5,6 +5,7 @@
 #include <sqlitestatementformatters.h>
 #include <sqlitefieldsop.h>
 #include <insertstatement.h>
+#include <selectstatement.h>
 #include "gtest/gtest.h"
 
 #include "sqlitestorage.h"
@@ -22,6 +23,12 @@ public:
         db->open();
     }
 };
+
+
+namespace {
+//    void func(std::tuple<std::string, double> d) {}
+void func(int d) {}
+}
 
 TEST_F(Statements, create)
 {
@@ -79,6 +86,23 @@ TEST_F(Statements, typedCreate)
     ASSERT_NO_THROW(insertStatement.attach(db, "sample"));
     ASSERT_NO_THROW(insertStatement.insert(1, std::string {"first"}, 10.0));
     ASSERT_NO_THROW(insertStatement.insert(2, std::string {"second"}, 20.0));
+
+    auto selectStatement1 = sqlite::makeSelectStatement (Select(fldName,fldValue), Where(fldId));
+    ASSERT_NO_THROW(selectStatement1.attach(db, "sample"));
+
+    std::string n;
+    double v;
+    ASSERT_NO_THROW(selectStatement1.bind(1));
+//    auto f = [](std::string n, double v){};
+
+//    ASSERT_NO_THROW(selectStatement1.exec([](int ) {}));
+    ASSERT_NO_THROW(selectStatement1.exec());
+
+//    ASSERT_NO_THROW(selectStatement1.exec(std::bind(func)));
+    //ASSERT_NO_THROW(selectStatement1.exec([](std::tuple<std::string, double> t)->void {} ));
+    ASSERT_EQ(n, "first");
+    ASSERT_EQ(v, 10.0);
+
 
 }
 
