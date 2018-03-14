@@ -53,6 +53,7 @@ public:
 
     auto rawType() -> RawType { return {}; }
 
+    FieldDef() : fieldName(), attributes() {}
     explicit FieldDef (std::string name, int fldattributes = 0)
         : fieldName(std::move(name)), attributes(fldattributes) {}
 

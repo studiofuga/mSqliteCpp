@@ -56,8 +56,19 @@ namespace sqlite {
         }
 
         template<typename ...Ts>
+        std::string unpackFieldNames(std::tuple<Ts...> def) {
+            return details::unpackFieldNames_impl<0>(def);
+        }
+
+
+        template<typename ...Ts>
         std::string unpackFieldPlaceholders(Ts... def) {
             return details::unpackFieldPlaceholders_impl<0>(std::make_tuple(def...));
+        }
+
+        template<typename ...Ts>
+        std::string unpackFieldPlaceholders(std::tuple<Ts...> def) {
+            return details::unpackFieldPlaceholders_impl<0>(def);
         }
 
         class StatementFormatter {
