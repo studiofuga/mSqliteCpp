@@ -270,6 +270,10 @@ public:
 
     bool createFromSQLString (std::string query);
 
+    void drop() {
+        db()->dropTable(name());
+    }
+
     template <typename ...Ts>
     bool create (std::tuple<Ts...> def) {
         std::ostringstream ss;
