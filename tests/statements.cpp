@@ -24,12 +24,6 @@ public:
     }
 };
 
-
-namespace {
-//    void func(std::tuple<std::string, double> d) {}
-void func(int d) {}
-}
-
 TEST_F(Statements, create)
 {
     {
@@ -87,6 +81,7 @@ TEST_F(Statements, typedCreate)
     ASSERT_NO_THROW(insertStatement.insert(1, std::string {"first"}, 10.0));
     ASSERT_NO_THROW(insertStatement.insert(2, std::string {"second"}, 20.0));
 
+#if 0   // WIP
     auto selectStatement1 = sqlite::makeSelectStatement (Select(fldName,fldValue), Where(fldId));
     ASSERT_NO_THROW(selectStatement1.attach(db, "sample"));
 
@@ -103,7 +98,7 @@ TEST_F(Statements, typedCreate)
     ASSERT_EQ(n, "first");
     ASSERT_EQ(v, 10.0);
 
-
+#endif
 }
 
 TEST_F(Statements, casts)
