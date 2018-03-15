@@ -24,6 +24,7 @@ class InsertStatement {
         statement->bind(N+1, std::get<N>(values));
     };
 public:
+    InsertStatement() {}
     explicit InsertStatement(FIELDS... f) { fields = std::make_tuple(f...); }
 
     void attach (std::shared_ptr<SQLiteStorage> dbm, std::string table) {
