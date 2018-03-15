@@ -48,10 +48,10 @@ namespace sqlite {
         ~SQLiteStatement();
 
         void bind(size_t idx, std::string value);
-        void bind(size_t idx, uint64_t value);
-        void bind(size_t idx, int64_t value);
-        void bind(size_t idx, int32_t value);
-        void bind(size_t idx, uint32_t value);
+        void bind(size_t idx, unsigned long long value);
+        void bind(size_t idx, long long value);
+        void bind(size_t idx, int value);
+        void bind(size_t idx, unsigned int value);
         void bind(size_t idx, double value);
 
         template <typename ...Ts>
@@ -64,6 +64,11 @@ namespace sqlite {
         int getIntValue(int idx);
         double getDoubleValue(int idx);
         std::string getStringValue(int idx);
+
+        template <typename T>
+        T get(int idx) {
+            static_assert(sizeof(T) == 0, "Generic version of get is undefined");
+        }
 
         FieldType::Type columnType(int idx);
         int columnCount();
@@ -81,6 +86,27 @@ namespace sqlite {
         bool execute(std::function<bool()> function);
         bool execute();
     };
+
+    template <>
+    inline int SQLiteStatement::get<int>(int idx) {
+        return getIntValue(idx);
+    }
+    template <>
+    inline double SQLiteStatement::get<double>(int idx) {
+        return getDoubleValue(idx);
+    }
+    template <>
+    inline long long SQLiteStatement::get<long long>(int idx) {
+        return getLongValue(idx);
+    }
+    template <>
+    inline unsigned long long SQLiteStatement::get<unsigned long long>(int idx) {
+        return getULongValue(idx);
+    }
+    template <>
+    inline std::string SQLiteStatement::get<std::string>(int idx) {
+        return getStringValue(idx);
+}
 
 } // ns sqlite
 
