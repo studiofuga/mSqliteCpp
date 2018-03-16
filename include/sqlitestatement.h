@@ -59,8 +59,8 @@ namespace sqlite {
             bind_impl<0>(t);
         }
 
-        int64_t getLongValue(int idx);
-        uint64_t getULongValue(int idx);
+        long long getLongValue(int idx);
+        unsigned long long getULongValue(int idx);
         int getIntValue(int idx);
         double getDoubleValue(int idx);
         std::string getStringValue(int idx);
