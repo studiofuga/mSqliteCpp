@@ -67,12 +67,12 @@ TEST_F(Statements, create)
 
 TEST_F(Statements, typedCreate)
 {
-    auto fldId = sqlite::makeFieldDef("id", sqlite::FieldType::Integer());
-    auto fldName = sqlite::makeFieldDef("name", sqlite::FieldType::Text());
-    auto fldValue = sqlite::makeFieldDef("value", sqlite::FieldType::Real());
+    auto fldId = sqlite::makeFieldDef("id", sqlite::FieldType::Integer()).notNull();
+    auto fldName = sqlite::makeFieldDef("name", sqlite::FieldType::Text()).notNull();
+    auto fldValue = sqlite::makeFieldDef("value", sqlite::FieldType::Real()).notNull();
 
     {
-        SQLiteStatement stmt(db, "CREATE TABLE sample (id INTEGER, name TEXT, value DOUBLE);");
+        SQLiteStatement stmt(db, "CREATE TABLE sample (id INTEGER NOT NULL, name TEXT NOT NULL, value DOUBLE NOT NULL);");
         ASSERT_NO_THROW(stmt.execute());
     }
 

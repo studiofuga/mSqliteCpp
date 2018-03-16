@@ -20,8 +20,13 @@ class InsertStatement {
     std::string tablename;
 
     template <int N=0, typename ...T>
+    typename std::enable_if<N == sizeof...(T), void>::type insertImpl(std::tuple<T...>) {
+    };
+
+    template <int N=0, typename ...T>
     typename std::enable_if<N < sizeof...(T), void>::type insertImpl(std::tuple<T...> values) {
         statement->bind(N+1, std::get<N>(values));
+        insertImpl<N+1>(values);
     };
 public:
     InsertStatement() {}
