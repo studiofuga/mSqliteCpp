@@ -283,6 +283,11 @@ public:
     }
 
     template <typename ...Ts>
+    bool create (Ts... def) {
+        return create (std::make_tuple(def...));
+    }
+
+    template <typename ...Ts>
     void createIndex (std::string name, std::tuple<Ts...> fields) {
         std::ostringstream ss;
         ss << "CREATE INDEX " << name << " ON " << mName << " ("
@@ -391,7 +396,7 @@ public:
     };
 
     template <typename ...Ts>
-    static SQLiteTable create (std::shared_ptr<SQLiteStorage> db, std::string name, std::tuple<Ts...> def) {
+    static SQLiteTable make (std::shared_ptr<SQLiteStorage> db, std::string name, std::tuple<Ts...> def) {
         SQLiteTable table(db, name);
 
         table.create(def);
@@ -400,8 +405,8 @@ public:
     }
 
     template <typename ...Ts>
-    static SQLiteTable create (std::shared_ptr<SQLiteStorage> db, std::string name, Ts... def) {
-        return create(db, name, std::make_tuple(def...));
+    static SQLiteTable make (std::shared_ptr<SQLiteStorage> db, std::string name, Ts... def) {
+        return make(db, name, std::make_tuple(def...));
     }
 
 protected:

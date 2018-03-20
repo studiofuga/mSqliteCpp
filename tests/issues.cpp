@@ -26,7 +26,7 @@ TEST(issues, lockAfterClose)
                 fldName
         );
 
-        auto tbl = SQLiteTable::create(db1, "mytable", t);
+        auto tbl = SQLiteTable::make(db1, "mytable", t);
         ASSERT_NO_THROW(tbl.insert(t, std::make_tuple(1, std::string{"aaa"})));
 
         tbl.query(std::make_tuple(fldId), [](int x) {});

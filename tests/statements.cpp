@@ -5,7 +5,6 @@
 #include <sqlitestatementformatters.h>
 #include <sqlitefieldsop.h>
 #include <insertstatement.h>
-#include <selectstatement.h>
 #include "gtest/gtest.h"
 
 #include "sqlitestorage.h"

@@ -32,7 +32,7 @@ TEST_F(table, creation)
     ASSERT_THROW(db->dropTable("sample"), SQLiteException);
 
     SQLiteTable table;
-    ASSERT_NO_THROW(table = SQLiteTable::create(db, "sample", testTable));
+    ASSERT_NO_THROW(table = SQLiteTable::make(db, "sample", testTable));
 
     ASSERT_TRUE(db->tableExists("sample"));
 }
@@ -40,7 +40,7 @@ TEST_F(table, creation)
 TEST_F(table, creationWithoutTuple)
 {
     SQLiteTable table;
-    ASSERT_NO_THROW(table = SQLiteTable::create(db, "sample",
+    ASSERT_NO_THROW(table = SQLiteTable::make(db, "sample",
                                                 makeFieldDef("id", FieldType::Integer()).primaryKey().autoincrement(),
                                                 makeFieldDef("name", FieldType::Text())
     ));
@@ -60,7 +60,7 @@ TEST_F(table, query)
     );
 
     SQLiteTable table;
-    ASSERT_NO_THROW(table = SQLiteTable::create(db, "sample", testTable));
+    ASSERT_NO_THROW(table = SQLiteTable::make(db, "sample", testTable));
 
     auto tb = std::make_tuple(fldName, fldCount);
     ASSERT_NO_THROW(table.insert(tb, std::make_tuple(std::string{"first"}, 0)));
@@ -148,7 +148,7 @@ TEST_F(table, DynamicCreate)
     );
 
     SQLiteTable table;
-    ASSERT_NO_THROW(table = SQLiteTable::create(db, "sample", testTable));
+    ASSERT_NO_THROW(table = SQLiteTable::make(db, "sample", testTable));
 
     ASSERT_NO_THROW(table.query(std::make_tuple(dynFields[0], dynFields[1]), [](int, int) { }));
 }
@@ -167,7 +167,7 @@ TEST_F(table, IndexCreate)
     );
 
     SQLiteTable table;
-    ASSERT_NO_THROW(table = SQLiteTable::create(db, "sample", testTable));
+    ASSERT_NO_THROW(table = SQLiteTable::make(db, "sample", testTable));
 
     ASSERT_NO_THROW(table.createIndex ("name", std::make_tuple(fldName)));
     ASSERT_NO_THROW(table.createIndex ("coords", std::make_tuple(fldX, fldY)));
@@ -186,7 +186,7 @@ TEST_F(table, InsertWithStatement)
     );
 
     SQLiteTable table;
-    ASSERT_NO_THROW(table = SQLiteTable::create(db, "sample", testTable));
+    ASSERT_NO_THROW(table = SQLiteTable::make(db, "sample", testTable));
 
     auto tb = std::make_tuple(fldName, fldCount);
     SQLiteTable::PreparedInsert<decltype(fldName), decltype(fldCount)> pInsert;
@@ -209,7 +209,7 @@ TEST_F(table, InsertOrUpdate)
     auto schema = std::make_tuple(key,value);
 
     SQLiteTable table;
-    ASSERT_NO_THROW(table = SQLiteTable::create(db, "KeyValue", schema));
+    ASSERT_NO_THROW(table = SQLiteTable::make(db, "KeyValue", schema));
 
 
     SQLiteTable::PreparedInsert<decltype(key), decltype(value)> pInsert;
