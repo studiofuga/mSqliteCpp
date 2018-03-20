@@ -124,13 +124,15 @@ namespace sqlite {
         };
 
         class Insert : public StatementFormatter {
+            std::string mAction;
             std::string mStatementString;
         public:
             template <typename ...F>
             explicit Insert (std::string tablename, F... flds) {
+                mAction = "INSERT ";
                 std::ostringstream ss;
 
-                ss << "INSERT INTO " << tablename << "("
+                ss << "INTO " << tablename << "("
                                                   << unpackFieldNames(flds...) << ") VALUES("
                                                                             << unpackFieldPlaceholders(flds...) << ");";
 
@@ -138,8 +140,14 @@ namespace sqlite {
                 mStatementString = ss.str();
             }
 
+            void doReplace() {
+                mAction = "INSERT OR REPLACE ";
+            }
+
             std::string string() const override {
-                return mStatementString;
+                std::ostringstream ss;
+                ss << mAction << mStatementString;
+                return ss.str();
             }
         };
 

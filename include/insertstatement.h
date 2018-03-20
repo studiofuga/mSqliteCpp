@@ -18,6 +18,7 @@ class InsertStatement {
     std::shared_ptr<SQLiteStorage> db;
     std::shared_ptr<SQLiteStatement> statement;
     std::string tablename;
+    bool do_replace = false;
 
     template <int N=0, typename ...T>
     typename std::enable_if<N == sizeof...(T), void>::type insertImpl(std::tuple<T...>) {
@@ -32,10 +33,19 @@ public:
     InsertStatement() {}
     explicit InsertStatement(FIELDS... f) { fields = std::make_tuple(f...); }
 
+    void doReplace() {
+        if (statement)
+            throw std::logic_error("Cannot call InsertStatement::doReplace() after InsertStatement::Attach()");
+        do_replace = true;
+    }
+
     void attach (std::shared_ptr<SQLiteStorage> dbm, std::string table) {
         db = dbm;
         tablename = std::move(table);
-        statement = std::make_shared<SQLiteStatement>(db, statements::Insert(tablename, fields));
+        auto r = statements::Insert(tablename, fields);
+        if (do_replace)
+            r.doReplace();
+        statement = std::make_shared<SQLiteStatement>(db, r);
     }
 
     template <typename ...T>

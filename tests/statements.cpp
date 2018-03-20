@@ -71,7 +71,7 @@ TEST_F(Statements, typedCreate)
     auto fldValue = sqlite::makeFieldDef("value", sqlite::FieldType::Real()).notNull();
 
     {
-        SQLiteStatement stmt(db, "CREATE TABLE sample (id INTEGER NOT NULL, name TEXT NOT NULL, value DOUBLE NOT NULL);");
+        SQLiteStatement stmt(db, "CREATE TABLE sample (id INTEGER PRIMARY KEY, name TEXT NOT NULL, value DOUBLE NOT NULL);");
         ASSERT_NO_THROW(stmt.execute());
     }
 
@@ -79,6 +79,12 @@ TEST_F(Statements, typedCreate)
     ASSERT_NO_THROW(insertStatement.attach(db, "sample"));
     ASSERT_NO_THROW(insertStatement.insert(1, std::string {"first"}, 10.0));
     ASSERT_NO_THROW(insertStatement.insert(2, std::string {"second"}, 20.0));
+    ASSERT_THROW(insertStatement.insert(1, std::string {"First Again"}, 1.0), sqlite::SQLiteException);
+
+    auto insertOrReplaceStatement = sqlite::makeInsertStatement(fldId, fldName, fldValue);
+    ASSERT_NO_THROW(insertOrReplaceStatement.doReplace());
+    ASSERT_NO_THROW(insertOrReplaceStatement.attach(db, "sample"));
+    ASSERT_NO_THROW(insertOrReplaceStatement.insert(1, std::string {"First Again"}, 1.0));
 
 #if 0   // WIP
     auto selectStatement1 = sqlite::makeSelectStatement (Select(fldName,fldValue), Where(fldId));
