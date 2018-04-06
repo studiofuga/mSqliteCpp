@@ -85,12 +85,16 @@ namespace sqlite {
             std::string mGroupBy;
         public:
             template <typename ...F>
-            explicit Select (std::string tablename, F... flds) {
+            explicit Select(std::string tablename, std::tuple<F...> flds) {
                 mSelectOp = "SELECT ";
                 std::ostringstream ss;
-                ss << unpackFieldNames(flds...) << " FROM " << tablename;
+                ss << unpackFieldNames(flds) << " FROM " << tablename;
 
                 mSelectBase = ss.str();
+            }
+            template <typename ...F>
+            explicit Select (std::string tablename, F... flds)
+            : Select(tablename, std::make_tuple(flds...)) {
             }
 
             Select &distinct() {

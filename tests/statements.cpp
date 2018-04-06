@@ -5,10 +5,12 @@
 #include <sqlitestatementformatters.h>
 #include <sqlitefieldsop.h>
 #include <insertstatement.h>
+#include <clauses.h>
 #include "gtest/gtest.h"
 
 #include "sqlitestorage.h"
 #include "sqlitestatement.h"
+#include "selectstatement.h"
 
 using namespace sqlite;
 
@@ -85,25 +87,49 @@ TEST_F(Statements, typedCreate)
     ASSERT_NO_THROW(insertOrReplaceStatement.doReplace());
     ASSERT_NO_THROW(insertOrReplaceStatement.attach(db, "sample"));
     ASSERT_NO_THROW(insertOrReplaceStatement.insert(1, std::string {"First Again"}, 1.0));
+}
 
-#if 0   // WIP
-    auto selectStatement1 = sqlite::makeSelectStatement (Select(fldName,fldValue), Where(fldId));
-    ASSERT_NO_THROW(selectStatement1.attach(db, "sample"));
+TEST_F(Statements, selectStatements1)
+{
+    auto fldId = sqlite::makeFieldDef("id", sqlite::FieldType::Integer()).notNull();
+    auto fldName = sqlite::makeFieldDef("name", sqlite::FieldType::Text()).notNull();
+    auto fldValue = sqlite::makeFieldDef("value", sqlite::FieldType::Real()).notNull();
 
-    std::string n;
-    double v;
-    ASSERT_NO_THROW(selectStatement1.bind(1));
-//    auto f = [](std::string n, double v){};
+    {
+        SQLiteStatement stmt(db, "CREATE TABLE sample (id INTEGER PRIMARY KEY, name TEXT NOT NULL, value DOUBLE NOT NULL);");
+        ASSERT_NO_THROW(stmt.execute());
+    }
 
-//    ASSERT_NO_THROW(selectStatement1.exec([](int ) {}));
-    ASSERT_NO_THROW(selectStatement1.exec());
+    auto insertStatement = sqlite::makeInsertStatement(fldId, fldName, fldValue);
+    ASSERT_NO_THROW(insertStatement.attach(db, "sample"));
+    ASSERT_NO_THROW(insertStatement.insert(1, std::string {"first"}, 10.0));
 
-//    ASSERT_NO_THROW(selectStatement1.exec(std::bind(func)));
-    //ASSERT_NO_THROW(selectStatement1.exec([](std::tuple<std::string, double> t)->void {} ));
-    ASSERT_EQ(n, "first");
+    SelectStatement<
+            decltype(fldId), decltype(fldValue)>
+            selectStatement(fldId, fldValue);
+
+    ASSERT_NO_THROW(selectStatement.attach(db, "sample"));
+    ASSERT_NO_THROW(selectStatement.prepare());
+
+    int count = 0;
+    int n = 0;
+    double v = 0;
+    ASSERT_NO_THROW(selectStatement.exec([&n,&v, &count](int rn, double rv) {
+        n = rn;
+        v = rv;
+        count++;
+        return true;
+    }));
+
+    ASSERT_EQ(count, 1);
+    ASSERT_EQ(n, 1);
     ASSERT_EQ(v, 10.0);
 
-#endif
+    /*
+    Where<decltype(fldId)> where (fldId);
+    ASSERT_NO_THROW(selectStatement.where(where));
+    ASSERT_NO_THROW(selectStatement.bind(1));
+     */
 }
 
 TEST_F(Statements, casts)

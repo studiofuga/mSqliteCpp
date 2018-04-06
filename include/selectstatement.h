@@ -11,90 +11,54 @@
 
 namespace sqlite {
 
-template <typename Tag, typename ...T>
-struct SqlTuple {
-    using TupleType = std::tuple<T...>;
-    std::tuple<T...> asTuple;
-
-    explicit SqlTuple(std::tuple<T...> t)
-    : asTuple(t) {}
-    SqlTuple(T... t)
-    : asTuple (std::make_tuple(t...)) {}
-};
-
-struct SelectTag {};
-template <typename ...T>
-using SelectTuple = SqlTuple<SelectTag, T...>;
-
-struct WhereTag {};
-template <typename ...T>
-using WhereTuple = SqlTuple<WhereTag, T...>;
-
-struct BindTag {};
-template <typename ...T>
-using BindTuple = SqlTuple<BindTag, T...>;
-
-template <typename S, typename W>
+template <typename ...Fs>
 class SelectStatement {
-    S selectFields;
+private:
     std::shared_ptr<SQLiteStorage> db;
-    std::shared_ptr<SQLiteStatement> statement;
-    std::string tablename;
+    std::string name;
+    std::tuple<Fs...> fields;
+    SQLiteStatement statement;
 
-    template <int N=0, typename ...T>
-    typename std::enable_if<N < sizeof...(T), void>::type bindImpl(std::tuple<T...> values) {
-        statement->bind(N+1, std::get<N>(values));
+    /// Impl
+
+    /**
+     * Get a single return value from the statement. The returned type is the Field::RawType()
+     * @tparam I the index of the value
+     * @return The returned value as from SQLiteStatement::get<T>(I);
+     */
+    template <std::size_t I>
+    auto getValue() {
+        return statement.get<decltype(std::get<I>(fields).rawType())>(I);
     };
 
-    template <int N = 0, typename ...TA, std::enable_if<N < sizeof...(TA)> >
-    auto getImpl(const std::tuple<TA...> &tpl) {
-        using T = decltype(std::get<N>(tpl)->rawType());
-        return std::tuple_cat(std::make_tuple(statement->get<T>(N)), getImpl<N+1>(tpl));
+    template <typename F, std::size_t ...Is>
+    bool execImpl(F func, std::index_sequence<Is...> const &i) {
+        return func(getValue<Is>()...);
     };
-
 public:
-    SelectStatement(S s)
-            : selectFields(s) {
+    explicit SelectStatement(Fs... f)
+    : fields(std::make_tuple(f...))
+    {
+
     }
 
-    void attach (std::shared_ptr<SQLiteStorage> dbm, std::string table) {
-        db = dbm;
-        tablename = std::move(table);
-        statement = std::make_shared<SQLiteStatement>(db, statements::Select(tablename, selectFields.asTuple));
+    void attach (std::shared_ptr<SQLiteStorage> db, std::string name) {
+        this->db = db;
+        this->name = std::move(name);
     }
 
-    template <typename ...BT>
-    void bind(BT... b) {
-        bindImpl<0>(std::make_tuple(b...));
+    void prepare() {
+        statements::Select sql(name, fields);
+        statement = SQLiteStatement(db, sql);
     }
 
-    void exec () {
-        statement->execute([this](){
-            auto r = getImpl<0>(selectFields.asTuple);
-            return true;
+    template <typename F>
+    void exec(F func) {
+        statement.execute([this, func]() {
+            return execImpl(func, std::make_index_sequence<sizeof...(Fs)>{});
         });
     }
 };
-
-template <typename ...T>
-inline SelectTuple<T...> Select(T... t) {
-    return SelectTuple<T...>(t...);
-}
-
-template <typename ...T>
-inline WhereTuple<T...> Where(T... t) {
-    return WhereTuple<T...>(t...);
-}
-
-template <typename ...T>
-inline BindTuple<T...> Bind(T... t) {
-    return BindTuple<T...>(t...);
-}
-
-template <typename ...T, typename ...U>
-inline SelectStatement<SelectTuple<T...>,WhereTuple<U...>> makeSelectStatement(SelectTuple<T...> s, WhereTuple<U...> w) {
-    return SelectStatement<decltype(s), decltype(w)>(s);
-}
 
 }
 
