@@ -207,6 +207,26 @@ TEST_F(Statements, createWithStatements)
     }
 }
 
+TEST_F(Statements, failAndRepeat)
+{
+    // Check that a failing statement is correctly reset after
+    SQLiteStatement create(db, "CREATE TABLE sample (id INTEGER PRIMARY KEY, name TEXT);");
+    ASSERT_NO_THROW(create.execute());
+
+    SQLiteStatement stmt(db, "INSERT INTO sample VALUES (?, ?);");
+    ASSERT_NO_THROW(stmt.bind(std::make_tuple(0, "This ok")));
+    ASSERT_NO_THROW(stmt.execute());
+    ASSERT_NO_THROW(stmt.bind(std::make_tuple(0, "This Fails (Unique)")));
+    ASSERT_THROW(stmt.execute(), sqlite::SQLiteException);
+    ASSERT_NO_THROW(stmt.bind(std::make_tuple(1, "This Ok too")));
+    ASSERT_NO_THROW(stmt.execute());
+
+    ASSERT_NO_THROW(stmt.bind(std::make_tuple(1, "This Fails again (Unique)")));
+    ASSERT_THROW(stmt.execute([]() { return true; }), sqlite::SQLiteException);
+    ASSERT_NO_THROW(stmt.bind(std::make_tuple(2, "This Ok too")));
+    ASSERT_NO_THROW(stmt.execute([]() { return true; }));
+
+}
 
 class SelectStatements : public testing::Test
 {
