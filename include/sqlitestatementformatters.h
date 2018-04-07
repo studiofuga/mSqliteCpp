@@ -157,6 +157,28 @@ namespace sqlite {
             }
         };
 
+        class Delete : public StatementFormatter {
+            std::string mAction;
+            std::string mWhere;
+        public:
+            explicit Delete(std::string tablename) {
+                std::ostringstream ss;
+                ss << "DELETE FROM " << tablename;
+                mAction = ss.str();
+            }
+            Delete &where(std::string condition) {
+                mWhere = " WHERE " + condition;
+                return *this;
+            }
+
+            std::string string() const override
+            {
+                std::ostringstream ss;
+                ss << mAction << mWhere << ";";
+                return ss.str();
+            }
+        };
+
     }
 }
 #endif //SQLITE_SQLITESTATEMENTFORMATTERS_H

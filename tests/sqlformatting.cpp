@@ -86,7 +86,7 @@ TEST(SqlFormatting, select)
     }
 }
 
-TEST(SqlFormattings, insert)
+TEST(SqlFormatting, insert)
 {
     auto fldId = sqlite::makeFieldDef("id", sqlite::FieldType::Integer());
     auto fldName = sqlite::makeFieldDef("name", sqlite::FieldType::Text());
@@ -97,3 +97,11 @@ TEST(SqlFormattings, insert)
     ASSERT_EQ(i.string(), "INSERT INTO Table(id,name,value) VALUES(?,?,?);");
 }
 
+TEST(SqlFormatting, deleteStatement)
+{
+    sqlite::statements::Delete d("MyTable");
+    ASSERT_EQ(d.string(), "DELETE FROM MyTable;");
+
+    d.where("id = ?");
+    ASSERT_EQ(d.string(), "DELETE FROM MyTable WHERE id = ?;");
+}
