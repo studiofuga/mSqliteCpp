@@ -53,7 +53,6 @@ public:
     }
 
     void prepare() {
-        std::cout << sql.string() << "\n";
         statement.attach(db, sql);
     }
 
