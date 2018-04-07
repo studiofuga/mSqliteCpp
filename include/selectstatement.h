@@ -8,6 +8,9 @@
 #include <functional>
 #include <tuple>
 #include <type_traits>
+#include <utility>
+
+#include <iostream>
 
 namespace sqlite {
 
@@ -18,6 +21,7 @@ private:
     std::string name;
     std::tuple<Fs...> fields;
     SQLiteStatement statement;
+    statements::Select sql;
 
     /// Impl
 
@@ -43,13 +47,23 @@ public:
     }
 
     void attach (std::shared_ptr<SQLiteStorage> db, std::string name) {
+        sql = statements::Select(name, fields);
         this->db = db;
         this->name = std::move(name);
     }
 
     void prepare() {
-        statements::Select sql(name, fields);
-        statement = SQLiteStatement(db, sql);
+        std::cout << sql.string() << "\n";
+        statement.attach(db, sql);
+    }
+
+    template <typename W>
+    void where (W w) {
+        sql.where(w.toText());
+    }
+
+    SQLiteStatement* getStatement() {
+        return &statement;
     }
 
     template <typename F>

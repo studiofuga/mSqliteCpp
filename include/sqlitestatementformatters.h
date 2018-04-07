@@ -84,6 +84,8 @@ namespace sqlite {
             std::string mWhere;
             std::string mGroupBy;
         public:
+            Select() = default;
+
             template <typename ...F>
             explicit Select(std::string tablename, std::tuple<F...> flds) {
                 mSelectOp = "SELECT ";

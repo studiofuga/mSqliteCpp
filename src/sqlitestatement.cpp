@@ -6,44 +6,54 @@
 
 using namespace sqlite;
 
-struct SQLiteStatement::Impl {
+struct sqlite::SQLiteStatement::Impl {
     std::weak_ptr<SQLiteStorage> mDb;
     sqlite3_stmt *stmt = nullptr;
 };
 
 
-SQLiteStatement::SQLiteStatement()
+sqlite::SQLiteStatement::SQLiteStatement()
 {
 
 }
 
-SQLiteStatement::SQLiteStatement(std::shared_ptr<SQLiteStorage> db,
+sqlite::SQLiteStatement::SQLiteStatement(std::shared_ptr<SQLiteStorage> db,
                                  const sqlite::statements::StatementFormatter &stmt)
 {
-    init(db);
-    prepare(stmt.string());
+    attach(db,stmt);
 }
 
-SQLiteStatement::SQLiteStatement(std::shared_ptr<SQLiteStorage> db, std::string sql)
+sqlite::SQLiteStatement::SQLiteStatement(std::shared_ptr<SQLiteStorage> db, std::string sql)
 {
-    init(db);
-    prepare(sql);
+    attach(db,sql);
 }
 
-SQLiteStatement::SQLiteStatement(std::shared_ptr<SQLiteStorage> db, const char *sql)
+sqlite::SQLiteStatement::SQLiteStatement(std::shared_ptr<SQLiteStorage> db, const char *sql)
 {
-    init(db);
-    prepare(std::string(sql));
+    attach(db, sql);
 }
 
-SQLiteStatement::~SQLiteStatement()
+sqlite::SQLiteStatement::~SQLiteStatement()
 {
     if (p != nullptr && p->stmt != nullptr)
         sqlite3_finalize(p->stmt);
 }
 
-SQLiteStatement::SQLiteStatement(SQLiteStatement &&) = default;
-SQLiteStatement &SQLiteStatement::operator =(SQLiteStatement &&) = default;
+sqlite::SQLiteStatement::SQLiteStatement(SQLiteStatement &&) = default;
+sqlite::SQLiteStatement &SQLiteStatement::operator =(SQLiteStatement &&) = default;
+
+void sqlite::SQLiteStatement::attach(std::shared_ptr<SQLiteStorage> dbm, std::string stmt)
+{
+    init(dbm);
+    prepare(std::string(stmt));
+}
+
+void
+sqlite::SQLiteStatement::attach(std::shared_ptr<SQLiteStorage> db, const sqlite::statements::StatementFormatter &stmt)
+{
+    init(db);
+    prepare(stmt.string());
+}
 
 void SQLiteStatement::init(std::shared_ptr<SQLiteStorage> db)
 {

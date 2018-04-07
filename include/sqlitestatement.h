@@ -47,6 +47,9 @@ namespace sqlite {
 
         ~SQLiteStatement();
 
+        void attach (std::shared_ptr<SQLiteStorage> dbm, std::string stmt);
+        void attach (std::shared_ptr<SQLiteStorage> dbm, const sqlite::statements::StatementFormatter &stmt);
+
         void bind(size_t idx, std::string value);
         void bind(size_t idx, unsigned long long value);
         void bind(size_t idx, long long value);

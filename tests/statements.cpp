@@ -125,11 +125,39 @@ TEST_F(Statements, selectStatements1)
     ASSERT_EQ(n, 1);
     ASSERT_EQ(v, 10.0);
 
-    /*
-    Where<decltype(fldId)> where (fldId);
+    // Insert another row
+    ASSERT_NO_THROW(insertStatement.insert(2, std::string {"second"}, 20.0));
+
+    // Count again
+    count = 0;
+    ASSERT_NO_THROW(selectStatement.exec([&count](int rn, double rv) {
+        count++;
+        return true;
+    }));
+    ASSERT_EQ(count, 2);
+
+    // Now we add a where clause
+
+    Where<decltype(fldId)> where (selectStatement.getStatement(), op::eq(fldId));
     ASSERT_NO_THROW(selectStatement.where(where));
-    ASSERT_NO_THROW(selectStatement.bind(1));
-     */
+    ASSERT_NO_THROW(selectStatement.prepare());
+
+    ASSERT_NO_THROW(where.bind(int(1)));
+
+    count = 0;
+    n = 0;
+    v = 0;
+    ASSERT_NO_THROW(selectStatement.exec([&n,&v, &count](int rn, double rv) {
+        n = rn;
+        v = rv;
+        count++;
+        return true;
+    }));
+
+    ASSERT_EQ(count, 1);
+    ASSERT_EQ(n, 1);
+    ASSERT_EQ(v, 10.0);
+
 }
 
 TEST_F(Statements, casts)
