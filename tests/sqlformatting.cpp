@@ -48,6 +48,12 @@ TEST(SqlFormatting, internalUnpack)
     ASSERT_EQ(placeholders, "?,?,?");
     placeholders = sqlite::statements::unpackFieldPlaceholders(fldId);
     ASSERT_EQ(placeholders, "?");
+
+    auto fieldplaceholders = sqlite::statements::unpackFieldsAndPlaceholders(fldId, fldName, fldValue);
+    ASSERT_EQ(fieldplaceholders, "id = ?,name = ?,value = ?");
+
+    fieldplaceholders = sqlite::statements::unpackFieldsAndPlaceholders(fldId);
+    ASSERT_EQ(fieldplaceholders, "id = ?");
 }
 
 TEST(SqlFormatting, select)
@@ -111,4 +117,13 @@ TEST(SqlFormatting, deleteStatement)
 
     d.where("id = ?");
     ASSERT_EQ(d.string(), "DELETE FROM MyTable WHERE id = ?;");
+}
+
+TEST(SqlFormatting, updateStatement)
+{
+    auto fldName = sqlite::makeFieldDef("name", sqlite::FieldType::Text());
+    auto fldValue = sqlite::makeFieldDef("value", sqlite::FieldType::Real());
+    sqlite::statements::Update u("MyTable",fldName, fldValue);
+
+    ASSERT_EQ(u.string(), "UPDATE MyTable SET name = ?,value = ?;");
 }

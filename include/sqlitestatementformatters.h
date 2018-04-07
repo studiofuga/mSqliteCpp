@@ -48,6 +48,22 @@ namespace sqlite {
                 return std::string {"?"} + (I == sizeof...(Ts) - 1 ? "" : ",") + unpackFieldPlaceholders_impl<I + 1, Ts...>(def);
             }
 
+
+            /// @brief Ends the recursion of unpackFieldsAndPlaceholders_impl()
+            template <size_t I, typename ...Ts>
+            std::string unpackFieldsAndPlaceholders_impl (const std::tuple<Ts...> &,
+                                                          typename std::enable_if<I == sizeof...(Ts)>::type * = 0) {
+                return std::string();
+            }
+            /// @brief unpacks the fields into a list of strings in the form (FieldName = ?[,FieldName = ?...])
+            template <size_t I, typename ...Ts>
+            std::string unpackFieldsAndPlaceholders_impl (const std::tuple<Ts...> &def,
+                                                          typename std::enable_if<I < sizeof...(Ts)>::type * = 0) {
+                auto const &field = std::get<I>(def);
+                return field.name()
+                       + " = ?" + (I == sizeof...(Ts) - 1 ? "" : ",")
+                       + unpackFieldsAndPlaceholders_impl<I+1>(def);
+            }
         }
 
         template<typename ...Ts>
@@ -71,7 +87,18 @@ namespace sqlite {
             return details::unpackFieldPlaceholders_impl<0>(def);
         }
 
-        class StatementFormatter {
+        template<typename ...Ts>
+        std::string unpackFieldsAndPlaceholders(Ts... def) {
+            return details::unpackFieldsAndPlaceholders_impl<0>(std::make_tuple(def...));
+        }
+
+        template<typename ...Ts>
+        std::string unpackFieldsAndPlaceholders(std::tuple<Ts...> def) {
+            return details::unpackFieldsAndPlaceholders_impl<0>(def);
+        }
+
+
+    class StatementFormatter {
         public:
             virtual ~StatementFormatter() noexcept = default;
 
@@ -176,6 +203,27 @@ namespace sqlite {
             {
                 std::ostringstream ss;
                 ss << mAction << mWhere << ";";
+                return ss.str();
+            }
+        };
+
+        class Update : public StatementFormatter {
+            std::string mAction = "UPDATE ";
+            std::string mDefinition;
+        public:
+            Update() = default;
+            template <typename ...F>
+            explicit Update (std::string tablename, F... flds) {
+                std::ostringstream ss;
+
+                ss << tablename << " SET "
+                   << unpackFieldsAndPlaceholders(flds...);
+                mDefinition = ss.str();
+            }
+
+            std::string string() const override {
+                std::ostringstream ss;
+                ss << mAction << mDefinition << ";";
                 return ss.str();
             }
         };
