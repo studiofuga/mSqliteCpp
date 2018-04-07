@@ -24,7 +24,7 @@ add_executable(runTests
         table.cpp
         transactions.cpp
         issues.cpp
-        statements.cpp sqlformatting.cpp clauses.cpp)
+        statements.cpp sqlformatting.cpp clauses.cpp updatestatements.cpp)
 
 target_link_libraries(runTests msqlitecpp gtest gtest_main)
 

@@ -5,6 +5,10 @@
 #ifndef SQLITE_CLAUSES_H
 #define SQLITE_CLAUSES_H
 
+#include "sqlitestatement.h"
+
+#include <string>
+
 namespace sqlite {
 
 template <typename ...Ts>
