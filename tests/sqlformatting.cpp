@@ -39,8 +39,15 @@ TEST(SqlFormatting, internalUnpack)
     auto fldName = sqlite::makeFieldDef("name", sqlite::FieldType::Text());
     auto fldValue = sqlite::makeFieldDef("value", sqlite::FieldType::Real());
 
-    std::string str = sqlite::statements::unpackFieldNames(fldId, fldName, fldValue);
-    ASSERT_EQ(str, "id,name,value");
+    std::string fields = sqlite::statements::unpackFieldNames(fldId, fldName, fldValue);
+    ASSERT_EQ(fields, "id,name,value");
+    fields = sqlite::statements::unpackFieldNames(fldId);
+    ASSERT_EQ(fields, "id");
+
+    auto placeholders = sqlite::statements::unpackFieldPlaceholders(fldId, fldName, fldValue);
+    ASSERT_EQ(placeholders, "?,?,?");
+    placeholders = sqlite::statements::unpackFieldPlaceholders(fldId);
+    ASSERT_EQ(placeholders, "?");
 }
 
 TEST(SqlFormatting, select)
