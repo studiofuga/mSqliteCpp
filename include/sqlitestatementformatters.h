@@ -210,6 +210,7 @@ namespace sqlite {
         class Update : public StatementFormatter {
             std::string mAction = "UPDATE ";
             std::string mDefinition;
+            std::string mWhere;
         public:
             Update() = default;
             template <typename ...F>
@@ -221,10 +222,37 @@ namespace sqlite {
                 mDefinition = ss.str();
             }
 
+            Update &where(std::string condition) {
+                mWhere = " WHERE " + condition;
+                return *this;
+            }
+
             std::string string() const override {
                 std::ostringstream ss;
-                ss << mAction << mDefinition << ";";
+                ss << mAction
+                   << mDefinition
+                   << mWhere << ";";
                 return ss.str();
+            }
+
+            enum class OrAction {
+                Rollback, Abort, Replace, Fail, Ignore
+            };
+
+            Update &orAction(OrAction o) {
+                switch (o) {
+                    case OrAction ::Rollback:
+                        mAction = "UPDATE OR ROLLBACK "; break;
+                    case OrAction ::Abort:
+                        mAction = "UPDATE OR ABORT "; break;
+                    case OrAction ::Replace:
+                        mAction = "UPDATE OR REPLACE "; break;
+                    case OrAction ::Fail:
+                        mAction = "UPDATE OR FAIL "; break;
+                    case OrAction ::Ignore:
+                        mAction = "UPDATE OR IGNORE "; break;
+                }
+                return *this;
             }
         };
 

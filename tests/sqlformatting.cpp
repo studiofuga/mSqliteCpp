@@ -126,4 +126,10 @@ TEST(SqlFormatting, updateStatement)
     sqlite::statements::Update u("MyTable",fldName, fldValue);
 
     ASSERT_EQ(u.string(), "UPDATE MyTable SET name = ?,value = ?;");
+
+    u.where("id = ?");
+    ASSERT_EQ(u.string(), "UPDATE MyTable SET name = ?,value = ? WHERE id = ?;");
+
+    u.orAction(sqlite::statements::Update::OrAction::Rollback);
+    ASSERT_EQ(u.string(), "UPDATE OR ROLLBACK MyTable SET name = ?,value = ? WHERE id = ?;");
 }
