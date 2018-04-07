@@ -161,6 +161,7 @@ namespace sqlite {
             std::string mAction;
             std::string mWhere;
         public:
+            Delete() = default;
             explicit Delete(std::string tablename) {
                 std::ostringstream ss;
                 ss << "DELETE FROM " << tablename;

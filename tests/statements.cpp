@@ -6,6 +6,7 @@
 #include <sqlitefieldsop.h>
 #include <insertstatement.h>
 #include <clauses.h>
+#include <deletestatement.h>
 #include "gtest/gtest.h"
 
 #include "sqlitestorage.h"
@@ -356,4 +357,67 @@ TEST_F(SelectStatements, join)
         ASSERT_EQ(names[1], "b");
         ASSERT_EQ(names[2], "c");
     }
+}
+
+class DeleteStatements : public testing::Test
+{
+protected:
+    std::shared_ptr<SQLiteStorage> db;
+public:
+    const FieldDef<FieldType::Integer> fldId = sqlite::makeFieldDef("id", sqlite::FieldType::Integer());
+    const FieldDef<FieldType::Text> fldName = sqlite::makeFieldDef("n", sqlite::FieldType::Text());
+    const FieldDef<FieldType::Real> fldValue = sqlite::makeFieldDef("v", sqlite::FieldType::Real());
+
+    int count() {
+        int c = 0;
+        SQLiteStatement select (db, "SELECT id FROM ex;");
+        select.execute([&c](){
+            ++c;
+            return true;
+        });
+
+        return c;
+    }
+
+protected:
+    void SetUp() override
+    {
+        db = std::make_shared<SQLiteStorage>(":memory:");
+        db->open();
+
+        SQLiteStatement create_stmt(db, "CREATE TABLE ex (id INTEGER, n TEXT, v DOUBLE);");
+        create_stmt.executeStep();
+
+        SQLiteStatement stmt(db, statements::Insert("ex", fldId, fldName, fldValue));
+        stmt.bind(std::make_tuple(1, "name1", 2.0));
+        stmt.execute();
+        stmt.bind(std::make_tuple(2, "name2", 4.0));
+        stmt.execute();
+        stmt.bind(std::make_tuple(3, "name3", 6.0));
+        stmt.execute();
+
+        Test::SetUp();
+    }
+};
+
+TEST_F(DeleteStatements, exec)
+{
+    // first check that everything is properly prepared.
+    ASSERT_EQ(count(), 3);
+
+    DeleteStatement deleteStatement;
+    ASSERT_NO_THROW(deleteStatement.attach(db, "ex"));
+
+    Where<decltype(fldId)> whereClause(deleteStatement.getStatement(), op::eq(fldId));
+    ASSERT_NO_THROW(deleteStatement.where(whereClause));
+    ASSERT_NO_THROW(deleteStatement.prepare());
+    ASSERT_NO_THROW(whereClause.bind(1));
+    ASSERT_NO_THROW(deleteStatement.exec());
+    ASSERT_EQ(count(), 2);
+
+    DeleteStatement deleteAllStatement;
+    ASSERT_NO_THROW(deleteAllStatement.attach(db, "ex"));
+    ASSERT_NO_THROW(deleteAllStatement.prepare());
+    ASSERT_NO_THROW(deleteAllStatement.exec());
+    ASSERT_EQ(count(), 0);
 }
