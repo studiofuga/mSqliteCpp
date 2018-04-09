@@ -47,7 +47,8 @@ public:
     }
 
     template <typename W>
-    void where (W w) {
+    void where (W &w) {
+        w.setBindOffset(sizeof...(FIELDS));
         sql.where(w.toText());
     }
 

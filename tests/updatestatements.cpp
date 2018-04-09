@@ -15,6 +15,7 @@ protected:
     std::shared_ptr<SQLiteStorage> db;
 public:
     FieldDef<FieldType::Integer> fldId = sqlite::makeFieldDef("id", sqlite::FieldType::Integer());
+    FieldDef<FieldType::Integer> fldId2 = sqlite::makeFieldDef("id2", sqlite::FieldType::Integer());
     FieldDef<FieldType::Text> fldName = sqlite::makeFieldDef("n", sqlite::FieldType::Text());
     FieldDef<FieldType::Integer> fldValue = sqlite::makeFieldDef("v", sqlite::FieldType::Integer());
 
@@ -37,15 +38,15 @@ protected:
         db = std::make_shared<SQLiteStorage>(":memory:");
         db->open();
 
-        SQLiteStatement create_stmt(db, "CREATE TABLE " + tablename + " (id INTEGER, n TEXT, v INTEGER);");
+        SQLiteStatement create_stmt(db, "CREATE TABLE " + tablename + " (id INTEGER, id2 INTEGER, n TEXT, v INTEGER);");
         create_stmt.executeStep();
 
-        SQLiteStatement stmt(db, statements::Insert(tablename, fldId, fldName, fldValue));
-        stmt.bind(std::make_tuple(1, "name1", 2));
+        SQLiteStatement stmt(db, statements::Insert(tablename, fldId, fldId2, fldName, fldValue));
+        stmt.bind(std::make_tuple(1, 1, "name1", 2));
         stmt.execute();
-        stmt.bind(std::make_tuple(2, "name2", 4));
+        stmt.bind(std::make_tuple(1, 2, "name2", 4));
         stmt.execute();
-        stmt.bind(std::make_tuple(3, "name3", 6));
+        stmt.bind(std::make_tuple(3, 2, "name3", 6));
         stmt.execute();
 
         Test::SetUp();
@@ -62,10 +63,13 @@ TEST_F(UpdateStatements, update)
 
     SQLiteStatement allzerocheck (db, "SELECT " + fldValue.name() + " FROM " + tablename + ";");
 
-    auto allzerochecker = [&allzerocheck]() {
+    bool f = false;
+    auto allzerochecker = [&allzerocheck, &f]() {
+        f = true;
         return allzerocheck.getIntValue(0) == 0;
     };
     ASSERT_TRUE(allzerocheck.execute(allzerochecker));
+    ASSERT_TRUE(f);
 
     Where<decltype(fldId)> where(statement.getStatement(), op::eq(fldId));
 
@@ -75,11 +79,23 @@ TEST_F(UpdateStatements, update)
     ASSERT_NO_THROW(statement.update(1));
 
     SQLiteStatement checker (db, "SELECT " + fldId.name() + "," + fldValue.name() + " FROM " + tablename + ";");
-    auto onechecker = [&checker]() {
-        if (checker.getIntValue(0) == 1)
-            return checker.getIntValue(1) == 1;
-        return checker.getIntValue(1) == 0;
+    auto onechecker = [&checker,&f]() {
+        std::cout << "Id: " << checker.getIntValue(0) << " value " << checker.getIntValue(1) << "\n";
+        f = true;
+        auto v = checker.getIntValue(1);
+        if (checker.getIntValue(0) == 1) {
+            if (v != 1) {
+                std::cout << "Id 1 should have value 1, has "<< v << " instead\n";
+            }
+            return v == 1;
+        }
+        if (v != 0) {
+            std::cout << "Expected value 0, "<< v << " instead\n";
+        }
+        return v == 0;
     };
 
+    f = false;
     ASSERT_TRUE(checker.execute(onechecker));
+    ASSERT_TRUE(f);
 }

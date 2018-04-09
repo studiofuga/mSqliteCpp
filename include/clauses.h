@@ -15,6 +15,7 @@ template <typename ...Ts>
 class Where {
     SQLiteStatement *statement;
     std::string condition;
+    int bindOffset = 0;
 
     template <size_t I, typename ...Vs>
     void bindImpl(std::tuple<Vs...>, typename std::enable_if<I == sizeof...(Vs)>::type * = 0) {
@@ -40,6 +41,10 @@ public:
 
     std::string toText() {
         return condition;
+    }
+
+    void setBindOffset(int n) {
+        bindOffset = n;
     }
 
     template <typename ...Vs>
