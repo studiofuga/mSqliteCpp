@@ -90,6 +90,32 @@ TEST_F(Statements, typedCreate)
     ASSERT_NO_THROW(insertOrReplaceStatement.insert(1, std::string {"First Again"}, 1.0));
 }
 
+TEST_F(Statements, statementExecuteFail)
+{
+    SQLiteStatement stmt(db,
+                         "CREATE TABLE sample (id INTEGER PRIMARY KEY, name TEXT);");
+    ASSERT_NO_THROW(stmt.execute());
+
+    stmt.attach(db,
+                "INSERT INTO sample VALUES (0, 'AAA'),(1,'BBB'),(2,'CCC');");
+    ASSERT_NO_THROW(stmt.execute());
+
+    // fails at mid
+    stmt.attach(db, "SELECT * from SAMPLE;");
+    ASSERT_TRUE(stmt.execute());
+    ASSERT_FALSE(stmt.execute([](){
+        return false;
+    }));
+    int c = 0;
+    ASSERT_FALSE(stmt.execute([&c](){
+        ++c;
+        if (c == 2)
+            return false;
+        return true;
+    }));
+
+}
+
 TEST_F(Statements, selectStatements1)
 {
     auto fldId = sqlite::makeFieldDef("id", sqlite::FieldType::Integer()).notNull();

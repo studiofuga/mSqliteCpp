@@ -138,20 +138,20 @@ std::string SQLiteStatement::getStringValue(int idx)
     return std::string(sptr, sptr + len);
 }
 
-bool SQLiteStatement::executeStep(std::function<bool()> func)
+SQLiteStatement::QueryResult SQLiteStatement::executeStep(std::function<bool()> func)
 {
     auto db = p->mDb.lock();
     auto r = sqlite3_step(p->stmt);
     if (r == SQLITE_DONE) {
-        return false;
+        return QueryResult::Completed;
     } else if (r != SQLITE_ROW) {
         SQLiteException::throwIfNotOk(r, db->handle());
     }
 
-    return func();
+    return (func() ? QueryResult::Ongoing : QueryResult::Aborted);
 }
 
-bool SQLiteStatement::executeStep()
+SQLiteStatement::QueryResult SQLiteStatement::executeStep()
 {
     return executeStep([]() { return true; });
 }
@@ -178,24 +178,18 @@ int SQLiteStatement::columnCount()
 
 bool SQLiteStatement::execute(std::function<bool()> function)
 {
+    QueryResult result;
     try {
-        while (executeStep(function));
+        while ((result = executeStep(function)) == SQLiteStatement::QueryResult::Ongoing);
     } catch (SQLiteException &) {
         sqlite3_reset(p->stmt); // Reset the statement before throwing again
         throw;
     }
     sqlite3_reset(p->stmt);
-    return true;
+    return result == SQLiteStatement::QueryResult::Completed;
 }
 
 bool SQLiteStatement::execute()
 {
-    try {
-        while (executeStep());
-    } catch (SQLiteException &) {
-        sqlite3_reset(p->stmt);
-        throw;
-    }
-    sqlite3_reset(p->stmt);
-    return true;
+    return execute([]() { return true; });
 }

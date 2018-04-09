@@ -76,6 +76,9 @@ namespace sqlite {
         FieldType::Type columnType(int idx);
         int columnCount();
 
+        enum class QueryResult {
+            Ongoing, Completed, Aborted
+        };
         /** @brief Execute a step of a statement, calling a result manipulation function.
          *
          * @args function a functor that treats the results, returns true if ok, false if execution is completed
@@ -83,8 +86,8 @@ namespace sqlite {
          * @return true if ok and more data has to come, false if statement execution is completed
          * @throws SqliteException if error occurs
          */
-        bool executeStep(std::function<bool()> function);
-        bool executeStep();
+        QueryResult executeStep(std::function<bool()> function);
+        QueryResult executeStep();
 
         bool execute(std::function<bool()> function);
         bool execute();
