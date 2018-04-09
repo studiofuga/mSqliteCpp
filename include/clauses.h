@@ -27,8 +27,15 @@ class Where {
     };
 
 public:
+    Where() = default;
     explicit Where (SQLiteStatement *refStatement, std::string cond)
     : statement(refStatement), condition (std::move(cond)) {
+    }
+
+    void attach (SQLiteStatement *refStatement, std::string cond)
+    {
+        statement = refStatement;
+        condition = std::move(cond);
     }
 
     std::string toText() {
