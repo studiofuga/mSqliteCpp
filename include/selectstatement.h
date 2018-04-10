@@ -52,6 +52,11 @@ public:
         this->name = std::move(name);
     }
 
+    template <typename ...FLDS>
+    void groupBy(FLDS... fields) {
+        sql.groupBy(fields...);
+    }
+
     void prepare() {
         statement.attach(db, sql);
     }

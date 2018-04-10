@@ -185,6 +185,29 @@ TEST_F(Statements, selectStatements1)
     ASSERT_EQ(n, 1);
     ASSERT_EQ(v, 10.0);
 
+    // Insert another row
+    ASSERT_NO_THROW(insertStatement.insert(3, std::string {"second"}, 20.0));
+
+    SelectStatement<
+            decltype(fldName), decltype(fldValue)>
+            selectStatement2(fldName, fldValue);
+
+    ASSERT_NO_THROW(selectStatement2.attach(db, "sample"));
+    selectStatement2.groupBy(fldName);
+    ASSERT_NO_THROW(selectStatement2.prepare());
+
+    count = 0;
+    v = 0;
+    ASSERT_NO_THROW(selectStatement2.exec([&v, &count](std::string nm, double rv) {
+        if (nm == "second") {
+            v = rv;
+        }
+        count++;
+        return true;
+    }));
+
+    ASSERT_EQ(count, 2);
+    ASSERT_EQ(v, 20.0);
 }
 
 TEST_F(Statements, casts)
