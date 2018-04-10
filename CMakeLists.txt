@@ -21,6 +21,10 @@ set(CMAKE_ARCHIVE_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/lib)
 set(CMAKE_LIBRARY_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/bin)
 set(CMAKE_RUNTIME_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/bin)
 
+if (${CMAKE_VERSION} VERSION_GREATER_EQUAL 3.9)
+    find_package(Doxygen)
+endif (${CMAKE_VERSION} VERSION_GREATER_EQUAL 3.9)
+
 include_directories(
         ${MSQLITECPP_ROOT}/include
         ${SQLITE_INCLUDE_DIRS}
@@ -65,3 +69,10 @@ endif(ENABLE_TEST)
 if (ENABLE_PROFILER)
     add_subdirectory(profiler)
 endif(ENABLE_PROFILER)
+
+if (DOXYGEN_FOUND)
+    list(APPEND DOXYGEN_EXCLUDE_PATTERNS
+            */tests/googletest
+            )
+    doxygen_add_docs(documentation)
+endif (DOXYGEN_FOUND)
