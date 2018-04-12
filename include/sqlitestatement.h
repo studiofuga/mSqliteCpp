@@ -53,9 +53,12 @@ namespace sqlite {
         void bind(size_t idx, std::string value);
         void bind(size_t idx, unsigned long long value);
         void bind(size_t idx, long long value);
+        void bind(size_t idx, unsigned long value);
+        void bind(size_t idx, long value);
         void bind(size_t idx, int value);
         void bind(size_t idx, unsigned int value);
         void bind(size_t idx, double value);
+        void bind(size_t idx, float value);
 
         template <typename ...Ts>
         void bind(std::tuple<Ts...> t) {

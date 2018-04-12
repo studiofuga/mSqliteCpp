@@ -90,6 +90,20 @@ void SQLiteStatement::bind(size_t idx, long long value)
     SQLiteException::throwIfNotOk(r,db->handle());
 }
 
+void SQLiteStatement::bind(size_t idx, unsigned long value)
+{
+    auto db = p->mDb.lock();
+    auto r = sqlite3_bind_int64(p->stmt, idx, value);
+    SQLiteException::throwIfNotOk(r,db->handle());
+}
+
+void SQLiteStatement::bind(size_t idx, long value)
+{
+    auto db = p->mDb.lock();
+    auto r = sqlite3_bind_int64(p->stmt, idx, value);
+    SQLiteException::throwIfNotOk(r,db->handle());
+}
+
 void SQLiteStatement::bind(size_t idx, unsigned int value)
 {
     auto db = p->mDb.lock();
@@ -105,6 +119,13 @@ void SQLiteStatement::bind(size_t idx, int value)
 }
 
 void SQLiteStatement::bind(size_t idx, double value)
+{
+    auto db = p->mDb.lock();
+    auto r = sqlite3_bind_double(p->stmt, idx, value);
+    SQLiteException::throwIfNotOk(r,db->handle());
+}
+
+void SQLiteStatement::bind(size_t idx, float value)
 {
     auto db = p->mDb.lock();
     auto r = sqlite3_bind_double(p->stmt, idx, value);
