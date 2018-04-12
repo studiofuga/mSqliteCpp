@@ -33,10 +33,14 @@ public:
     InsertStatement() {}
     explicit InsertStatement(FIELDS... f) { fields = std::make_tuple(f...); }
 
-    void doReplace() {
+    void replaceOnConflict() {
         if (statement)
             throw std::logic_error("Cannot call InsertStatement::doReplace() after InsertStatement::Attach()");
         do_replace = true;
+    }
+    [[deprecated("use replaceOnConflict() instead")]]
+    void doReplace() {
+        replaceOnConflict();
     }
 
     void attach (std::shared_ptr<SQLiteStorage> dbm, std::string table) {
