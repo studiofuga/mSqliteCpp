@@ -70,6 +70,10 @@ public:
         return &statement;
     }
 
+    std::string statementString() const {
+        return sql.string();
+    }
+
     template <typename F>
     void exec(F func) {
         statement.execute([this, func]() {
