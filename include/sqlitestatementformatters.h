@@ -14,6 +14,23 @@ namespace sqlite {
 
         namespace details {
 
+            template <typename T>
+            std::string toString(T t) {
+                return t.toString();
+            }
+            template <>
+            inline std::string toString (std::string t) {
+                return t;
+            }
+            template <>
+            inline std::string toString (const char *t) {
+                return std::string(t);
+            }
+            template <typename Q>
+            inline std::string toString (sqlite::FieldDef<Q> t) {
+                return t.name();
+            }
+
             template<size_t I, typename ...Ts>
             std::string
             unpackFieldNames_impl(const std::tuple<Ts...> &def,
@@ -28,7 +45,7 @@ namespace sqlite {
             unpackFieldNames_impl(const std::tuple<Ts...> &def,
                                   typename std::enable_if<I < sizeof...(Ts)>::type * = 0) {
                 auto &field = std::get<I>(def);
-                return field.name() + (I == sizeof...(Ts) - 1 ? "" : ",") + unpackFieldNames_impl<I + 1, Ts...>(def);
+                return toString(field) + (I == sizeof...(Ts) - 1 ? "" : ",") + unpackFieldNames_impl<I + 1, Ts...>(def);
             }
 
             template<size_t I, typename ...Ts>
@@ -60,7 +77,7 @@ namespace sqlite {
             std::string unpackFieldsAndPlaceholders_impl (const std::tuple<Ts...> &def,
                                                           typename std::enable_if<I < sizeof...(Ts)>::type * = 0) {
                 auto const &field = std::get<I>(def);
-                return field.name()
+                return toString(field)
                        + " = ?" + (I == sizeof...(Ts) - 1 ? "" : ",")
                        + unpackFieldsAndPlaceholders_impl<I+1>(def);
             }
@@ -76,7 +93,7 @@ namespace sqlite {
         std::string unpackFieldDefinitions_impl (const std::tuple<Ts...> &def,
                                                       typename std::enable_if<I < sizeof...(Ts)>::type * = 0) {
             auto const &field = std::get<I>(def);
-            return field.name() + " " + field.sqlType() + field.sqlAttributes()
+            return toString(field) + " " + field.sqlType() + field.sqlAttributes()
                    + (I == sizeof...(Ts) - 1 ? "" : ", ")
                    + unpackFieldDefinitions_impl<I+1>(def);
         }
@@ -183,22 +200,51 @@ namespace sqlite {
         };
 
         class CreateTable : public StatementFormatter {
+            std::string mName;
             std::string mStatementString;
+            std::string mConstraintString;
         public:
             template <typename ...F>
             explicit CreateTable(std::string tablename, F... fields) {
+                mName = tablename;
                 std::ostringstream ss;
-
-                ss << "CREATE TABLE " << tablename << " ("
-                                                      << unpackFieldDefinitions(fields...) << ");";
+                ss << unpackFieldDefinitions(fields...);
                 mStatementString = ss.str();
             }
 
             std::string string() const override {
                 std::ostringstream ss;
-                ss << mStatementString;
+                ss << "CREATE TABLE " << mName << " ("
+                                                  << mStatementString << mConstraintString << ");";
                 return ss.str();
             }
+
+            template <typename CONSTRAINT>
+            void setConstraint(CONSTRAINT c) {
+                mConstraintString = ", " + details::toString(c);
+            }
+
+            struct TableConstraint {
+                class ForeignKey {
+                    std::string statement;
+                public:
+                    template<typename ...FLDS, typename ...REF_FLDS>
+                    explicit
+                    ForeignKey(std::string name, std::tuple<FLDS...> f, std::string refTable, std::tuple<REF_FLDS...> refFields) {
+                        std::ostringstream ss;
+                        ss << "CONSTRAINT " << name << " FOREIGN KEY("
+                                                        << unpackFieldNames(f)
+                                                        << ") REFERENCES " << refTable << "("
+                                                                                          << unpackFieldNames(refFields)
+                                                                                          <<")";
+                        statement = ss.str();
+                    }
+
+                    std::string toString() const {
+                        return statement;
+                    }
+                };
+            };
         };
 
         class Insert : public StatementFormatter {

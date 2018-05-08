@@ -142,4 +142,9 @@ TEST(SqlFormatting, createTableStatement)
 
     sqlite::statements::CreateTable c ("MyTable", fldId, fldName, fldValue);
     ASSERT_EQ(c.string(), "CREATE TABLE MyTable (id INTEGER PRIMARY KEY, name TEXT, value REAL);");
+
+    sqlite::statements::CreateTable::TableConstraint::ForeignKey constraint("u", std::make_tuple(fldId), "x", std::make_tuple("y"));
+    c.setConstraint(constraint);
+    ASSERT_EQ(c.string(), "CREATE TABLE MyTable (id INTEGER PRIMARY KEY, name TEXT, value REAL,"
+                          " CONSTRAINT u FOREIGN KEY(id) REFERENCES x(y));");
 }
