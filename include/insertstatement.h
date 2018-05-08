@@ -20,48 +20,61 @@ class InsertStatement {
     std::string tablename;
     bool do_replace = false;
 
-    template <int N=0, typename ...T>
-    typename std::enable_if<N == sizeof...(T), void>::type insertImpl(std::tuple<T...>) {
+    template<int N = 0, typename ...T>
+    typename std::enable_if<N == sizeof...(T), void>::type insertImpl(std::tuple<T...>)
+    {
     };
 
-    template <int N=0, typename ...T>
-    typename std::enable_if<N < sizeof...(T), void>::type insertImpl(std::tuple<T...> values) {
-        statement->bind(N+1, std::get<N>(values));
-        insertImpl<N+1>(values);
+    template<int N = 0, typename ...T>
+    typename std::enable_if<N < sizeof...(T), void>::type insertImpl(std::tuple<T...> values)
+    {
+        statement->bind(N + 1, std::get<N>(values));
+        insertImpl<N + 1>(values);
     };
 public:
-    InsertStatement() {}
-    explicit InsertStatement(FIELDS... f) { fields = std::make_tuple(f...); }
+    InsertStatement()
+    {}
 
-    void replaceOnConflict() {
-        if (statement)
+    explicit InsertStatement(FIELDS... f)
+    { fields = std::make_tuple(f...); }
+
+    void replaceOnConflict()
+    {
+        if (statement) {
             throw std::logic_error("Cannot call InsertStatement::doReplace() after InsertStatement::Attach()");
+        }
         do_replace = true;
     }
+
     [[deprecated("use replaceOnConflict() instead")]]
-    void doReplace() {
+    void doReplace()
+    {
         replaceOnConflict();
     }
 
-    void attach (std::shared_ptr<SQLiteStorage> dbm, std::string table) {
+    void attach(std::shared_ptr<SQLiteStorage> dbm, std::string table)
+    {
         db = dbm;
         tablename = std::move(table);
         auto r = statements::Insert(tablename, fields);
-        if (do_replace)
+        if (do_replace) {
             r.doReplace();
+        }
         statement = std::make_shared<SQLiteStatement>(db, r);
     }
 
-    template <typename ...T>
-    void insert (T... values) {
+    template<typename ...T>
+    void insert(T... values)
+    {
         insertImpl<0>(std::make_tuple(values...));
         statement->execute();
     }
 
 };
 
-template <typename ...FIELDS>
-inline InsertStatement<FIELDS...> makeInsertStatement(FIELDS... fields) {
+template<typename ...FIELDS>
+inline InsertStatement<FIELDS...> makeInsertStatement(FIELDS... fields)
+{
     return InsertStatement<FIELDS...>(fields...);
 }
 

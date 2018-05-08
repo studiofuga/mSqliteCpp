@@ -17,15 +17,14 @@
 
 using namespace sqlite;
 
-class Statements : public testing::Test
-{
+class Statements : public testing::Test {
 protected:
     std::shared_ptr<SQLiteStorage> db;
 public:
     Statements()
-    : fldId("id", sqlite::FieldAttribute::NotNull),
-      fldName("name", sqlite::FieldAttribute::NotNull),
-      fldValue("v", sqlite::FieldAttribute::NotNull)
+            : fldId("id", sqlite::FieldAttribute::NotNull),
+              fldName("name", sqlite::FieldAttribute::NotNull),
+              fldValue("v", sqlite::FieldAttribute::NotNull)
     {
         db = std::make_shared<SQLiteStorage>(":memory:");
         db->open();
@@ -38,13 +37,15 @@ public:
 
 TEST_F(Statements, CreateTable)
 {
-    CreateTableStatement<decltype(fldId), decltype(fldName), decltype(fldValue)> create (db, "sample", fldId, fldName, fldValue);
+    CreateTableStatement<decltype(fldId), decltype(fldName), decltype(fldValue)> create(db, "sample", fldId, fldName,
+                                                                                        fldValue);
     ASSERT_NO_THROW(create.execute());
 
     sqlite::FieldDef<sqlite::FieldType::Integer> fid2("id2");
-    sqlite::FieldDef<sqlite::FieldType::Text> ftext ("text");
-    CreateTableStatement<decltype(fid2), decltype(ftext)> cdep (db, "other", fid2, ftext);
-    statements::CreateTable::TableConstraint::ForeignKey fkey("u", std::make_tuple(fid2), "other", std::make_tuple(fldId));
+    sqlite::FieldDef<sqlite::FieldType::Text> ftext("text");
+    CreateTableStatement<decltype(fid2), decltype(ftext)> cdep(db, "other", fid2, ftext);
+    statements::CreateTable::TableConstraint::ForeignKey fkey("u", std::make_tuple(fid2), "other",
+                                                              std::make_tuple(fldId));
     cdep.setTableConstraint(fkey);
     ASSERT_NO_THROW(cdep.execute());
 }
@@ -97,20 +98,21 @@ TEST_F(Statements, typedCreate)
     auto fldValue = sqlite::makeFieldDef("value", sqlite::FieldType::Real()).notNull();
 
     {
-        SQLiteStatement stmt(db, "CREATE TABLE sample (id INTEGER PRIMARY KEY, name TEXT NOT NULL, value DOUBLE NOT NULL);");
+        SQLiteStatement stmt(db,
+                             "CREATE TABLE sample (id INTEGER PRIMARY KEY, name TEXT NOT NULL, value DOUBLE NOT NULL);");
         ASSERT_NO_THROW(stmt.execute());
     }
 
     auto insertStatement = sqlite::makeInsertStatement(fldId, fldName, fldValue);
     ASSERT_NO_THROW(insertStatement.attach(db, "sample"));
-    ASSERT_NO_THROW(insertStatement.insert(1, std::string {"first"}, 10.0));
-    ASSERT_NO_THROW(insertStatement.insert(2, std::string {"second"}, 20.0));
-    ASSERT_THROW(insertStatement.insert(1, std::string {"First Again"}, 1.0), sqlite::SQLiteException);
+    ASSERT_NO_THROW(insertStatement.insert(1, std::string{"first"}, 10.0));
+    ASSERT_NO_THROW(insertStatement.insert(2, std::string{"second"}, 20.0));
+    ASSERT_THROW(insertStatement.insert(1, std::string{"First Again"}, 1.0), sqlite::SQLiteException);
 
     auto insertOrReplaceStatement = sqlite::makeInsertStatement(fldId, fldName, fldValue);
     ASSERT_NO_THROW(insertOrReplaceStatement.replaceOnConflict());
     ASSERT_NO_THROW(insertOrReplaceStatement.attach(db, "sample"));
-    ASSERT_NO_THROW(insertOrReplaceStatement.insert(1, std::string {"First Again"}, 1.0));
+    ASSERT_NO_THROW(insertOrReplaceStatement.insert(1, std::string{"First Again"}, 1.0));
 }
 
 TEST_F(Statements, statementExecuteFail)
@@ -126,14 +128,15 @@ TEST_F(Statements, statementExecuteFail)
     // fails at mid
     stmt.attach(db, "SELECT * from SAMPLE;");
     ASSERT_TRUE(stmt.execute());
-    ASSERT_FALSE(stmt.execute([](){
+    ASSERT_FALSE(stmt.execute([]() {
         return false;
     }));
     int c = 0;
-    ASSERT_FALSE(stmt.execute([&c](){
+    ASSERT_FALSE(stmt.execute([&c]() {
         ++c;
-        if (c == 2)
+        if (c == 2) {
             return false;
+        }
         return true;
     }));
 
@@ -146,13 +149,14 @@ TEST_F(Statements, selectStatements1)
     auto fldValue = sqlite::makeFieldDef("value", sqlite::FieldType::Real()).notNull();
 
     {
-        SQLiteStatement stmt(db, "CREATE TABLE sample (id INTEGER PRIMARY KEY, name TEXT NOT NULL, value DOUBLE NOT NULL);");
+        SQLiteStatement stmt(db,
+                             "CREATE TABLE sample (id INTEGER PRIMARY KEY, name TEXT NOT NULL, value DOUBLE NOT NULL);");
         ASSERT_NO_THROW(stmt.execute());
     }
 
     auto insertStatement = sqlite::makeInsertStatement(fldId, fldName, fldValue);
     ASSERT_NO_THROW(insertStatement.attach(db, "sample"));
-    ASSERT_NO_THROW(insertStatement.insert(1, std::string {"first"}, 10.0));
+    ASSERT_NO_THROW(insertStatement.insert(1, std::string{"first"}, 10.0));
 
     SelectStatement<
             decltype(fldId), decltype(fldValue)>
@@ -164,7 +168,7 @@ TEST_F(Statements, selectStatements1)
     int count = 0;
     int n = 0;
     double v = 0;
-    ASSERT_NO_THROW(selectStatement.exec([&n,&v, &count](int rn, double rv) {
+    ASSERT_NO_THROW(selectStatement.exec([&n, &v, &count](int rn, double rv) {
         n = rn;
         v = rv;
         count++;
@@ -176,7 +180,7 @@ TEST_F(Statements, selectStatements1)
     ASSERT_EQ(v, 10.0);
 
     // Insert another row
-    ASSERT_NO_THROW(insertStatement.insert(2, std::string {"second"}, 20.0));
+    ASSERT_NO_THROW(insertStatement.insert(2, std::string{"second"}, 20.0));
 
     // Count again
     count = 0;
@@ -188,7 +192,7 @@ TEST_F(Statements, selectStatements1)
 
     // Now we add a where clause
 
-    Where<decltype(fldId)> where (selectStatement.getStatement(), op::eq(fldId));
+    Where<decltype(fldId)> where(selectStatement.getStatement(), op::eq(fldId));
     ASSERT_NO_THROW(selectStatement.where(where));
     ASSERT_NO_THROW(selectStatement.prepare());
 
@@ -197,7 +201,7 @@ TEST_F(Statements, selectStatements1)
     count = 0;
     n = 0;
     v = 0;
-    ASSERT_NO_THROW(selectStatement.exec([&n,&v, &count](int rn, double rv) {
+    ASSERT_NO_THROW(selectStatement.exec([&n, &v, &count](int rn, double rv) {
         n = rn;
         v = rv;
         count++;
@@ -209,7 +213,7 @@ TEST_F(Statements, selectStatements1)
     ASSERT_EQ(v, 10.0);
 
     // Insert another row
-    ASSERT_NO_THROW(insertStatement.insert(3, std::string {"second"}, 20.0));
+    ASSERT_NO_THROW(insertStatement.insert(3, std::string{"second"}, 20.0));
 
     SelectStatement<
             decltype(fldName), decltype(fldValue)>
@@ -355,8 +359,7 @@ TEST_F(Statements, failAndRepeat)
 
 }
 
-class SelectStatements : public testing::Test
-{
+class SelectStatements : public testing::Test {
 protected:
     std::shared_ptr<SQLiteStorage> db;
 public:
@@ -364,7 +367,8 @@ public:
     const FieldDef<FieldType::Text> fldName = sqlite::makeFieldDef("n", sqlite::FieldType::Text());
     const FieldDef<FieldType::Real> fldValue = sqlite::makeFieldDef("v", sqlite::FieldType::Real());
 
-    SelectStatements() {
+    SelectStatements()
+    {
         db = std::make_shared<SQLiteStorage>(":memory:");
         db->open();
 
@@ -412,7 +416,7 @@ TEST_F(SelectStatements, join)
 
     {
         auto s = sqlite::statements::Select("ex", fldId, jfldName, fldValue, jfldValue);
-        s.join("ex2", fldId, field("ex2",jfldId));
+        s.join("ex2", fldId, field("ex2", jfldId));
 
         std::vector<int> ids;
         std::vector<std::string> names;
@@ -431,8 +435,7 @@ TEST_F(SelectStatements, join)
     }
 }
 
-class DeleteStatements : public testing::Test
-{
+class DeleteStatements : public testing::Test {
 protected:
     std::shared_ptr<SQLiteStorage> db;
 public:
@@ -440,10 +443,11 @@ public:
     const FieldDef<FieldType::Text> fldName = sqlite::makeFieldDef("n", sqlite::FieldType::Text());
     const FieldDef<FieldType::Real> fldValue = sqlite::makeFieldDef("v", sqlite::FieldType::Real());
 
-    int count() {
+    int count()
+    {
         int c = 0;
-        SQLiteStatement select (db, "SELECT id FROM ex;");
-        select.execute([&c](){
+        SQLiteStatement select(db, "SELECT id FROM ex;");
+        select.execute([&c]() {
             ++c;
             return true;
         });

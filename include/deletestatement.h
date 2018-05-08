@@ -25,26 +25,31 @@ class DeleteStatement {
 public:
     DeleteStatement() = default;
 
-    void attach (std::shared_ptr<SQLiteStorage> db, std::string name) {
+    void attach(std::shared_ptr<SQLiteStorage> db, std::string name)
+    {
         sql = statements::Delete(name);
         this->db = db;
         this->name = std::move(name);
     }
 
-    void prepare() {
+    void prepare()
+    {
         statement.attach(db, sql);
     }
 
-    template <typename W>
-    void where (W w) {
+    template<typename W>
+    void where(W w)
+    {
         sql.where(w.toText());
     }
 
-    void exec() {
+    void exec()
+    {
         statement.execute();
     }
 
-    SQLiteStatement *getStatement() {
+    SQLiteStatement *getStatement()
+    {
         return &statement;
     }
 };

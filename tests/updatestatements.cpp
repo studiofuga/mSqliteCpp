@@ -9,8 +9,7 @@
 
 using namespace sqlite;
 
-class UpdateStatements : public testing::Test
-{
+class UpdateStatements : public testing::Test {
 protected:
     std::shared_ptr<SQLiteStorage> db;
 public:
@@ -21,10 +20,11 @@ public:
 
     const std::string tablename = "ex";
 
-    int count() {
+    int count()
+    {
         int c = 0;
-        SQLiteStatement select (db, "SELECT id FROM " + tablename + ";");
-        select.execute([&c](){
+        SQLiteStatement select(db, "SELECT id FROM " + tablename + ";");
+        select.execute([&c]() {
             ++c;
             return true;
         });
@@ -61,7 +61,7 @@ TEST_F(UpdateStatements, update)
     ASSERT_NO_THROW(statement.prepare());
     ASSERT_NO_THROW(statement.update(0));
 
-    SQLiteStatement allzerocheck (db, "SELECT " + fldValue.name() + " FROM " + tablename + ";");
+    SQLiteStatement allzerocheck(db, "SELECT " + fldValue.name() + " FROM " + tablename + ";");
 
     bool f = false;
     auto allzerochecker = [&allzerocheck, &f]() {
@@ -78,19 +78,19 @@ TEST_F(UpdateStatements, update)
     ASSERT_NO_THROW(where.bind(1));
     ASSERT_NO_THROW(statement.update(1));
 
-    SQLiteStatement checker (db, "SELECT " + fldId.name() + "," + fldValue.name() + " FROM " + tablename + ";");
-    auto onechecker = [&checker,&f]() {
+    SQLiteStatement checker(db, "SELECT " + fldId.name() + "," + fldValue.name() + " FROM " + tablename + ";");
+    auto onechecker = [&checker, &f]() {
         std::cout << "Id: " << checker.getIntValue(0) << " value " << checker.getIntValue(1) << "\n";
         f = true;
         auto v = checker.getIntValue(1);
         if (checker.getIntValue(0) == 1) {
             if (v != 1) {
-                std::cout << "Id 1 should have value 1, has "<< v << " instead\n";
+                std::cout << "Id 1 should have value 1, has " << v << " instead\n";
             }
             return v == 1;
         }
         if (v != 0) {
-            std::cout << "Expected value 0, "<< v << " instead\n";
+            std::cout << "Expected value 0, " << v << " instead\n";
         }
         return v == 0;
     };

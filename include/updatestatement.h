@@ -22,43 +22,53 @@ class UpdateStatement {
     SQLiteStatement statement;
     statements::Update sql;
 
-    template <int N=0, typename ...T>
-    typename std::enable_if<N == sizeof...(T), void>::type updateImpl(std::tuple<T...>) {
+    template<int N = 0, typename ...T>
+    typename std::enable_if<N == sizeof...(T), void>::type updateImpl(std::tuple<T...>)
+    {
     };
 
-    template <int N=0, typename ...T>
-    typename std::enable_if<N < sizeof...(T), void>::type updateImpl(std::tuple<T...> values) {
-        statement.bind(N+1, std::get<N>(values));
+    template<int N = 0, typename ...T>
+    typename std::enable_if<N < sizeof...(T), void>::type updateImpl(std::tuple<T...> values)
+    {
+        statement.bind(N + 1, std::get<N>(values));
         updateImpl<N + 1>(values);
     };
 
 public:
-    UpdateStatement() {}
-    explicit UpdateStatement(FIELDS... f) { fields = std::make_tuple(f...); }
+    UpdateStatement()
+    {}
 
-    void attach (std::shared_ptr<SQLiteStorage> dbm, std::string table) {
+    explicit UpdateStatement(FIELDS... f)
+    { fields = std::make_tuple(f...); }
+
+    void attach(std::shared_ptr<SQLiteStorage> dbm, std::string table)
+    {
         db = dbm;
         tablename = std::move(table);
         sql = statements::Update(tablename, fields);
     }
 
-    void prepare() {
+    void prepare()
+    {
         statement.attach(db, sql);
     }
 
-    template <typename W>
-    void where (W &w) {
+    template<typename W>
+    void where(W &w)
+    {
         w.setBindOffset(sizeof...(FIELDS));
         sql.where(w.toText());
     }
 
-    template <typename ...T>
-    void update (T... values) {
+    template<typename ...T>
+    void update(T... values)
+    {
         updateImpl<0>(std::make_tuple(values...));
         statement.execute();
     }
 
-    SQLiteStatement *getStatement() {
+    SQLiteStatement *getStatement()
+    {
         return &statement;
     }
 };
