@@ -264,6 +264,8 @@ public:
     struct TableConstraint {
         class ForeignKey {
             std::string statement;
+            std::string actionString;
+
         public:
             template<typename ...FLDS, typename ...REF_FLDS>
             explicit
@@ -278,9 +280,47 @@ public:
                 statement = ss.str();
             }
 
+            enum class Action {
+                SetNull, SetDefault, Cascade, Restrict, NoAction
+            };
+
+        private:
+            std::string translateActionString(Action a)
+            {
+                switch (a) {
+                    case Action::SetNull:
+                        return "SET NULL";
+                    case Action::SetDefault:
+                        return "SET DEFAULT";
+                    case Action::Cascade:
+                        return "CASCADE";
+                    case Action::Restrict:
+                        return "RESTRICT";
+                    case Action::NoAction:
+                        return "NO ACTION";
+                }
+            }
+
+        public:
+            void onDelete(Action a)
+            {
+                std::ostringstream ss;
+                ss << actionString << " ON DELETE " << translateActionString(a);
+                actionString = ss.str();
+            }
+
+            void onUpdate(Action a)
+            {
+                std::ostringstream ss;
+                ss << actionString << " ON UPDATE " << translateActionString(a);
+                actionString = ss.str();
+            }
+
             std::string toString() const
             {
-                return statement;
+                std::ostringstream ss;
+                ss << statement << actionString;
+                return ss.str();
             }
         };
     };

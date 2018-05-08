@@ -134,6 +134,20 @@ TEST(SqlFormatting, updateStatement)
     ASSERT_EQ(u.string(), "UPDATE OR ROLLBACK MyTable SET name = ?,value = ? WHERE id = ?;");
 }
 
+TEST(SqlFormatting, ForeignKey)
+{
+    auto fldId = sqlite::makeFieldDef("id", sqlite::FieldType::Integer()).primaryKey();
+    sqlite::statements::CreateTable::TableConstraint::ForeignKey constraint("u", std::make_tuple(fldId), "x", std::make_tuple("y"));
+
+    ASSERT_EQ(constraint.toString(), "CONSTRAINT u FOREIGN KEY(id) REFERENCES x(y)");
+
+    constraint.onDelete(sqlite::statements::CreateTable::TableConstraint::ForeignKey::Action::Cascade);
+    ASSERT_EQ(constraint.toString(), "CONSTRAINT u FOREIGN KEY(id) REFERENCES x(y) ON DELETE CASCADE");
+
+    constraint.onUpdate(sqlite::statements::CreateTable::TableConstraint::ForeignKey::Action::NoAction);
+    ASSERT_EQ(constraint.toString(), "CONSTRAINT u FOREIGN KEY(id) REFERENCES x(y) ON DELETE CASCADE ON UPDATE NO ACTION");
+}
+
 TEST(SqlFormatting, createTableStatement)
 {
     auto fldId = sqlite::makeFieldDef("id", sqlite::FieldType::Integer()).primaryKey();
