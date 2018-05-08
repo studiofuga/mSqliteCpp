@@ -64,6 +64,22 @@ namespace sqlite {
                        + " = ?" + (I == sizeof...(Ts) - 1 ? "" : ",")
                        + unpackFieldsAndPlaceholders_impl<I+1>(def);
             }
+
+
+        template <size_t I, typename ...Ts>
+        std::string unpackFieldDefinitions_impl (const std::tuple<Ts...> &,
+                                                 typename std::enable_if<I == sizeof...(Ts)>::type * = 0) {
+            return std::string();
+        }
+
+        template <size_t I, typename ...Ts>
+        std::string unpackFieldDefinitions_impl (const std::tuple<Ts...> &def,
+                                                      typename std::enable_if<I < sizeof...(Ts)>::type * = 0) {
+            auto const &field = std::get<I>(def);
+            return field.name() + " " + field.sqlType() + field.sqlAttributes()
+                   + (I == sizeof...(Ts) - 1 ? "" : ", ")
+                   + unpackFieldDefinitions_impl<I+1>(def);
+        }
         }
 
         template<typename ...Ts>
@@ -96,6 +112,16 @@ namespace sqlite {
         std::string unpackFieldsAndPlaceholders(std::tuple<Ts...> def) {
             return details::unpackFieldsAndPlaceholders_impl<0>(def);
         }
+
+    template<typename ...Ts>
+    std::string unpackFieldDefinitions(std::tuple<Ts...> def) {
+        return details::unpackFieldDefinitions_impl<0>(def);
+    }
+
+    template<typename ...Ts>
+    std::string unpackFieldDefinitions(Ts... def) {
+        return details::unpackFieldDefinitions_impl<0>(std::make_tuple(def...));
+    }
 
 
     class StatementFormatter {
@@ -163,8 +189,8 @@ namespace sqlite {
             explicit Create(std::string tablename, F... fields) {
                 std::ostringstream ss;
 
-                ss << "CREATE TABLE " << tablename << "("
-                                                      << unpackFieldNames(fields...) << ");";
+                ss << "CREATE TABLE " << tablename << " ("
+                                                      << unpackFieldDefinitions(fields...) << ");";
                 mStatementString = ss.str();
             }
 

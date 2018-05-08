@@ -133,3 +133,13 @@ TEST(SqlFormatting, updateStatement)
     u.orAction(sqlite::statements::Update::OrAction::Rollback);
     ASSERT_EQ(u.string(), "UPDATE OR ROLLBACK MyTable SET name = ?,value = ? WHERE id = ?;");
 }
+
+TEST(SqlFormatting, createTableStatement)
+{
+    auto fldId = sqlite::makeFieldDef("id", sqlite::FieldType::Integer()).primaryKey();
+    auto fldName = sqlite::makeFieldDef("name", sqlite::FieldType::Text());
+    auto fldValue = sqlite::makeFieldDef("value", sqlite::FieldType::Real());
+
+    sqlite::statements::Create c ("MyTable", fldId, fldName, fldValue);
+    ASSERT_EQ(c.string(), "CREATE TABLE MyTable (id INTEGER PRIMARY KEY, name TEXT, value REAL);");
+}
