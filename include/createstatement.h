@@ -55,6 +55,11 @@ public:
     {
         statement.setConstraint(tableConstraint);
     }
+
+    std::string statementString() const
+    {
+        return statement.string();
+    }
 };
 }
 
