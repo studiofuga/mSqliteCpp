@@ -2,16 +2,18 @@
 // Created by Federico Fuga on 19/12/17.
 //
 
-#include <sqlitestatementformatters.h>
-#include <sqlitefieldsop.h>
-#include <insertstatement.h>
-#include <clauses.h>
-#include <deletestatement.h>
-#include "gtest/gtest.h"
-
+#include "insertstatement.h"
+#include "deletestatement.h"
 #include "sqlitestorage.h"
 #include "sqlitestatement.h"
 #include "selectstatement.h"
+#include "createstatement.h"
+
+#include "sqlitestatementformatters.h"
+#include "sqlitefieldsop.h"
+#include "clauses.h"
+
+#include "gtest/gtest.h"
 
 using namespace sqlite;
 
@@ -20,11 +22,25 @@ class Statements : public testing::Test
 protected:
     std::shared_ptr<SQLiteStorage> db;
 public:
-    Statements() {
+    Statements()
+    : fldId("id", sqlite::FieldAttribute::NotNull),
+      fldName("name", sqlite::FieldAttribute::NotNull),
+      fldValue("v", sqlite::FieldAttribute::NotNull)
+    {
         db = std::make_shared<SQLiteStorage>(":memory:");
         db->open();
     }
+
+    sqlite::FieldDef<sqlite::FieldType::Integer> fldId;
+    sqlite::FieldDef<sqlite::FieldType::Text> fldName;
+    sqlite::FieldDef<sqlite::FieldType::Real> fldValue;
 };
+
+TEST_F(Statements, CreateTable)
+{
+    CreateStatement<decltype(fldId), decltype(fldName), decltype(fldValue)> create (db, "sample", fldId, fldName, fldValue);
+    ASSERT_NO_THROW(create.execute());
+}
 
 TEST_F(Statements, create)
 {

@@ -156,6 +156,25 @@ namespace sqlite {
             }
         };
 
+        class Create : public StatementFormatter {
+            std::string mStatementString;
+        public:
+            template <typename ...F>
+            explicit Create(std::string tablename, F... fields) {
+                std::ostringstream ss;
+
+                ss << "CREATE TABLE " << tablename << "("
+                                                      << unpackFieldNames(fields...) << ");";
+                mStatementString = ss.str();
+            }
+
+            std::string string() const override {
+                std::ostringstream ss;
+                ss << mStatementString;
+                return ss.str();
+            }
+        };
+
         class Insert : public StatementFormatter {
             std::string mAction;
             std::string mStatementString;
