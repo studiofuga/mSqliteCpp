@@ -204,6 +204,7 @@ namespace sqlite {
             std::string mStatementString;
             std::string mConstraintString;
         public:
+            CreateTable() = default;
             template <typename ...F>
             explicit CreateTable(std::string tablename, F... fields) {
                 mName = tablename;

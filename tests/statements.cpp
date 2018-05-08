@@ -40,6 +40,13 @@ TEST_F(Statements, CreateTable)
 {
     CreateTableStatement<decltype(fldId), decltype(fldName), decltype(fldValue)> create (db, "sample", fldId, fldName, fldValue);
     ASSERT_NO_THROW(create.execute());
+
+    sqlite::FieldDef<sqlite::FieldType::Integer> fid2("id2");
+    sqlite::FieldDef<sqlite::FieldType::Text> ftext ("text");
+    CreateTableStatement<decltype(fid2), decltype(ftext)> cdep (db, "other", fid2, ftext);
+    statements::CreateTable::TableConstraint::ForeignKey fkey("u", std::make_tuple(fid2), "other", std::make_tuple(fldId));
+    cdep.setTableConstraint(fkey);
+    ASSERT_NO_THROW(cdep.execute());
 }
 
 TEST_F(Statements, create)

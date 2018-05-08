@@ -21,7 +21,7 @@ template<typename ...FIELDS>
 class CreateTableStatement {
     std::tuple<FIELDS...> fields;
     std::shared_ptr<SQLiteStorage> db;
-    std::shared_ptr<SQLiteStatement> statement;
+    statements::CreateTable statement;
     std::string tablename;
 public:
     CreateTableStatement() = default;
@@ -36,12 +36,17 @@ public:
     void attach (std::shared_ptr<SQLiteStorage> dbm, std::string table) {
         db = dbm;
         tablename = std::move(table);
-        auto r = statements::CreateTable(tablename, fields);
-        statement = std::make_shared<SQLiteStatement>(db, r);
+        statement = statements::CreateTable(tablename, fields);
     }
 
     void execute() {
-        statement->execute();
+        auto pstatement = std::make_shared<SQLiteStatement>(db, statement);
+        pstatement->execute();
+    }
+
+    template <typename T>
+    void setTableConstraint(T tableConstraint) {
+        statement.setConstraint(tableConstraint);
     }
 };
 }
