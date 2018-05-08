@@ -108,7 +108,7 @@ TEST_F(Statements, typedCreate)
     ASSERT_THROW(insertStatement.insert(1, std::string {"First Again"}, 1.0), sqlite::SQLiteException);
 
     auto insertOrReplaceStatement = sqlite::makeInsertStatement(fldId, fldName, fldValue);
-    ASSERT_NO_THROW(insertOrReplaceStatement.doReplace());
+    ASSERT_NO_THROW(insertOrReplaceStatement.replaceOnConflict());
     ASSERT_NO_THROW(insertOrReplaceStatement.attach(db, "sample"));
     ASSERT_NO_THROW(insertOrReplaceStatement.insert(1, std::string {"First Again"}, 1.0));
 }
