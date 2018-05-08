@@ -18,17 +18,17 @@
 namespace sqlite {
 
 template<typename ...FIELDS>
-class CreateStatement {
+class CreateTableStatement {
     std::tuple<FIELDS...> fields;
     std::shared_ptr<SQLiteStorage> db;
     std::shared_ptr<SQLiteStatement> statement;
     std::string tablename;
 public:
-    CreateStatement() = default;
-    explicit CreateStatement(FIELDS... f) {
+    CreateTableStatement() = default;
+    explicit CreateTableStatement(FIELDS... f) {
         fields = std::make_tuple(f...);
     }
-    CreateStatement(std::shared_ptr<SQLiteStorage> dbm, std::string table, FIELDS... f) {
+    CreateTableStatement(std::shared_ptr<SQLiteStorage> dbm, std::string table, FIELDS... f) {
         fields = std::make_tuple(f...);
         attach(dbm, table);
     }
@@ -36,7 +36,7 @@ public:
     void attach (std::shared_ptr<SQLiteStorage> dbm, std::string table) {
         db = dbm;
         tablename = std::move(table);
-        auto r = statements::Create(tablename, fields);
+        auto r = statements::CreateTable(tablename, fields);
         statement = std::make_shared<SQLiteStatement>(db, r);
     }
 

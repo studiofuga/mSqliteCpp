@@ -140,6 +140,6 @@ TEST(SqlFormatting, createTableStatement)
     auto fldName = sqlite::makeFieldDef("name", sqlite::FieldType::Text());
     auto fldValue = sqlite::makeFieldDef("value", sqlite::FieldType::Real());
 
-    sqlite::statements::Create c ("MyTable", fldId, fldName, fldValue);
+    sqlite::statements::CreateTable c ("MyTable", fldId, fldName, fldValue);
     ASSERT_EQ(c.string(), "CREATE TABLE MyTable (id INTEGER PRIMARY KEY, name TEXT, value REAL);");
 }

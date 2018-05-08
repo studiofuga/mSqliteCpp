@@ -182,11 +182,11 @@ namespace sqlite {
             }
         };
 
-        class Create : public StatementFormatter {
+        class CreateTable : public StatementFormatter {
             std::string mStatementString;
         public:
             template <typename ...F>
-            explicit Create(std::string tablename, F... fields) {
+            explicit CreateTable(std::string tablename, F... fields) {
                 std::ostringstream ss;
 
                 ss << "CREATE TABLE " << tablename << " ("

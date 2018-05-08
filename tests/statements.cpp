@@ -38,7 +38,7 @@ public:
 
 TEST_F(Statements, CreateTable)
 {
-    CreateStatement<decltype(fldId), decltype(fldName), decltype(fldValue)> create (db, "sample", fldId, fldName, fldValue);
+    CreateTableStatement<decltype(fldId), decltype(fldName), decltype(fldValue)> create (db, "sample", fldId, fldName, fldValue);
     ASSERT_NO_THROW(create.execute());
 }
 
