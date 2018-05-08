@@ -29,7 +29,7 @@ void profile_st(std::string dbname, bool usePreparedStatements)
     auto db = std::make_shared<SQLiteStorage>(dbname);
     db->open();
 
-    auto table = SQLiteTable::create(db, "profiler", fldId, fldName, fldReal);
+    auto table = SQLiteTable::make(db, "profiler", fldId, fldName, fldReal);
 
     auto start = std::chrono::high_resolution_clock::now();
     db->startTransaction();
@@ -73,7 +73,7 @@ void profile_mt(std::string dbname, bool usePreparedStatements)
     auto db = std::make_shared<SQLiteStorage>(dbname);
     db->open();
 
-    auto table = SQLiteTable::create(db, "profiler", fldId, fldName, fldReal);
+    auto table = SQLiteTable::make(db, "profiler", fldId, fldName, fldReal);
 
     auto start = std::chrono::high_resolution_clock::now();
     db->startTransaction();
@@ -130,7 +130,7 @@ void profile_qmt(std::string dbname, bool usePreparedStatements)
     auto db = std::make_shared<SQLiteStorage>(dbname);
     db->open();
 
-    auto table = SQLiteTable::create(db, "profiler", fldId, fldName, fldReal);
+    auto table = SQLiteTable::make(db, "profiler", fldId, fldName, fldReal);
 
     auto start = std::chrono::high_resolution_clock::now();
     db->startTransaction();
