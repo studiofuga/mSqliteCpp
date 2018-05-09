@@ -80,6 +80,8 @@ public:
     bool commitTransaction();
 
     bool abortTransaction();
+
+    size_t getLastRowId();
 };
 
 } // ns sqlite

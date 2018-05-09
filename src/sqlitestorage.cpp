@@ -104,3 +104,7 @@ bool SQLiteStorage::abortTransaction()
     return true;
 }
 
+size_t SQLiteStorage::getLastRowId()
+{
+    sqlite3_last_insert_rowid(handle());
+}
