@@ -323,6 +323,48 @@ public:
                 return ss.str();
             }
         };
+
+        class Unique {
+            std::string statement;
+        public:
+            template<typename ...FLDS, typename ...REF_FLDS>
+            explicit
+            Unique(std::tuple<FLDS...> f)
+            {
+                std::ostringstream ss;
+                ss << "CONSTRAINT UNIQUE ("
+                   << unpackFieldNames(f)
+                   << ")";
+                statement = ss.str();
+            }
+            std::string toString() const
+            {
+                std::ostringstream ss;
+                ss << statement;
+                return ss.str();
+            }
+        };
+
+        class PrimaryKey {
+            std::string statement;
+        public:
+            template<typename ...FLDS, typename ...REF_FLDS>
+            explicit
+            PrimaryKey(std::tuple<FLDS...> f)
+            {
+                std::ostringstream ss;
+                ss << "CONSTRAINT PRIMARY KEY ("
+                   << unpackFieldNames(f)
+                   << ")";
+                statement = ss.str();
+            }
+            std::string toString() const
+            {
+                std::ostringstream ss;
+                ss << statement;
+                return ss.str();
+            }
+        };
     };
 };
 

@@ -146,6 +146,29 @@ TEST(SqlFormatting, ForeignKey)
 
     constraint.onUpdate(sqlite::statements::CreateTable::TableConstraint::ForeignKey::Action::NoAction);
     ASSERT_EQ(constraint.toString(), "CONSTRAINT u FOREIGN KEY(id) REFERENCES x(y) ON DELETE CASCADE ON UPDATE NO ACTION");
+
+    auto fldName = sqlite::makeFieldDef("name", sqlite::FieldType::Integer()).primaryKey();
+    sqlite::statements::CreateTable::TableConstraint::ForeignKey c2("w", std::make_tuple(fldId, fldName), "x", std::make_tuple("y", "z"));
+
+    ASSERT_EQ(c2.toString(), "CONSTRAINT w FOREIGN KEY(id,name) REFERENCES x(y,z)");
+}
+
+TEST(SqlFormatting, UniqueAndPrimaryKey)
+{
+    auto fldId = sqlite::makeFieldDef("id", sqlite::FieldType::Integer()).primaryKey();
+    auto fldName = sqlite::makeFieldDef("name", sqlite::FieldType::Text());
+
+    sqlite::statements::CreateTable::TableConstraint::Unique c1(std::make_tuple(fldId));
+    ASSERT_EQ(c1.toString(), "CONSTRAINT UNIQUE (id)");
+
+    sqlite::statements::CreateTable::TableConstraint::Unique c2(std::make_tuple(fldId, fldName));
+    ASSERT_EQ(c2.toString(), "CONSTRAINT UNIQUE (id,name)");
+
+    sqlite::statements::CreateTable::TableConstraint::PrimaryKey p1(std::make_tuple(fldId));
+    ASSERT_EQ(p1.toString(), "CONSTRAINT PRIMARY KEY (id)");
+
+    sqlite::statements::CreateTable::TableConstraint::PrimaryKey p2(std::make_tuple(fldId, fldName));
+    ASSERT_EQ(p2.toString(), "CONSTRAINT PRIMARY KEY (id,name)");
 }
 
 TEST(SqlFormatting, createTableStatement)
