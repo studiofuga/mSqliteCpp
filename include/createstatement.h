@@ -23,6 +23,13 @@ class CreateTableStatement {
     std::shared_ptr<SQLiteStorage> db;
     statements::CreateTable statement;
     std::string tablename;
+
+    void createStatement() {
+        statement = statements::CreateTable(tablename, fields);
+    }
+    bool attached() const {
+        return !tablename.empty();
+    }
 public:
     CreateTableStatement() = default;
 
@@ -41,7 +48,7 @@ public:
     {
         db = dbm;
         tablename = std::move(table);
-        statement = statements::CreateTable(tablename, fields);
+        createStatement();
     }
 
     void execute()
@@ -54,6 +61,8 @@ public:
     void setTableConstraint(T tableConstraint)
     {
         statement.setConstraint(tableConstraint);
+        if (attached())
+            createStatement();
     }
 
     std::string statementString() const
