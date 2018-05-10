@@ -80,18 +80,20 @@ TEST_F(UpdateStatements, update)
 
     SQLiteStatement checker(db, "SELECT " + fldId.name() + "," + fldValue.name() + " FROM " + tablename + ";");
     auto onechecker = [&checker, &f]() {
-        std::cout << "Id: " << checker.getIntValue(0) << " value " << checker.getIntValue(1) << "\n";
+        //std::cout << "Id: " << checker.getIntValue(0) << " value " << checker.getIntValue(1) << "\n";
         f = true;
         auto v = checker.getIntValue(1);
         if (checker.getIntValue(0) == 1) {
+            /*
             if (v != 1) {
                 std::cout << "Id 1 should have value 1, has " << v << " instead\n";
-            }
+            }*/
             return v == 1;
         }
+        /*
         if (v != 0) {
             std::cout << "Expected value 0, " << v << " instead\n";
-        }
+        }*/
         return v == 0;
     };
 
