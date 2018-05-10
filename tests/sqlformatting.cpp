@@ -158,17 +158,17 @@ TEST(SqlFormatting, UniqueAndPrimaryKey)
     auto fldId = sqlite::makeFieldDef("id", sqlite::FieldType::Integer()).primaryKey();
     auto fldName = sqlite::makeFieldDef("name", sqlite::FieldType::Text());
 
-    sqlite::statements::CreateTable::TableConstraint::Unique c1(std::make_tuple(fldId));
-    ASSERT_EQ(c1.toString(), "CONSTRAINT UNIQUE (id)");
+    sqlite::statements::CreateTable::TableConstraint::Unique c1("u", fldId);
+    ASSERT_EQ(c1.toString(), "CONSTRAINT u UNIQUE (id)");
 
-    sqlite::statements::CreateTable::TableConstraint::Unique c2(std::make_tuple(fldId, fldName));
-    ASSERT_EQ(c2.toString(), "CONSTRAINT UNIQUE (id,name)");
+    sqlite::statements::CreateTable::TableConstraint::Unique c2("u", fldId, fldName);
+    ASSERT_EQ(c2.toString(), "CONSTRAINT u UNIQUE (id,name)");
 
-    sqlite::statements::CreateTable::TableConstraint::PrimaryKey p1(std::make_tuple(fldId));
-    ASSERT_EQ(p1.toString(), "CONSTRAINT PRIMARY KEY (id)");
+    sqlite::statements::CreateTable::TableConstraint::PrimaryKey p1("pk", fldId);
+    ASSERT_EQ(p1.toString(), "CONSTRAINT pk PRIMARY KEY (id)");
 
-    sqlite::statements::CreateTable::TableConstraint::PrimaryKey p2(std::make_tuple(fldId, fldName));
-    ASSERT_EQ(p2.toString(), "CONSTRAINT PRIMARY KEY (id,name)");
+    sqlite::statements::CreateTable::TableConstraint::PrimaryKey p2("pk", fldId, fldName);
+    ASSERT_EQ(p2.toString(), "CONSTRAINT pk PRIMARY KEY (id,name)");
 }
 
 TEST(SqlFormatting, createTableStatement)

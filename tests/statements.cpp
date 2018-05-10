@@ -55,18 +55,36 @@ TEST_F(Statements, CreateTable)
 
 }
 
+TEST_F(Statements, CreateTableWithConstraint)
+{
+    CreateTableStatement<decltype(fldId), decltype(fldName), decltype(fldValue)> c1(db, "withunique", fldId, fldName,
+                                                                                        fldValue);
+
+    statements::CreateTable::TableConstraint::Unique unique("uniqueKey", fldId, fldName);
+    c1.setTableConstraint(unique);
+    ASSERT_NO_THROW(c1.execute());
+
+    CreateTableStatement<decltype(fldId), decltype(fldName), decltype(fldValue)> c2(db, "withprimarykey", fldId, fldName,
+                                                                                    fldValue);
+
+    statements::CreateTable::TableConstraint::PrimaryKey primaryKey("pkey", fldId, fldName);
+    c2.setTableConstraint(primaryKey);
+    ASSERT_NO_THROW(c2.execute());
+
+}
+
 TEST_F(Statements, FixCreateTableInvertedAttachConstraint)
 {
     CreateTableStatement<decltype(fldId), decltype(fldName), decltype(fldValue)> create(fldId, fldName,
                                                                                         fldValue);
 
-    statements::CreateTable::TableConstraint::Unique unique(std::make_tuple(fldId, fldName));
+    statements::CreateTable::TableConstraint::Unique unique("u", fldId, fldName);
 
     create.attach(db, "sample");
     create.setTableConstraint(unique);
 
     ASSERT_EQ(create.statementString(),
-              "CREATE TABLE sample (id INTEGER NOT NULL, name TEXT NOT NULL, v REAL NOT NULL, CONSTRAINT UNIQUE (id,name));"
+              "CREATE TABLE sample (id INTEGER NOT NULL, name TEXT NOT NULL, v REAL NOT NULL, CONSTRAINT u UNIQUE (id,name));"
     );
 
     // here we invert the two functions
@@ -74,13 +92,13 @@ TEST_F(Statements, FixCreateTableInvertedAttachConstraint)
     CreateTableStatement<decltype(fldId), decltype(fldName), decltype(fldValue)> create2(fldId, fldName,
                                                                                         fldValue);
 
-    statements::CreateTable::TableConstraint::Unique unique2(std::make_tuple(fldId, fldName));
+    statements::CreateTable::TableConstraint::Unique unique2("u2", fldId, fldName);
 
     create2.setTableConstraint(unique2);
     create2.attach(db, "sample");
 
     ASSERT_EQ(create2.statementString(),
-              "CREATE TABLE sample (id INTEGER NOT NULL, name TEXT NOT NULL, v REAL NOT NULL, CONSTRAINT UNIQUE (id,name));"
+              "CREATE TABLE sample (id INTEGER NOT NULL, name TEXT NOT NULL, v REAL NOT NULL, CONSTRAINT u2 UNIQUE (id,name));"
     );
 }
 

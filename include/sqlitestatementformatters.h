@@ -327,13 +327,13 @@ public:
         class Unique {
             std::string statement;
         public:
-            template<typename ...FLDS, typename ...REF_FLDS>
+            template<typename ...FLDS>
             explicit
-            Unique(std::tuple<FLDS...> f)
+            Unique(std::string keyname, FLDS... f)
             {
                 std::ostringstream ss;
-                ss << "CONSTRAINT UNIQUE ("
-                   << unpackFieldNames(f)
+                ss << "CONSTRAINT " << keyname << " UNIQUE ("
+                   << unpackFieldNames(std::make_tuple(f...))
                    << ")";
                 statement = ss.str();
             }
@@ -348,13 +348,13 @@ public:
         class PrimaryKey {
             std::string statement;
         public:
-            template<typename ...FLDS, typename ...REF_FLDS>
+            template<typename ...FLDS>
             explicit
-            PrimaryKey(std::tuple<FLDS...> f)
+            PrimaryKey(std::string keyname, FLDS... f)
             {
                 std::ostringstream ss;
-                ss << "CONSTRAINT PRIMARY KEY ("
-                   << unpackFieldNames(f)
+                ss << "CONSTRAINT " << keyname << " PRIMARY KEY ("
+                   << unpackFieldNames(std::make_tuple(f...))
                    << ")";
                 statement = ss.str();
             }
