@@ -48,6 +48,40 @@ TEST_F(Statements, CreateTable)
                                                               std::make_tuple(fldId));
     cdep.setTableConstraint(fkey);
     ASSERT_NO_THROW(cdep.execute());
+
+    ASSERT_EQ(cdep.statementString(),
+              "CREATE TABLE other (id2 INTEGER, text TEXT, CONSTRAINT u FOREIGN KEY(id2) REFERENCES other(id));"
+    );
+
+}
+
+TEST_F(Statements, FixCreateTableInvertedAttachConstraint)
+{
+    CreateTableStatement<decltype(fldId), decltype(fldName), decltype(fldValue)> create(fldId, fldName,
+                                                                                        fldValue);
+
+    statements::CreateTable::TableConstraint::Unique unique(std::make_tuple(fldId, fldName));
+
+    create.attach(db, "sample");
+    create.setTableConstraint(unique);
+
+    ASSERT_EQ(create.statementString(),
+              "CREATE TABLE sample (id INTEGER NOT NULL, name TEXT NOT NULL, v REAL NOT NULL, CONSTRAINT UNIQUE (id,name));"
+    );
+
+    // here we invert the two functions
+
+    CreateTableStatement<decltype(fldId), decltype(fldName), decltype(fldValue)> create2(fldId, fldName,
+                                                                                        fldValue);
+
+    statements::CreateTable::TableConstraint::Unique unique2(std::make_tuple(fldId, fldName));
+
+    create2.setTableConstraint(unique2);
+    create2.attach(db, "sample");
+
+    ASSERT_EQ(create2.statementString(),
+              "CREATE TABLE sample (id INTEGER NOT NULL, name TEXT NOT NULL, v REAL NOT NULL, CONSTRAINT UNIQUE (id,name));"
+    );
 }
 
 TEST_F(Statements, create)
