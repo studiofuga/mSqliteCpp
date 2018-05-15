@@ -185,3 +185,15 @@ TEST(SqlFormatting, createTableStatement)
     ASSERT_EQ(c.string(), "CREATE TABLE MyTable (id INTEGER PRIMARY KEY, name TEXT, value REAL,"
                           " CONSTRAINT u FOREIGN KEY(id) REFERENCES x(y));");
 }
+
+TEST(SqlFormatting, createIndex)
+{
+    auto fldId = sqlite::makeFieldDef("id", sqlite::FieldType::Integer()).primaryKey();
+    auto fldName = sqlite::makeFieldDef("name", sqlite::FieldType::Text());
+
+    sqlite::statements::CreateIndex createIndex1("idx", "mytable", fldId, fldName);
+    ASSERT_EQ(createIndex1.string(), "CREATE INDEX idx ON mytable(id,name);");
+
+    sqlite::statements::CreateIndex createIndex2(sqlite::statements::CreateIndex::Unique, "idx", "mytable", fldId, fldName);
+    ASSERT_EQ(createIndex2.string(), "CREATE UNIQUE INDEX idx ON mytable(id,name);");
+}

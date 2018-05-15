@@ -121,6 +121,19 @@ TEST_F(Statements, FixCreateTableMultipleConstraint)
     );
 }
 
+TEST_F(Statements, createIndex)
+{
+    CreateTableStatement<decltype(fldId), decltype(fldName), decltype(fldValue)> create(fldId, fldName,
+                                                                                        fldValue);
+    create.attach(db, "mytable");
+    ASSERT_NO_THROW(create.execute());
+
+    CreateIndexStatement<decltype(fldId), decltype(fldName)> createIndex1("idx", fldId, fldName);
+
+    createIndex1.attach(db, "mytable");
+    ASSERT_NO_THROW(createIndex1.execute());
+}
+
 TEST_F(Statements, create)
 {
     {

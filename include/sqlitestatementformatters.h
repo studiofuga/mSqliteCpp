@@ -368,6 +368,48 @@ public:
     };
 };
 
+class CreateIndex : public StatementFormatter {
+    std::string mAction;
+    std::string mName;
+    std::string mTableName;
+    std::string mFieldsPack;
+public:
+    struct UniqueIndexType {};
+    static constexpr UniqueIndexType Unique {};
+
+    CreateIndex() = default;
+
+    template<typename ...F>
+    explicit CreateIndex(std::string indexname, std::string tablename, F... fields)
+            : mAction("CREATE INDEX"),
+              mName(std::move(indexname)),
+              mTableName(std::move(tablename))
+    {
+        std::ostringstream ss;
+        ss << unpackFieldNames(fields...);
+        mFieldsPack = ss.str();
+    }
+
+    template<typename ...F>
+    explicit CreateIndex(UniqueIndexType, std::string indexname, std::string tablename, F... fields)
+            : mAction("CREATE UNIQUE INDEX"),
+              mName(std::move(indexname)),
+              mTableName(std::move(tablename))
+    {
+        std::ostringstream ss;
+        ss << unpackFieldNames(fields...);
+        mFieldsPack = ss.str();
+    }
+
+    std::string string() const override
+    {
+        std::ostringstream ss;
+        ss << mAction << " " << mName << " ON " << mTableName << "("
+           << mFieldsPack << ");";
+        return ss.str();
+    }
+};
+
 class Insert : public StatementFormatter {
     std::string mAction;
     std::string mStatementString;
