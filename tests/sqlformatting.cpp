@@ -29,8 +29,17 @@ TEST(SqlFormatting, relOperators)
 
     ASSERT_EQ(sqlite::op::eq(fldId), "id = ?");
     ASSERT_EQ(sqlite::op::lt(fldId), "id < ?");
-    ASSERT_EQ(sqlite::op::and_(sqlite::op::lt(fldId),sqlite::op::gt(fldValue)), "id < ? AND value > ?");
-    ASSERT_EQ(sqlite::op::or_(sqlite::op::lt(fldId),sqlite::op::gt(fldId)), "id < ? OR id > ?");
+
+    ASSERT_EQ(sqlite::op::and_("1", "2"), "(1 AND 2)");
+
+    ASSERT_EQ(sqlite::op::and_(sqlite::op::lt(fldId),sqlite::op::gt(fldValue)), "(id < ? AND value > ?)");
+    ASSERT_EQ(sqlite::op::or_(sqlite::op::lt(fldId),sqlite::op::gt(fldId)), "(id < ? OR id > ?)");
+
+    ASSERT_EQ(sqlite::op::and_(sqlite::op::ne(fldId), sqlite::op::ne(fldId), sqlite::op::ne(fldId)),
+                      "(id <> ? AND id <> ? AND id <> ?)");
+
+    ASSERT_EQ(sqlite::op::or_(sqlite::op::eq(fldId), sqlite::op::eq(fldId), sqlite::op::eq(fldId)),
+                      "(id = ? OR id = ? OR id = ?)");
 }
 
 TEST(SqlFormatting, internalUnpack)

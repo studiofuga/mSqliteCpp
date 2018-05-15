@@ -407,8 +407,7 @@ public:
         ss << mAction << " " << mName << " ON " << mTableName << "("
            << mFieldsPack << ");";
         return ss.str();
-    }
-};
+    }};
 
 class Insert : public StatementFormatter {
     std::string mAction;

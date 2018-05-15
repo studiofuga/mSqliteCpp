@@ -6,9 +6,24 @@
 #define SQLITE_SQLITEFIELDSOP_H
 
 #include "sqlitefielddef.h"
+#include "sqlformatters_helpers.h"
 
 namespace sqlite {
 namespace op {
+
+namespace details {
+template<size_t I, typename ...OP, typename std::enable_if<I == sizeof...(OP), int>::type = 0>
+std::string unpackImpl(const char *, std::tuple<OP...>)
+{
+    return std::string();
+};
+
+template<size_t I, typename ...OP, typename std::enable_if<I < sizeof...(OP), int>::type = 0>
+std::string unpackImpl(const char *sep, std::tuple<OP...> op)
+{
+   return sqlite::helpers::toString(std::get<I>(op)) + (I < sizeof...(OP)-1 ? sep : "") + unpackImpl<I + 1>(sep, op);
+};
+}
 
 template<typename FT>
 FieldDef <FT> count(FieldDef <FT> field)
@@ -88,14 +103,16 @@ std::string like(const FieldDef <FT> &field)
     return field.name() + " LIKE ?";
 }
 
-inline std::string and_(const std::string &o1, const std::string &o2)
+template <typename ...OP>
+inline std::string and_(OP... op)
 {
-    return o1 + " AND " + o2;
+    return "(" + details::unpackImpl<0>(" AND ", std::make_tuple(op...)) + ")";
 }
 
-inline std::string or_(const std::string &o1, const std::string &o2)
+template <typename ...OP>
+inline std::string or_(OP... op)
 {
-    return o1 + " OR " + o2;
+    return "(" + details::unpackImpl<0>(" OR ", std::make_tuple(op...)) + ")";
 }
 
 inline std::string not_(const std::string &o1)
