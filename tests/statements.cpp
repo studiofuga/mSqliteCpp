@@ -102,6 +102,25 @@ TEST_F(Statements, FixCreateTableInvertedAttachConstraint)
     );
 }
 
+
+TEST_F(Statements, FixCreateTableMultipleConstraint)
+{
+    CreateTableStatement<decltype(fldId), decltype(fldName), decltype(fldValue)> create(fldId, fldName,
+                                                                                        fldValue);
+
+    statements::CreateTable::TableConstraint::Unique unique("u", fldId, fldName);
+    statements::CreateTable::TableConstraint::Unique unique2("u2", fldValue);
+
+    create.attach(db, "sample");
+    create.setTableConstraint(unique);
+    create.setTableConstraint(unique2);
+
+    ASSERT_EQ(create.statementString(),
+              "CREATE TABLE sample (id INTEGER NOT NULL, name TEXT NOT NULL, v REAL NOT NULL, CONSTRAINT u UNIQUE (id,name),"
+              " CONSTRAINT u2 UNIQUE (v));"
+    );
+}
+
 TEST_F(Statements, create)
 {
     {

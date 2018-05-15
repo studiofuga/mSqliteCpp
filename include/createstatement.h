@@ -63,8 +63,9 @@ public:
     template<typename T>
     void setTableConstraint(T tableConstraint)
     {
-        statement.setConstraint(tableConstraint);
-        constraint = statements::details::toString(tableConstraint);
+        if (!constraint.empty())
+            constraint += ", ";
+        constraint += statements::details::toString(tableConstraint);
     }
 
     std::string statementString()
