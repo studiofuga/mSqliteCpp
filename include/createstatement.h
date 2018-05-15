@@ -77,6 +77,7 @@ public:
 
 template<typename ...FIELDS>
 class CreateIndexStatement {
+    bool mUnique = false;
     std::tuple<FIELDS...> fields;
     std::shared_ptr<SQLiteStorage> db;
     std::string mIndexName;
@@ -85,7 +86,10 @@ class CreateIndexStatement {
 
     template<std::size_t ...I>
     void buildStatementImpl(std::index_sequence<I...>) {
-        statement = statements::CreateIndex(mIndexName, mTableName, std::get<I>(fields)...);
+        if (mUnique)
+            statement = statements::CreateIndex(statements::CreateIndex::Unique, mIndexName, mTableName, std::get<I>(fields)...);
+        else
+            statement = statements::CreateIndex(mIndexName, mTableName, std::get<I>(fields)...);
     }
 
     void buildStatement() {
@@ -107,10 +111,12 @@ public:
         attach(dbm, table);
     }
 
-    void attach(std::shared_ptr<SQLiteStorage> dbm, std::string table)
+    CreateIndexStatement &unique() { mUnique = true;  return *this; }
+    CreateIndexStatement &attach(std::shared_ptr<SQLiteStorage> dbm, std::string table)
     {
         db = dbm;
         mTableName = std::move(table);
+        return *this;
     }
 
     void execute()
@@ -120,6 +126,11 @@ public:
         pstatement->execute();
     }
 
+    std::string statementString()
+    {
+        buildStatement();
+        return statement.string();
+    }
 };
 }
 

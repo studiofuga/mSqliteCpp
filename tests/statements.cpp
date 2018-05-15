@@ -132,6 +132,12 @@ TEST_F(Statements, createIndex)
 
     createIndex1.attach(db, "mytable");
     ASSERT_NO_THROW(createIndex1.execute());
+
+    CreateIndexStatement<decltype(fldId), decltype(fldName)> createIndex2("unqIdx", fldId, fldName);
+
+    createIndex2.attach(db, "mytable").unique();
+    ASSERT_EQ(createIndex2.statementString(), "CREATE UNIQUE INDEX unqIdx ON mytable(id,name);");
+    ASSERT_NO_THROW(createIndex2.execute());
 }
 
 TEST_F(Statements, create)
