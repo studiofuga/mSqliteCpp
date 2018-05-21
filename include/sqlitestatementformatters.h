@@ -299,6 +299,9 @@ public:
                     case Action::NoAction:
                         return "NO ACTION";
                 }
+                std::ostringstream ss;
+                ss << "Not all switch case are handled in translateActionString: " << static_cast<int>(a);
+                throw std::logic_error(ss.str());
             }
 
         public:
