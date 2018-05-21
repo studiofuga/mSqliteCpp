@@ -232,6 +232,30 @@ TEST_F(Statements, statementExecuteFail)
 
 }
 
+TEST_F(Statements, insertFromQuery)
+{
+    SQLiteStatement stmt(db,
+                         "CREATE TABLE sample (id INTEGER PRIMARY KEY, name TEXT);");
+    ASSERT_NO_THROW(stmt.execute());
+
+    stmt.attach(db,
+                "INSERT INTO sample VALUES (0, 'AAA'),(1,'BBB'),(2,'CCC');");
+    ASSERT_NO_THROW(stmt.execute());
+
+    stmt.attach(db,
+                "CREATE TABLE newsample (id INTEGER PRIMARY KEY, relid INTEGER, name TEXT);");
+    ASSERT_NO_THROW(stmt.execute());
+
+
+    stmt.attach(db,
+                "INSERT INTO newsample (relid, name) SELECT  id,? FROM sample WHERE id=?");
+
+    ASSERT_NO_THROW(stmt.bind(1, "aiuto"));
+    ASSERT_NO_THROW(stmt.bind(2, 0));
+
+    ASSERT_NO_THROW(stmt.execute());
+}
+
 TEST_F(Statements, selectStatements1)
 {
     auto fldId = sqlite::makeFieldDef("id", sqlite::FieldType::Integer()).notNull();
