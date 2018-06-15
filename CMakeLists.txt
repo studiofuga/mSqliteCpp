@@ -29,7 +29,7 @@ endif(Boost_FOUND)
 
 if (${CMAKE_VERSION} VERSION_GREATER 3.8.99)
     find_package(Doxygen)
-endif (${CMAKE_VERSION} VERSION_GREATER_EQUAL 3.9)
+endif (${CMAKE_VERSION} VERSION_GREATER 3.8.99)
 
 include_directories(
         ${MSQLITECPP_ROOT}/include
