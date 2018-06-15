@@ -73,6 +73,20 @@ TEST_F(Statements, CreateTableWithConstraint)
 
 }
 
+TEST_F(Statements, MakeCreateTableStatementOpt1)
+{
+    auto createTable = makeCreateTableStatement(fldId, fldName, fldValue);
+    createTable.attach(db, "make1");
+
+    ASSERT_NO_THROW(createTable.execute());
+}
+
+TEST_F(Statements, MakeCreateTableStatementOpt2)
+{
+    auto createTable = makeCreateTableStatement2(db, "make2", fldId, fldName, fldValue);
+    ASSERT_NO_THROW(createTable.execute());
+}
+
 TEST_F(Statements, FixCreateTableInvertedAttachConstraint)
 {
     CreateTableStatement<decltype(fldId), decltype(fldName), decltype(fldValue)> create(fldId, fldName,

@@ -132,6 +132,17 @@ public:
         return statement.string();
     }
 };
+
+template <typename ...FIELDS>
+inline CreateTableStatement<FIELDS...> makeCreateTableStatement2(std::shared_ptr<SQLiteStorage> db,
+                                                                std::string table, FIELDS ...fields) {
+    return CreateTableStatement<FIELDS...>(db, table, fields...);
+}
+template <typename ...FIELDS>
+inline CreateTableStatement<FIELDS...> makeCreateTableStatement(FIELDS ...fields) {
+    return CreateTableStatement<FIELDS...>(fields...);
+}
+
 }
 
 #endif //SQLITE_CREATESTATEMENT_H
