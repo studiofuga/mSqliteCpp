@@ -76,6 +76,8 @@ public:
 
     void bind(size_t idx, float value);
 
+    void bind(size_t idx, nullptr_t value);
+
     template<typename ...Ts>
     void bind(std::tuple<Ts...> t)
     {

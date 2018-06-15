@@ -132,6 +132,13 @@ void SQLiteStatement::bind(size_t idx, float value)
     SQLiteException::throwIfNotOk(r,db->handle());
 }
 
+void SQLiteStatement::bind(size_t idx, nullptr_t value)
+{
+    auto db = p->mDb.lock();
+    auto r = sqlite3_bind_null(p->stmt, idx);
+    SQLiteException::throwIfNotOk(r,db->handle());
+}
+
 long long SQLiteStatement::getLongValue(int idx)
 {
     return sqlite3_column_int64(p->stmt, idx);
@@ -214,3 +221,4 @@ bool SQLiteStatement::execute()
 {
     return execute([]() { return true; });
 }
+
