@@ -8,6 +8,7 @@
 #include "sqlitefielddef.h"
 #include <sstream>
 #include <tuple>
+#include <boost/optional.hpp>
 
 namespace sqlite {
 namespace statements {
@@ -38,48 +39,105 @@ inline std::string toString(sqlite::FieldDef<Q> t)
     return t.name();
 }
 
+template <typename T>
+inline std::string toString(boost::optional<T> v)
+{
+    if (v)
+        return toString(v.value());
+    return std::string{};
+}
+
+template <typename T>
+std::string formatFieldName (const T&t, const std::string &sep)
+{
+    return sep + toString(t);
+}
+
+template <typename T>
+std::string formatFieldName (const boost::optional<T> &t, const std::string &sep)
+{
+    if (t)
+        return sep + toString(t);
+    return std::string{};
+}
+
 template<size_t I, typename ...Ts>
 std::string
-unpackFieldNames_impl(const std::tuple<Ts...> &def,
+unpackFieldNames_impl(const std::tuple<Ts...> &def, size_t count = 0,
                       typename std::enable_if<I == sizeof...(Ts)>::type * = 0)
 {
     (void) def;
+    (void) count;
     return std::string();
 }
 
 /// @brief builds a Field list part of a SQL Insert statement
 template<size_t I, typename ...Ts>
 std::string
-unpackFieldNames_impl(const std::tuple<Ts...> &def,
+unpackFieldNames_impl(const std::tuple<Ts...> &def, size_t count = 0,
                       typename std::enable_if<I < sizeof...(Ts)>::type * = 0)
 {
-    auto &field = std::get<I>(def);
-    return toString(field) + (I == sizeof...(Ts) - 1 ? "" : ",") + unpackFieldNames_impl<I + 1, Ts...>(def);
+    auto fld = formatFieldName(std::get<I>(def), (count > 0 ? "," : ""));
+    if (!fld.empty())
+        ++count;
+    return fld + unpackFieldNames_impl<I + 1, Ts...>(def, count);
 }
+
+template <typename T>
+std::string formatFieldPlaceholder (const T&t, const std::string &sep)
+{
+    return sep + std::string{"?"};
+}
+
+template <typename T>
+std::string formatFieldPlaceholder (const boost::optional<T> &t, const std::string &sep)
+{
+    if (t)
+        return sep + std::string{"?"};
+    return std::string{};
+}
+
 
 template<size_t I, typename ...Ts>
 std::string
-unpackFieldPlaceholders_impl(const std::tuple<Ts...> &def,
+unpackFieldPlaceholders_impl(const std::tuple<Ts...> &def, size_t count = 0,
                              typename std::enable_if<I == sizeof...(Ts)>::type * = 0)
 {
     (void) def;
+    (void) count;
     return std::string();
 }
 
 /// @brief builds a Field list part of a SQL Insert statement
 template<size_t I, typename ...Ts>
 std::string
-unpackFieldPlaceholders_impl(const std::tuple<Ts...> &def,
+unpackFieldPlaceholders_impl(const std::tuple<Ts...> &def, size_t count = 0,
                              typename std::enable_if<I < sizeof...(Ts)>::type * = 0)
 {
-    auto &field = std::get<I>(def);
-    return std::string{"?"} + (I == sizeof...(Ts) - 1 ? "" : ",") + unpackFieldPlaceholders_impl<I + 1, Ts...>(def);
+    auto fld = formatFieldPlaceholder(std::get<I>(def), (count > 0 ? "," : ""));
+    if (!fld.empty())
+        ++count;
+    return  fld + unpackFieldPlaceholders_impl<I + 1, Ts...>(def, count);
 }
 
 
+template <typename T>
+std::string formatFieldNameAndPlaceholder (const T&t, const std::string &sep)
+{
+    return sep + toString(t) + " = ?";
+}
+
+template <typename T>
+std::string formatFieldNameAndPlaceholder (const boost::optional<T> &t, const std::string &sep)
+{
+    if (t)
+        return sep + toString(t) + " = ?";
+    return std::string{};
+}
+
 /// @brief Ends the recursion of unpackFieldsAndPlaceholders_impl()
 template<size_t I, typename ...Ts>
-std::string unpackFieldsAndPlaceholders_impl(const std::tuple<Ts...> &,
+std::string unpackFieldsAndPlaceholders_impl(const std::tuple<Ts...> &, size_t = 0,
                                              typename std::enable_if<I == sizeof...(Ts)>::type * = 0)
 {
     return std::string();
@@ -87,13 +145,15 @@ std::string unpackFieldsAndPlaceholders_impl(const std::tuple<Ts...> &,
 
 /// @brief unpacks the fields into a list of strings in the form (FieldName = ?[,FieldName = ?...])
 template<size_t I, typename ...Ts>
-std::string unpackFieldsAndPlaceholders_impl(const std::tuple<Ts...> &def,
+std::string unpackFieldsAndPlaceholders_impl(const std::tuple<Ts...> &def, size_t count = 0,
                                              typename std::enable_if<I < sizeof...(Ts)>::type * = 0)
 {
+    auto fld = formatFieldNameAndPlaceholder(std::get<I>(def), (count > 0 ? "," : ""));
+    if (!fld.empty())
+        ++count;
+
     auto const &field = std::get<I>(def);
-    return toString(field)
-           + " = ?" + (I == sizeof...(Ts) - 1 ? "" : ",")
-           + unpackFieldsAndPlaceholders_impl<I + 1>(def);
+    return fld + unpackFieldsAndPlaceholders_impl<I + 1>(def, count);
 }
 
 
@@ -118,7 +178,7 @@ std::string unpackFieldDefinitions_impl(const std::tuple<Ts...> &def,
 template<typename ...Ts>
 std::string unpackFieldNames(Ts... def)
 {
-    return details::unpackFieldNames_impl<0>(std::make_tuple(def...));
+    return details::unpackFieldNames_impl<0>(std::make_tuple(def...), 0);
 }
 
 template<typename ...Ts>

@@ -1,0 +1,125 @@
+/** @file 
+ * @author Federico Fuga <fuga@studiofuga.com>
+ * @date 15/06/18
+ */
+
+#include "createstatement.h"
+#include "insertstatement.h"
+
+#include <boost/optional.hpp>
+
+#include <gtest/gtest.h>
+
+using namespace sqlite;
+
+class OptionalStatements : public testing::Test {
+protected:
+    std::shared_ptr<SQLiteStorage> db;
+public:
+    OptionalStatements()
+    {
+        db = std::make_shared<SQLiteStorage>(":memory:");
+        db->open();
+    }
+
+    FieldDef<FieldType::Integer> fieldId{"id", PrimaryKey};
+    FieldDef<FieldType::Text> fieldText {"text"};
+    FieldDef<FieldType::Integer> fieldCount {"count"};
+    FieldDef<FieldType::Real> fieldValue {"value"};
+};
+
+TEST_F(OptionalStatements, FieldsFormat)
+{
+    boost::optional<FieldDef<FieldType::Text>> text;
+    boost::optional<FieldDef<FieldType::Integer>> count;
+    boost::optional<FieldDef<FieldType::Real>> value;
+
+    ASSERT_EQ(statements::details::toString(text), "");
+    ASSERT_EQ(statements::details::toString(count), "");
+    ASSERT_EQ(statements::details::toString(value), "");
+
+    text = fieldText;
+
+    ASSERT_EQ(statements::details::toString(text), "text");
+}
+
+TEST_F(OptionalStatements, Unpack)
+{
+    boost::optional<FieldDef<FieldType::Text>> text;
+    boost::optional<FieldDef<FieldType::Integer>> count;
+    boost::optional<FieldDef<FieldType::Real>> value;
+
+    value = fieldValue;
+
+    std::string fields = sqlite::statements::unpackFieldNames(fieldId, text, value);
+    ASSERT_EQ(fields, "id,value");
+    fields = sqlite::statements::unpackFieldNames(fieldId);
+    ASSERT_EQ(fields, "id");
+    fields = sqlite::statements::unpackFieldNames(text);
+    ASSERT_EQ(fields, "");
+    fields = sqlite::statements::unpackFieldNames(value);
+    ASSERT_EQ(fields, "value");
+
+    auto placeholders = sqlite::statements::unpackFieldPlaceholders(fieldId, text, value);
+    ASSERT_EQ(placeholders, "?,?");
+    placeholders = sqlite::statements::unpackFieldPlaceholders(fieldId);
+    ASSERT_EQ(placeholders, "?");
+    placeholders = sqlite::statements::unpackFieldPlaceholders(text);
+    ASSERT_EQ(placeholders, "");
+    placeholders = sqlite::statements::unpackFieldPlaceholders(value);
+    ASSERT_EQ(placeholders, "?");
+
+    auto fieldplaceholders = sqlite::statements::unpackFieldsAndPlaceholders(fieldId, text, value);
+    ASSERT_EQ(fieldplaceholders, "id = ?,value = ?");
+
+    fieldplaceholders = sqlite::statements::unpackFieldsAndPlaceholders(fieldId);
+    ASSERT_EQ(fieldplaceholders, "id = ?");
+
+    fieldplaceholders = sqlite::statements::unpackFieldsAndPlaceholders(text);
+    ASSERT_EQ(fieldplaceholders, "");
+
+    fieldplaceholders = sqlite::statements::unpackFieldsAndPlaceholders(value);
+    ASSERT_EQ(fieldplaceholders, "value = ?");
+}
+
+TEST_F(OptionalStatements, InsertFormatter)
+{
+    boost::optional<FieldDef<FieldType::Text>> text;
+    boost::optional<FieldDef<FieldType::Integer>> count;
+    boost::optional<FieldDef<FieldType::Real>> value;
+
+    text = fieldText;
+
+    ASSERT_EQ(statements::details::toString(text), "text");
+
+    sqlite::statements::Insert
+            insert("tab", text, count, value);
+
+    std::string exp {
+        "INSERT INTO tab(text) VALUES(?);"
+    };
+
+    ASSERT_EQ(exp, insert.string());
+}
+
+TEST_F(OptionalStatements, Insert)
+{
+    auto createTable = makeCreateTableStatement2(db, "Insert1", fieldId, fieldText, fieldCount, fieldValue);
+    ASSERT_NO_THROW(createTable.execute());
+
+
+#if 0
+
+    auto text = boost::make_optional(fieldText);
+    auto count = boost::make_optional(fieldCount);
+    auto value = boost::make_optional(fieldValue);
+
+    text.value().assign("blah");
+
+    auto insertStatement = makeInsertStatement(text, count, value);
+
+    insertStatement.attach(db, "Insert1");
+    insertStatement.insert(text, count, value);
+#endif
+}
+
