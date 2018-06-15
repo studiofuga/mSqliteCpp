@@ -43,8 +43,11 @@ class InsertStatement {
     template<int N = 0, typename ...T>
     typename std::enable_if<N < sizeof...(T), void>::type insertImpl(std::tuple<T...> values, size_t idx = 0)
     {
+        /*
         if (bindValue(idx, std::get<N>(values)))
-            ++idx;
+            ++idx;*/
+        bindValue(idx, std::get<N>(values));
+                ++idx;
         insertImpl<N + 1>(values, idx);
     };
 

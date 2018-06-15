@@ -91,6 +91,13 @@ public:
     }
 };
 
+template<typename ...Fs>
+inline SelectStatement<Fs...> makeSelectStatement (Fs... fs)
+{
+    return SelectStatement<Fs...>(fs...);
+}
+
+
 }
 
 #endif //SQLITE_SELECTSTATEMENT_H

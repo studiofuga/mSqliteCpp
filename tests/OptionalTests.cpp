@@ -5,6 +5,7 @@
 
 #include "createstatement.h"
 #include "insertstatement.h"
+#include "selectstatement.h"
 
 #include <boost/optional.hpp>
 
@@ -18,8 +19,8 @@ protected:
 public:
     OptionalStatements()
     {
-        db = std::make_shared<SQLiteStorage>("OptionalStatement.db");
-     //   db = std::make_shared<SQLiteStorage>(":memory:");
+        //db = std::make_shared<SQLiteStorage>("OptionalStatement.db");
+        db = std::make_shared<SQLiteStorage>(":memory:");
         db->open();
     }
 
@@ -110,11 +111,78 @@ TEST_F(OptionalStatements, Insert)
 
     boost::optional<std::string> text {"sampleText"};
     boost::optional<int> count {1};
-    boost::optional<double> value;
+    boost::optional<double> value { 0.1 };
 
-    auto insertStatement = makeInsertStatement(fieldText, fieldCount, fieldValue);
+    auto insertStatement = makeInsertStatement(fieldId, fieldText, fieldCount, fieldValue);
+    insertStatement.replaceOnConflict();
 
-    insertStatement.attach(db, "Insert1");
-    insertStatement.insert(text, count, value);
+    ASSERT_NO_THROW(insertStatement.attach(db, "Insert1"));
+    ASSERT_NO_THROW(insertStatement.insert(1, text, count, value));
+
+    auto select = makeSelectStatement(fieldId, fieldText, fieldCount, fieldValue);
+    select.attach(db, "Insert1");
+    select.prepare();
+
+    // check insert
+
+    int rId, rCount;
+    std::string rText;
+    double rValue;
+    select.exec([&rId, &rText, &rCount, &rValue](int id, std::string text, int count, double value) {
+        rId = id;
+        rText = text;
+        rCount = count;
+        rValue = value;
+        return true;
+    });
+
+    ASSERT_EQ(rId, 1);
+    ASSERT_EQ(rText, "sampleText");
+    ASSERT_EQ(rCount, 1);
+    ASSERT_EQ(rValue, 0.1);
+
+    // ** now update
+
+    text = "NewText";
+    count.reset();
+    value.reset();
+
+    ASSERT_NO_THROW(insertStatement.insert(1, text, count, value));
+
+    select.exec([&rId, &rText, &rCount, &rValue](int id, std::string text, int count, double value) {
+        rId = id;
+        rText = text;
+        rCount = count;
+        rValue = value;
+        return true;
+    });
+
+    ASSERT_EQ(rId, 1);
+    ASSERT_EQ(rText, "NewText");
+    ASSERT_EQ(rCount, 1);
+    ASSERT_EQ(rValue, 0.1);
+
+// update again...
+    // ** now update
+
+    text.reset();
+    count.reset();
+    value = 1000;
+
+    ASSERT_NO_THROW(insertStatement.insert(1, text, count, value));
+
+    select.exec([&rId, &rText, &rCount, &rValue](int id, std::string text, int count, double value) {
+        rId = id;
+        rText = text;
+        rCount = count;
+        rValue = value;
+        return true;
+    });
+
+    ASSERT_EQ(rId, 1);
+    ASSERT_EQ(rText, "NewText");
+    ASSERT_EQ(rCount, 1);
+    ASSERT_EQ(rValue, 1000);
+
 }
 
