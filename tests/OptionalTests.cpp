@@ -18,7 +18,8 @@ protected:
 public:
     OptionalStatements()
     {
-        db = std::make_shared<SQLiteStorage>(":memory:");
+        db = std::make_shared<SQLiteStorage>("OptionalStatement.db");
+     //   db = std::make_shared<SQLiteStorage>(":memory:");
         db->open();
     }
 
@@ -107,19 +108,13 @@ TEST_F(OptionalStatements, Insert)
     auto createTable = makeCreateTableStatement2(db, "Insert1", fieldId, fieldText, fieldCount, fieldValue);
     ASSERT_NO_THROW(createTable.execute());
 
+    boost::optional<std::string> text {"sampleText"};
+    boost::optional<int> count {1};
+    boost::optional<double> value;
 
-#if 0
-
-    auto text = boost::make_optional(fieldText);
-    auto count = boost::make_optional(fieldCount);
-    auto value = boost::make_optional(fieldValue);
-
-    text.value().assign("blah");
-
-    auto insertStatement = makeInsertStatement(text, count, value);
+    auto insertStatement = makeInsertStatement(fieldText, fieldCount, fieldValue);
 
     insertStatement.attach(db, "Insert1");
     insertStatement.insert(text, count, value);
-#endif
 }
 

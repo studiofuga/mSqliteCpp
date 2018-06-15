@@ -20,20 +20,36 @@ class InsertStatement {
     std::string tablename;
     bool do_replace = false;
 
+    template <typename T>
+    bool bindValue(int idx, const T& t) {
+        statement->bind(idx+1, t);
+        return true;
+    }
+
+    template <typename T>
+    bool bindValue(int idx, const boost::optional<T> & t) {
+        if (t) {
+            statement->bind(idx+1, t.value());
+            return true;
+        }
+        return false;
+    }
+
     template<int N = 0, typename ...T>
-    typename std::enable_if<N == sizeof...(T), void>::type insertImpl(std::tuple<T...>)
+    typename std::enable_if<N == sizeof...(T), void>::type insertImpl(std::tuple<T...>, size_t idx = 0)
     {
     };
 
     template<int N = 0, typename ...T>
-    typename std::enable_if<N < sizeof...(T), void>::type insertImpl(std::tuple<T...> values)
+    typename std::enable_if<N < sizeof...(T), void>::type insertImpl(std::tuple<T...> values, size_t idx = 0)
     {
-        statement->bind(N + 1, std::get<N>(values));
-        insertImpl<N + 1>(values);
+        if (bindValue(idx, std::get<N>(values)))
+            ++idx;
+        insertImpl<N + 1>(values, idx);
     };
+
 public:
-    InsertStatement()
-    {}
+    InsertStatement() = default;
 
     explicit InsertStatement(FIELDS... f)
     { fields = std::make_tuple(f...); }
