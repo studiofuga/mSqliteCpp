@@ -363,6 +363,19 @@ TEST_F(Statements, selectStatements1)
 
     ASSERT_EQ(count, 2);
     ASSERT_EQ(v, 20.0);
+
+    // now remove the where clause
+    ASSERT_NO_THROW(selectStatement.where());
+    ASSERT_NO_THROW(selectStatement.prepare());
+    count = 0;
+    n = 0;
+    v = 0;
+    ASSERT_NO_THROW(selectStatement.exec([&count](int rn, double rv) {
+        count++;
+        return true;
+    }));
+
+    ASSERT_EQ(count, 3);
 }
 
 TEST_F(Statements, casts)

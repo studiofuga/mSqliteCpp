@@ -33,6 +33,7 @@ endif (${CMAKE_VERSION} VERSION_GREATER 3.8.99)
 
 include_directories(
         ${MSQLITECPP_ROOT}/include
+        ${Boost_INCLUDE_DIRS}
         ${SQLITE_INCLUDE_DIRS}
         ${MSQLITECPP_ROOT}
 )

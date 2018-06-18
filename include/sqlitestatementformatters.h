@@ -271,7 +271,11 @@ public:
 
     Select &where(std::string condition)
     {
-        mWhere = " WHERE " + condition;
+        if (condition.empty()) {
+            mWhere = "";
+        } else {
+            mWhere = " WHERE " + condition;
+        }
         return *this;
     }
 
