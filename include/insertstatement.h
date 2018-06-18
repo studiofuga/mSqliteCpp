@@ -14,6 +14,11 @@
 
 namespace sqlite {
 
+template <typename T>
+inline void bind(SQLiteStatement &statement, size_t idx, const T &value) {
+    statement.bind(idx, value);
+}
+
 template<typename ...FIELDS>
 class InsertStatement {
     std::tuple<FIELDS...> fields;
@@ -24,21 +29,21 @@ class InsertStatement {
 
     template <typename T>
     bool bindValue(int idx, const T& t) {
-        statement->bind(idx+1, t);
+        sqlite::bind(*statement, idx+1, t);
         return true;
     }
 
     template <typename T>
     bool bindValue(int idx, const boost::optional<T> & t) {
         if (t) {
-            statement->bind(idx+1, t.value());
+            sqlite::bind(*statement, idx+1, t.value());
             return true;
         }
         return false;
     }
 
     bool bindValue(int idx, std::nullptr_t t) {
-        statement->bind(idx+1, nullptr);
+        sqlite::bind(*statement, idx+1, nullptr);
         return true;
     }
 

@@ -185,4 +185,3 @@ TEST_F(OptionalStatements, Insert)
     ASSERT_EQ(rValue, 1000);
 
 }
-
