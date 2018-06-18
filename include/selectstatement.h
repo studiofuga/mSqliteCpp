@@ -72,6 +72,11 @@ public:
         sql.where(w.toText());
     }
 
+    void where()
+    {
+        sql.where("");
+    }
+
     SQLiteStatement *getStatement()
     {
         return &statement;
