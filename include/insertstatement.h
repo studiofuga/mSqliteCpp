@@ -10,6 +10,8 @@
 #include "sqlitestatement.h"
 #include "sqlitestatementformatters.h"
 
+#include <cstddef>
+
 namespace sqlite {
 
 template<typename ...FIELDS>
@@ -35,7 +37,7 @@ class InsertStatement {
         return false;
     }
 
-    bool bindValue(int idx, nullptr_t t) {
+    bool bindValue(int idx, std::nullptr_t t) {
         statement->bind(idx+1, nullptr);
         return true;
     }

@@ -5,16 +5,16 @@
 #ifndef SQLITE_SQLITESTATEMENT_H
 #define SQLITE_SQLITESTATEMENT_H
 
-#include <sqlitestorage.h>
+#include "sqlitefielddef.h"
+#include "sqlitestatementformatters.h"
+#include "sqlitestorage.h"
+
+#include <sqlite3.h>
 
 #include <memory>
 #include <string>
 #include <functional>
-
-#include <sqlite3.h>
-#include "sqlitefielddef.h"
-#include "sqlitestatementformatters.h"
-
+#include <cstddef>
 #include <iostream>
 
 namespace sqlite {
@@ -76,7 +76,7 @@ public:
 
     void bind(size_t idx, float value);
 
-    void bind(size_t idx, nullptr_t value);
+    void bind(size_t idx, std::nullptr_t value);
 
     template<typename ...Ts>
     void bind(std::tuple<Ts...> t)

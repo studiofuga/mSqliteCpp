@@ -132,7 +132,7 @@ void SQLiteStatement::bind(size_t idx, float value)
     SQLiteException::throwIfNotOk(r,db->handle());
 }
 
-void SQLiteStatement::bind(size_t idx, nullptr_t value)
+void SQLiteStatement::bind(size_t idx, std::nullptr_t value)
 {
     auto db = p->mDb.lock();
     auto r = sqlite3_bind_null(p->stmt, idx);
