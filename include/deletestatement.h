@@ -43,6 +43,11 @@ public:
         sql.where(w.toText());
     }
 
+    void where()
+    {
+        sql.where("");
+    }
+
     void exec()
     {
         statement.execute();

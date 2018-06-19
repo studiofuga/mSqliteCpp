@@ -646,3 +646,26 @@ TEST_F(DeleteStatements, exec)
     ASSERT_NO_THROW(deleteAllStatement.exec());
     ASSERT_EQ(count(), 0);
 }
+
+TEST_F(DeleteStatements, whereReset)
+{
+    // first check that everything is properly prepared.
+    ASSERT_EQ(count(), 3);
+
+    DeleteStatement deleteStatement;
+    ASSERT_NO_THROW(deleteStatement.attach(db, "ex"));
+
+    Where<decltype(fldId)> whereClause(deleteStatement.getStatement(), op::eq(fldId));
+    ASSERT_NO_THROW(deleteStatement.where(whereClause));
+    ASSERT_NO_THROW(deleteStatement.prepare());
+    ASSERT_NO_THROW(whereClause.bind(1));
+    ASSERT_NO_THROW(deleteStatement.exec());
+    ASSERT_EQ(count(), 2);
+
+    // remove the where
+
+    ASSERT_NO_THROW(deleteStatement.where());
+    ASSERT_NO_THROW(deleteStatement.prepare());
+    ASSERT_NO_THROW(deleteStatement.exec());
+    ASSERT_EQ(count(), 0);
+}

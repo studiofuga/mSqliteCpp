@@ -522,7 +522,10 @@ public:
 
     Delete &where(std::string condition)
     {
-        mWhere = " WHERE " + condition;
+        if (!condition.empty())
+            mWhere = " WHERE " + condition;
+        else
+            mWhere = "";
         return *this;
     }
 
