@@ -152,6 +152,14 @@ TEST_F(Statements, createIndex)
     createIndex2.attach(db, "mytable").unique();
     ASSERT_EQ(createIndex2.statementString(), "CREATE UNIQUE INDEX unqIdx ON mytable(id,name);");
     ASSERT_NO_THROW(createIndex2.execute());
+
+    auto ind3 = makeCreateIndexStatement(db, "idx3", "mytable", fldId, fldName);
+    ASSERT_EQ(ind3.statementString(), "CREATE INDEX idx3 ON mytable(id,name);");
+    ASSERT_NO_THROW(ind3.execute());
+
+    auto uq = makeCreateUniqueIndexStatement(db, "unqIdx4", "mytable", fldId, fldName);
+    ASSERT_EQ(uq.statementString(), "CREATE UNIQUE INDEX unqIdx4 ON mytable(id,name);");
+    ASSERT_NO_THROW(uq.execute());
 }
 
 TEST_F(Statements, create)

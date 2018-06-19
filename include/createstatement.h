@@ -100,14 +100,13 @@ public:
     CreateIndexStatement() = default;
 
     explicit CreateIndexStatement(std::string indexname, FIELDS... f)
-    : mIndexName(indexname)
+    : mIndexName(indexname), fields(std::make_tuple(f...))
     {
-        fields = std::make_tuple(f...);
     }
 
-    CreateIndexStatement(std::shared_ptr<SQLiteStorage> dbm, std::string table, FIELDS... f)
+    CreateIndexStatement(std::shared_ptr<SQLiteStorage> dbm, std::string indexname, std::string table, FIELDS... f)
+    : mIndexName(indexname), fields(std::make_tuple(f...))
     {
-        fields = std::make_tuple(f...);
         attach(dbm, table);
     }
 
@@ -141,6 +140,22 @@ inline CreateTableStatement<FIELDS...> makeCreateTableStatement2(std::shared_ptr
 template <typename ...FIELDS>
 inline CreateTableStatement<FIELDS...> makeCreateTableStatement(FIELDS ...fields) {
     return CreateTableStatement<FIELDS...>(fields...);
+}
+
+template <typename ...FIELDS>
+inline CreateIndexStatement<FIELDS...> makeCreateIndexStatement(std::shared_ptr<SQLiteStorage> db,
+                                                                std::string indexname,
+                                                                std::string table,
+                                                                FIELDS ...fields) {
+    return CreateIndexStatement<FIELDS...>(db, indexname, table, fields...);
+}
+
+template <typename ...FIELDS>
+inline CreateIndexStatement<FIELDS...> makeCreateUniqueIndexStatement(std::shared_ptr<SQLiteStorage> db,
+                                                                std::string indexname,
+                                                                std::string table,
+                                                                FIELDS ...fields) {
+    return makeCreateIndexStatement(db, indexname, table, fields...).unique();
 }
 
 }
