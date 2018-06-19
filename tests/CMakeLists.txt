@@ -30,6 +30,7 @@ add_executable(runTests
         updatestatements.cpp
         OptionalTests.cpp
         NullsTest.cpp
+        StrongTypeTests.cpp
         )
 
 target_link_libraries(runTests msqlitecpp gtest gtest_main)
