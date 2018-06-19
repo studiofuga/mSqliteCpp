@@ -41,15 +41,26 @@ include_directories(
 set(SOURCE_FILES
         include/msqlitecpp.h
         include/sqlitefielddef.h
-        src/sqlitestorage.cpp
         include/sqlitestorage.h
-        src/sqlitetable.cpp
         include/sqlitetable.h
-        src/sqlitetransaction.cpp
         include/sqlitetransaction.h
         include/sqlitestatement.h
-        src/sqlitestatement.cpp include/sqlitestatementformatters.h include/sqlitefieldsop.h
-        src/utils/make_unique.h include/insertstatement.h include/selectstatement.h include/clauses.h include/deletestatement.h include/updatestatement.h include/createstatement.h include/sqlformatters_helpers.h)
+        include/sqlitestatementformatters.h
+        include/sqlitefieldsop.h
+        include/insertstatement.h
+        include/selectstatement.h
+        include/clauses.h
+        include/deletestatement.h
+        include/updatestatement.h
+        include/createstatement.h
+        include/sqlformatters_helpers.h
+
+        src/utils/make_unique.h
+        src/sqlitetable.cpp
+        src/sqlitestorage.cpp
+        src/sqlitetransaction.cpp
+        src/sqlitestatement.cpp
+        )
 
 if (ENABLE_SQLITE_AMALGAMATION)
     set (SOURCE_FILES ${SOURCE_FILES}
