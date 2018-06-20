@@ -42,6 +42,11 @@ sqlite::SQLiteStatement::~SQLiteStatement()
 sqlite::SQLiteStatement::SQLiteStatement(SQLiteStatement &&) = default;
 sqlite::SQLiteStatement &SQLiteStatement::operator =(SQLiteStatement &&) = default;
 
+void SQLiteStatement::attach(std::shared_ptr<SQLiteStorage> dbm)
+{
+    init(dbm);
+}
+
 void sqlite::SQLiteStatement::attach(std::shared_ptr<SQLiteStorage> dbm, std::string stmt)
 {
     init(dbm);
@@ -52,6 +57,11 @@ void
 sqlite::SQLiteStatement::attach(std::shared_ptr<SQLiteStorage> db, const sqlite::statements::StatementFormatter &stmt)
 {
     init(db);
+    prepare(stmt.string());
+}
+
+void SQLiteStatement::prepare(const sqlite::statements::StatementFormatter &stmt)
+{
     prepare(stmt.string());
 }
 

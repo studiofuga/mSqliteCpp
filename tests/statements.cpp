@@ -376,14 +376,81 @@ TEST_F(Statements, selectStatements1)
     ASSERT_NO_THROW(selectStatement.where());
     ASSERT_NO_THROW(selectStatement.prepare());
     count = 0;
-    n = 0;
-    v = 0;
     ASSERT_NO_THROW(selectStatement.exec([&count](int rn, double rv) {
         count++;
         return true;
     }));
 
     ASSERT_EQ(count, 3);
+}
+
+TEST_F(Statements, selectStatementsWhere)
+{
+    std::string table = "sample";
+
+    auto fldId = sqlite::makeFieldDef("id", sqlite::FieldType::Integer());
+    auto fldName = sqlite::makeFieldDef("name", sqlite::FieldType::Text());
+    auto fldValue = sqlite::makeFieldDef("value", sqlite::FieldType::Integer());
+
+    ASSERT_NO_THROW(makeCreateTableStatement2(db, table, fldId, fldName, fldValue).execute());
+
+    auto insertStatement = sqlite::makeInsertStatement(fldId, fldName, fldValue);
+    ASSERT_NO_THROW(insertStatement.attach(db, table));
+
+    ASSERT_NO_THROW(insertStatement.insert(1, std::string{"A"}, 1));
+    ASSERT_NO_THROW(insertStatement.insert(1, std::string{"B"}, 2));
+    ASSERT_NO_THROW(insertStatement.insert(2, std::string{"C"}, 1));
+    ASSERT_NO_THROW(insertStatement.insert(2, std::string{"D"}, 2));
+
+    SelectStatement<decltype(fldId)> selectStatement(fldId);
+    selectStatement.attach(db, table);
+
+    int count = 0;
+    auto countFuction = [&count](int id) {
+        ++count;
+        return true;
+    };
+
+    // reuse another where
+    Where<decltype(fldId)> where1(selectStatement.getStatement(), op::eq(fldId));
+    Where<decltype(fldId), decltype(fldValue)> where2(selectStatement.getStatement(),
+                                                      op::and_(op::eq(fldId), op::eq(fldValue)));
+
+    ASSERT_NO_THROW(where1.attach(selectStatement.getStatement(), op::eq(fldId)));
+    ASSERT_NO_THROW(where2.attach(selectStatement.getStatement(), op::and_(op::eq(fldId), op::eq(fldValue))));
+
+    count = 0;
+    ASSERT_NO_THROW(selectStatement.where());
+    ASSERT_NO_THROW(selectStatement.prepare());
+    ASSERT_NO_THROW(selectStatement.exec(countFuction));
+    ASSERT_EQ(count, 4);
+
+    count = 0;
+    ASSERT_NO_THROW(selectStatement.where(where1));
+    ASSERT_NO_THROW(selectStatement.prepare());
+    ASSERT_NO_THROW(where1.bind(1));
+    ASSERT_NO_THROW(selectStatement.exec(countFuction));
+    ASSERT_EQ(count, 2);
+
+    count = 0;
+    ASSERT_NO_THROW(selectStatement.where(where2));
+    ASSERT_NO_THROW(selectStatement.prepare());
+    ASSERT_NO_THROW(where2.bind(1, 1));
+    ASSERT_NO_THROW(selectStatement.exec(countFuction));
+    ASSERT_EQ(count, 1);
+
+    count = 0;
+    ASSERT_NO_THROW(selectStatement.where());
+    ASSERT_NO_THROW(selectStatement.prepare());
+    ASSERT_NO_THROW(selectStatement.exec(countFuction));
+    ASSERT_EQ(count, 4);
+
+    count = 0;
+    ASSERT_NO_THROW(selectStatement.where(where1));
+    ASSERT_NO_THROW(selectStatement.prepare());
+    ASSERT_NO_THROW(where1.bind(2));
+    ASSERT_NO_THROW(selectStatement.exec(countFuction));
+    ASSERT_EQ(count, 2);
 }
 
 TEST_F(Statements, casts)
@@ -668,4 +735,12 @@ TEST_F(DeleteStatements, whereReset)
     ASSERT_NO_THROW(deleteStatement.prepare());
     ASSERT_NO_THROW(deleteStatement.exec());
     ASSERT_EQ(count(), 0);
+
+    // Use another where statement
+
+    Where<decltype(fldName)> whereClause2(deleteStatement.getStatement(), op::eq(fldName));
+    ASSERT_NO_THROW(deleteStatement.where(whereClause2));
+    ASSERT_NO_THROW(deleteStatement.prepare());
+    ASSERT_NO_THROW(whereClause2.bind("first"));
+    ASSERT_NO_THROW(deleteStatement.exec());
 }

@@ -54,9 +54,13 @@ public:
 
     ~SQLiteStatement();
 
+    void attach(std::shared_ptr<SQLiteStorage> dbm);
+
     void attach(std::shared_ptr<SQLiteStorage> dbm, std::string stmt);
 
     void attach(std::shared_ptr<SQLiteStorage> dbm, const sqlite::statements::StatementFormatter &stmt);
+
+    void prepare(const sqlite::statements::StatementFormatter &stmt);
 
     void bind(size_t idx, std::string value);
 

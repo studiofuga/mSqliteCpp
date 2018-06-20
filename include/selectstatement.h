@@ -53,6 +53,7 @@ public:
         sql = statements::Select(name, fields);
         this->db = db;
         this->name = std::move(name);
+        statement.attach(db);
     }
 
     template<typename ...FLDS>
@@ -63,7 +64,7 @@ public:
 
     void prepare()
     {
-        statement.attach(db, sql);
+        statement.prepare(sql);
     }
 
     template<typename W>
