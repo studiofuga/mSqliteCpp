@@ -32,6 +32,10 @@ public:
         this->name = std::move(name);
     }
 
+    std::string sqlString() const {
+        return sql.string();
+    }
+
     void prepare()
     {
         statement.attach(db, sql);
