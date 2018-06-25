@@ -224,6 +224,7 @@ bool SQLiteStatement::execute(std::function<bool()> function)
         throw;
     }
     sqlite3_reset(p->stmt);
+    sqlite3_clear_bindings(p->stmt);
     return result == SQLiteStatement::QueryResult::Completed;
 }
 
