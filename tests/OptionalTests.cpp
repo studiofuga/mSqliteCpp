@@ -10,6 +10,8 @@
 #include <boost/optional.hpp>
 
 #include <gtest/gtest.h>
+#include <clauses.h>
+#include <sqlitefieldsop.h>
 
 using namespace sqlite;
 
@@ -184,4 +186,64 @@ TEST_F(OptionalStatements, Insert)
     ASSERT_EQ(rCount, 1);
     ASSERT_EQ(rValue, 1000);
 
+}
+
+TEST_F(OptionalStatements, Issue6InsertMultipleOptionals)
+{
+    auto createTable = makeCreateTableStatement2(db, "Insert1", fieldId, fieldText, fieldCount, fieldValue);
+    ASSERT_NO_THROW(createTable.execute());
+
+    boost::optional<std::string> text{"sampleText"};
+    boost::optional<int> countvalue{1};
+    boost::optional<double> value{0.1};
+
+    auto insertStatement = makeInsertStatement(fieldId, fieldText, fieldCount, fieldValue);
+    ASSERT_NO_THROW(insertStatement.attach(db, "Insert1"));
+
+    auto select = makeSelectStatement(fieldId, fieldText, fieldCount, fieldValue);
+    select.attach(db, "Insert1");
+    select.prepare();
+
+    int count = 0;
+    auto countFunction = [&count](int id, std::string, int, double){
+        ++count;
+        return true;
+    };
+
+    // insert one
+    ASSERT_NO_THROW(insertStatement.insert(1, text, countvalue, value));
+
+    count = 0;
+    select.exec(countFunction);
+    ASSERT_EQ(count, 1);
+
+    // insert another. It should have a null text, countvalue and value
+    text.reset();
+    countvalue.reset();
+    value.reset();
+    ASSERT_NO_THROW(insertStatement.insert(2, text, countvalue, value));
+
+    count = 0;
+    select.exec(countFunction);
+    ASSERT_EQ(count, 2);
+
+    Where<decltype(fieldId)> w;
+    w.attach(select.getStatement(), op::eq(fieldId));
+    select.where(w);
+    select.prepare();
+
+    std::string rtext;
+    int rcountvalue;
+    double rvalue;
+    w.bind(2);
+    select.exec([&rtext, &rvalue, &rcountvalue](int id, std::string t, int c, double v){
+        rtext = t;
+        rcountvalue = c;
+        rvalue = v;
+        return true;
+    });
+
+    ASSERT_EQ(rtext, "");
+    ASSERT_EQ(rcountvalue, 0);
+    ASSERT_EQ(rvalue, 0);
 }
