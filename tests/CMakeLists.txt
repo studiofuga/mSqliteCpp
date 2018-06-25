@@ -35,4 +35,6 @@ add_executable(runTests
 
 target_link_libraries(runTests msqlitecpp gtest gtest_main)
 
-add_test(NAME tests COMMAND runTests)
+add_custom_target(check
+        COMMAND runTests --gtest_output=xml:gtestresults.xml
+        DEPENDS runTests)
