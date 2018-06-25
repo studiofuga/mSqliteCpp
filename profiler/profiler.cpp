@@ -9,6 +9,7 @@
 #include <cstdio>
 #include <tuple>
 #include <condition_variable>
+#include <functional>
 
 using namespace sqlite;
 
