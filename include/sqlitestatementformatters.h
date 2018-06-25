@@ -480,6 +480,8 @@ class Insert : public StatementFormatter {
     std::string mAction;
     std::string mStatementString;
 public:
+    Insert() = default;
+
     template<typename ...F>
     explicit Insert(std::string tablename, F... flds)
     {

@@ -84,11 +84,15 @@ public:
     {
         db = dbm;
         tablename = std::move(table);
-        auto r = statements::Insert(tablename, fields);
+        prepare();
+    }
+
+    void prepare() {
+        auto insertStatement = statements::Insert(tablename, fields);
         if (do_replace) {
-            r.doReplace();
+            insertStatement.doReplace();
         }
-        statement = std::make_shared<SQLiteStatement>(db, r);
+        statement = std::make_shared<SQLiteStatement>(db, insertStatement);
     }
 
     template<typename ...T>
