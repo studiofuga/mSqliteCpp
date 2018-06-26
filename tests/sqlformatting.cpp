@@ -54,15 +54,15 @@ TEST(SqlFormatting, internalUnpack)
     ASSERT_EQ(fields, "id");
 
     auto placeholders = sqlite::statements::unpackFieldPlaceholders(fldId, fldName, fldValue);
-    ASSERT_EQ(placeholders, "?,?,?");
+    ASSERT_EQ(placeholders, "?1,?2,?3");
     placeholders = sqlite::statements::unpackFieldPlaceholders(fldId);
-    ASSERT_EQ(placeholders, "?");
+    ASSERT_EQ(placeholders, "?1");
 
     auto fieldplaceholders = sqlite::statements::unpackFieldsAndPlaceholders(fldId, fldName, fldValue);
-    ASSERT_EQ(fieldplaceholders, "id = ?,name = ?,value = ?");
+    ASSERT_EQ(fieldplaceholders, "id = ?1,name = ?2,value = ?3");
 
     fieldplaceholders = sqlite::statements::unpackFieldsAndPlaceholders(fldId);
-    ASSERT_EQ(fieldplaceholders, "id = ?");
+    ASSERT_EQ(fieldplaceholders, "id = ?1");
 }
 
 TEST(SqlFormatting, select)
@@ -116,7 +116,7 @@ TEST(SqlFormatting, insert)
 
     auto i = sqlite::statements::Insert("Table", std::make_tuple(fldId, fldName, fldValue));
 
-    ASSERT_EQ(i.string(), "INSERT INTO Table(id,name,value) VALUES(?,?,?);");
+    ASSERT_EQ(i.string(), "INSERT INTO Table(id,name,value) VALUES(?1,?2,?3);");
 }
 
 TEST(SqlFormatting, deleteStatement)
@@ -134,13 +134,13 @@ TEST(SqlFormatting, updateStatement)
     auto fldValue = sqlite::makeFieldDef("value", sqlite::FieldType::Real());
     sqlite::statements::Update u("MyTable",std::make_tuple(fldName, fldValue));
 
-    ASSERT_EQ(u.string(), "UPDATE MyTable SET name = ?,value = ?;");
+    ASSERT_EQ(u.string(), "UPDATE MyTable SET name = ?1,value = ?2;");
 
     u.where("id = ?");
-    ASSERT_EQ(u.string(), "UPDATE MyTable SET name = ?,value = ? WHERE id = ?;");
+    ASSERT_EQ(u.string(), "UPDATE MyTable SET name = ?1,value = ?2 WHERE id = ?;");
 
     u.orAction(sqlite::statements::Update::OrAction::Rollback);
-    ASSERT_EQ(u.string(), "UPDATE OR ROLLBACK MyTable SET name = ?,value = ? WHERE id = ?;");
+    ASSERT_EQ(u.string(), "UPDATE OR ROLLBACK MyTable SET name = ?1,value = ?2 WHERE id = ?;");
 }
 
 TEST(SqlFormatting, ForeignKey)

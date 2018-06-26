@@ -65,25 +65,25 @@ TEST_F(OptionalStatements, Unpack)
     ASSERT_EQ(fields, "value");
 
     auto placeholders = sqlite::statements::unpackFieldPlaceholders(fieldId, text, value);
-    ASSERT_EQ(placeholders, "?,?");
+    ASSERT_EQ(placeholders, "?1,?3");
     placeholders = sqlite::statements::unpackFieldPlaceholders(fieldId);
-    ASSERT_EQ(placeholders, "?");
+    ASSERT_EQ(placeholders, "?1");
     placeholders = sqlite::statements::unpackFieldPlaceholders(text);
     ASSERT_EQ(placeholders, "");
     placeholders = sqlite::statements::unpackFieldPlaceholders(value);
-    ASSERT_EQ(placeholders, "?");
+    ASSERT_EQ(placeholders, "?1");
 
     auto fieldplaceholders = sqlite::statements::unpackFieldsAndPlaceholders(fieldId, text, value);
-    ASSERT_EQ(fieldplaceholders, "id = ?,value = ?");
+    ASSERT_EQ(fieldplaceholders, "id = ?1,value = ?3");
 
     fieldplaceholders = sqlite::statements::unpackFieldsAndPlaceholders(fieldId);
-    ASSERT_EQ(fieldplaceholders, "id = ?");
+    ASSERT_EQ(fieldplaceholders, "id = ?1");
 
     fieldplaceholders = sqlite::statements::unpackFieldsAndPlaceholders(text);
     ASSERT_EQ(fieldplaceholders, "");
 
     fieldplaceholders = sqlite::statements::unpackFieldsAndPlaceholders(value);
-    ASSERT_EQ(fieldplaceholders, "value = ?");
+    ASSERT_EQ(fieldplaceholders, "value = ?1");
 }
 
 TEST_F(OptionalStatements, InsertFormatter)
@@ -100,7 +100,7 @@ TEST_F(OptionalStatements, InsertFormatter)
             insert("tab", text, count, value);
 
     std::string exp {
-        "INSERT INTO tab(text) VALUES(?);"
+        "INSERT INTO tab(text) VALUES(?1);"
     };
 
     ASSERT_EQ(exp, insert.string());
