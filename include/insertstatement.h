@@ -14,11 +14,6 @@
 
 namespace sqlite {
 
-template <typename T>
-inline void bind(SQLiteStatement &statement, size_t idx, const T &value) {
-    statement.bind(idx, value);
-}
-
 template<typename ...FIELDS>
 class InsertStatement {
     std::tuple<FIELDS...> fields;

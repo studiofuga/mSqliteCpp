@@ -158,6 +158,11 @@ inline std::string SQLiteStatement::get<std::string>(int idx)
     return getStringValue(idx);
 }
 
+template <typename T>
+inline void bind(SQLiteStatement &statement, size_t idx, const T &value) {
+    statement.bind(idx, value);
+}
+
 } // ns sqlite
 
 #endif //SQLITE_SQLITESTATEMENT_H

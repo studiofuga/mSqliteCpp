@@ -5,6 +5,8 @@
 #include <gtest/gtest.h>
 #include <clauses.h>
 #include <sqlitefieldsop.h>
+#include <createstatement.h>
+#include <selectstatement.h>
 #include "updatestatement.h"
 
 using namespace sqlite;
@@ -13,10 +15,10 @@ class UpdateStatements : public testing::Test {
 protected:
     std::shared_ptr<SQLiteStorage> db;
 public:
-    FieldDef<FieldType::Integer> fldId = sqlite::makeFieldDef("id", sqlite::FieldType::Integer());
-    FieldDef<FieldType::Integer> fldId2 = sqlite::makeFieldDef("id2", sqlite::FieldType::Integer());
-    FieldDef<FieldType::Text> fldName = sqlite::makeFieldDef("n", sqlite::FieldType::Text());
-    FieldDef<FieldType::Integer> fldValue = sqlite::makeFieldDef("v", sqlite::FieldType::Integer());
+    FieldDef<FieldType::Integer> fldId{"id", PrimaryKey};
+    FieldDef<FieldType::Integer> fldId2{"id2"};
+    FieldDef<FieldType::Text> fldName{"n"};
+    FieldDef<FieldType::Integer> fldValue{"v"};
 
     const std::string tablename = "ex";
 
@@ -38,13 +40,13 @@ protected:
         db = std::make_shared<SQLiteStorage>(":memory:");
         db->open();
 
-        SQLiteStatement create_stmt(db, "CREATE TABLE " + tablename + " (id INTEGER, id2 INTEGER, n TEXT, v INTEGER);");
-        create_stmt.executeStep();
+        auto create_stmt = makeCreateTableStatement2(db, tablename, fldId, fldId2, fldName, fldValue);
+        create_stmt.execute();
 
         SQLiteStatement stmt(db, statements::Insert(tablename, fldId, fldId2, fldName, fldValue));
         stmt.bind(std::make_tuple(1, 1, "name1", 2));
         stmt.execute();
-        stmt.bind(std::make_tuple(1, 2, "name2", 4));
+        stmt.bind(std::make_tuple(2, 2, "name2", 4));
         stmt.execute();
         stmt.bind(std::make_tuple(3, 2, "name3", 6));
         stmt.execute();
@@ -61,43 +63,91 @@ TEST_F(UpdateStatements, update)
     ASSERT_NO_THROW(statement.prepare());
     ASSERT_NO_THROW(statement.update(0));
 
-    SQLiteStatement allzerocheck(db, "SELECT " + fldValue.name() + " FROM " + tablename + ";");
+    SelectStatement<decltype(fldId)> allZero(fldId);
+    allZero.attach(db, tablename);
+    Where<decltype(fldValue)> allZeroWhere;
+    allZeroWhere.attach(allZero.getStatement(), op::ne(fldValue));
+    allZero.where(allZeroWhere);
+    allZero.prepare();
 
     bool f = false;
-    auto allzerochecker = [&allzerocheck, &f]() {
-        f = true;
-        return allzerocheck.getIntValue(0) == 0;
-    };
-    ASSERT_TRUE(allzerocheck.execute(allzerochecker));
-    ASSERT_TRUE(f);
+    allZero.exec([&f](int id) {
+        f = true;   // this should not be executed
+        return true;
+    });
+    ASSERT_FALSE(f);
 
-    Where<decltype(fldId)> where(statement.getStatement(), op::eq(fldId));
-
+    // update ID=1 value=1
+    Where<decltype(fldId)> where;
+    where.attach(statement.getStatement(), op::eq(fldId));
     ASSERT_NO_THROW(statement.where(where));
     ASSERT_NO_THROW(statement.prepare());
     ASSERT_NO_THROW(where.bind(1));
     ASSERT_NO_THROW(statement.update(1));
 
-    SQLiteStatement checker(db, "SELECT " + fldId.name() + "," + fldValue.name() + " FROM " + tablename + ";");
-    auto onechecker = [&checker, &f]() {
-        //std::cout << "Id: " << checker.getIntValue(0) << " value " << checker.getIntValue(1) << "\n";
-        f = true;
-        auto v = checker.getIntValue(1);
-        if (checker.getIntValue(0) == 1) {
-            /*
-            if (v != 1) {
-                std::cout << "Id 1 should have value 1, has " << v << " instead\n";
-            }*/
-            return v == 1;
-        }
-        /*
-        if (v != 0) {
-            std::cout << "Expected value 0, " << v << " instead\n";
-        }*/
-        return v == 0;
-    };
+
+    SelectStatement<decltype(fldValue)> checker(fldValue);
+    checker.attach(db, tablename);
+    Where<decltype(fldValue)> checkerWhere;
+    checkerWhere.attach(checker.getStatement(), op::eq(fldId));
+    checker.where(checkerWhere);
+    checker.prepare();
+    checkerWhere.bind(1);
 
     f = false;
-    ASSERT_TRUE(checker.execute(onechecker));
+    checker.exec([&f](int value) {
+        f= (value == 1);
+        return true;
+    });
     ASSERT_TRUE(f);
 }
+
+TEST_F(UpdateStatements, updateWithOptional)
+{
+    UpdateStatement<
+            decltype(fldId), decltype(fldId2), decltype(fldName), decltype(fldValue)
+    > updateStatement(fldId, fldId2, fldName, fldValue);
+
+    updateStatement.attach(db, tablename);
+
+    Where<decltype(fldId)> where;
+
+    where.attach(updateStatement.getStatement(), op::eq(fldId));
+    updateStatement.prepare();
+
+    int id = 1;
+    boost::optional<int> id2{20}, value;
+    boost::optional<std::string> name;
+
+    ASSERT_NO_THROW(where.bind(id));
+    ASSERT_NO_THROW(updateStatement.update(id, id2, name, value));
+
+    SelectStatement<
+            decltype(fldId), decltype(fldId2), decltype(fldName), decltype(fldValue)
+    > selectStatement(fldId, fldId2, fldName, fldValue);
+    selectStatement.attach(db, tablename);
+    Where<decltype(fldId)> selectWhere;
+
+    selectWhere.attach(selectStatement.getStatement(), op::eq(fldId));
+    selectStatement.where(selectWhere);
+    selectStatement.prepare();
+
+    selectWhere.bind(id);
+    int rid, rid2, rvalue;
+    std::string rname;
+    selectStatement.exec([&rid, &rid2, &rname, &rvalue](int id, int id2, std::string name, int value) {
+        rid = id;
+        rid2 = id2;
+        rname = name;
+        rvalue = value;
+        return true;
+    });
+
+    ASSERT_EQ(rid, id);
+    ASSERT_EQ(rid2, id2);
+    ASSERT_EQ(rname, name);
+    ASSERT_EQ(rvalue, value);
+}
+
+
+

@@ -19,19 +19,40 @@ class UpdateStatement {
     std::tuple<FIELDS...> fields;
     std::shared_ptr<SQLiteStorage> db;
     std::string tablename;
-    SQLiteStatement statement;
+    std::shared_ptr<SQLiteStatement> statement = std::make_shared<SQLiteStatement>();
     statements::Update sql;
 
+    template <typename T>
+    bool bindValue(int idx, const T& t) {
+        sqlite::bind(*statement, idx+1, t);
+        return true;
+    }
+
+    template <typename T>
+    bool bindValue(int idx, const boost::optional<T> & t) {
+        if (t) {
+            sqlite::bind(*statement, idx+1, t.value());
+            return true;
+        }
+        return false;
+    }
+
+    bool bindValue(int idx, std::nullptr_t t) {
+        sqlite::bind(*statement, idx+1, nullptr);
+        return true;
+    }
+
     template<int N = 0, typename ...T>
-    typename std::enable_if<N == sizeof...(T), void>::type updateImpl(std::tuple<T...>)
+    typename std::enable_if<N == sizeof...(T), void>::type updateImpl(std::tuple<T...>, size_t idx = 0)
     {
     };
 
     template<int N = 0, typename ...T>
-    typename std::enable_if<N < sizeof...(T), void>::type updateImpl(std::tuple<T...> values)
+    typename std::enable_if<N < sizeof...(T), void>::type updateImpl(std::tuple<T...> values, size_t idx = 0)
     {
-        statement.bind(N + 1, std::get<N>(values));
-        updateImpl<N + 1>(values);
+        bindValue(idx, std::get<N>(values));
+        ++idx;
+        updateImpl<N + 1>(values, idx);
     };
 
 public:
@@ -45,18 +66,19 @@ public:
     {
         db = dbm;
         tablename = std::move(table);
-        sql = statements::Update(tablename, fields);
+        statement->attach(db);
+        prepare();
     }
 
-    void prepare()
-    {
-        statement.attach(db, sql);
+    void prepare() {
+        sql = statements::Update(tablename, fields);
+        statement->prepare(sql);
     }
 
     template<typename W>
     void where(W &w)
     {
-        w.setBindOffset(sizeof...(FIELDS));
+        //w.setBindOffset(sizeof...(FIELDS));
         sql.where(w.toText());
     }
 
@@ -64,12 +86,12 @@ public:
     void update(T... values)
     {
         updateImpl<0>(std::make_tuple(values...));
-        statement.execute();
+        statement->execute();
     }
 
     SQLiteStatement *getStatement()
     {
-        return &statement;
+        return statement.get();
     }
 };
 
