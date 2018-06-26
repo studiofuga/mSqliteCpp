@@ -127,6 +127,7 @@ TEST_F(UpdateStatements, updateWithOptional)
     > selectStatement(fldId, fldId2, fldName, fldValue);
     selectStatement.attach(db, tablename);
     Where<decltype(fldId)> selectWhere;
+    Where<decltype(fldId)> selectWhereOthers;
 
     selectWhere.attach(selectStatement.getStatement(), op::eq(fldId));
     selectStatement.where(selectWhere);
@@ -147,6 +148,22 @@ TEST_F(UpdateStatements, updateWithOptional)
     ASSERT_EQ(rid2, id2.value());
     ASSERT_EQ(rname, "name1");
     ASSERT_EQ(rvalue, 2);
+
+    // check that the others id2 are NOT 20
+    selectWhereOthers.attach(selectStatement.getStatement(), op::ne(fldId));
+    selectStatement.where(selectWhereOthers);
+    selectStatement.prepare();
+    selectWhereOthers.bind(id);
+
+    bool ok = true;
+    selectStatement.exec([&ok](int id, int id2, std::string name, int value) {
+        std::cout << id << "," << id2 << "," << name << "," << value << "\n";
+        if (id != 1 && id2 == 20)
+            ok = false;
+        return true;
+    });
+
+    ASSERT_TRUE(ok);
 }
 
 
