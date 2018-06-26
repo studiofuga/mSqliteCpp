@@ -224,7 +224,7 @@ TEST_F(OptionalStatements, Issue6InsertMultipleOptionals)
     select.exec(countFunction);
     ASSERT_EQ(count, 2);
 
-    Where<decltype(fieldId)> w;
+    Where<std::string, decltype(fieldId)> w;
     w.attach(select.getStatement(), op::eq(fieldId));
     select.where(w);
     select.prepare();
