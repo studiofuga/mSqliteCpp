@@ -36,10 +36,10 @@ TEST(SqlFormatting, relOperators)
     ASSERT_EQ(sqlite::op::or_(sqlite::op::lt(fldId),sqlite::op::gt(fldId)), "(id < ? OR id > ?)");
 
     ASSERT_EQ(sqlite::op::and_(sqlite::op::ne(fldId), sqlite::op::ne(fldId), sqlite::op::ne(fldId)),
-                      "(id <> ? AND id <> ? AND id <> ?)");
+              "(id <> ? AND id <> ? AND id <> ?)");
 
     ASSERT_EQ(sqlite::op::or_(sqlite::op::eq(fldId), sqlite::op::eq(fldId), sqlite::op::eq(fldId)),
-                      "(id = ? OR id = ? OR id = ?)");
+              "(id = ? OR id = ? OR id = ?)");
 }
 
 TEST(SqlFormatting, internalUnpack)
@@ -114,7 +114,7 @@ TEST(SqlFormatting, insert)
     auto fldName = sqlite::makeFieldDef("name", sqlite::FieldType::Text());
     auto fldValue = sqlite::makeFieldDef("value", sqlite::FieldType::Real());
 
-    auto i = sqlite::statements::Insert("Table", fldId, fldName, fldValue);
+    auto i = sqlite::statements::Insert("Table", std::make_tuple(fldId, fldName, fldValue));
 
     ASSERT_EQ(i.string(), "INSERT INTO Table(id,name,value) VALUES(?,?,?);");
 }
@@ -132,7 +132,7 @@ TEST(SqlFormatting, updateStatement)
 {
     auto fldName = sqlite::makeFieldDef("name", sqlite::FieldType::Text());
     auto fldValue = sqlite::makeFieldDef("value", sqlite::FieldType::Real());
-    sqlite::statements::Update u("MyTable",fldName, fldValue);
+    sqlite::statements::Update u("MyTable",std::make_tuple(fldName, fldValue));
 
     ASSERT_EQ(u.string(), "UPDATE MyTable SET name = ?,value = ?;");
 

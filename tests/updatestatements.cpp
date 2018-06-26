@@ -105,8 +105,8 @@ TEST_F(UpdateStatements, update)
 TEST_F(UpdateStatements, updateWithOptional)
 {
     UpdateStatement<
-            decltype(fldId), decltype(fldId2), decltype(fldName), decltype(fldValue)
-    > updateStatement(fldId, fldId2, fldName, fldValue);
+            decltype(fldId2), decltype(fldName), decltype(fldValue)
+    > updateStatement(fldId2, fldName, fldValue);
 
     updateStatement.attach(db, tablename);
 
@@ -120,7 +120,7 @@ TEST_F(UpdateStatements, updateWithOptional)
     boost::optional<std::string> name;
 
     ASSERT_NO_THROW(where.bind(id));
-    ASSERT_NO_THROW(updateStatement.update(id, id2, name, value));
+    ASSERT_NO_THROW(updateStatement.unpreparedUpdate(id2, name, value));
 
     SelectStatement<
             decltype(fldId), decltype(fldId2), decltype(fldName), decltype(fldValue)
@@ -144,9 +144,9 @@ TEST_F(UpdateStatements, updateWithOptional)
     });
 
     ASSERT_EQ(rid, id);
-    ASSERT_EQ(rid2, id2);
-    ASSERT_EQ(rname, name);
-    ASSERT_EQ(rvalue, value);
+    ASSERT_EQ(rid2, id2.value());
+    ASSERT_EQ(rname, "name1");
+    ASSERT_EQ(rvalue, 2);
 }
 
 

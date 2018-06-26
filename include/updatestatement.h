@@ -19,6 +19,7 @@ class UpdateStatement {
     std::tuple<FIELDS...> fields;
     std::shared_ptr<SQLiteStorage> db;
     std::string tablename;
+    bool statementDirty = true;
     std::shared_ptr<SQLiteStatement> statement = std::make_shared<SQLiteStatement>();
     statements::Update sql;
 
@@ -73,20 +74,34 @@ public:
     void prepare() {
         sql = statements::Update(tablename, fields);
         statement->prepare(sql);
+        statementDirty = false;
     }
 
     template<typename W>
     void where(W &w)
     {
-        //w.setBindOffset(sizeof...(FIELDS));
         sql.where(w.toText());
     }
 
     template<typename ...T>
     void update(T... values)
     {
+        if (statementDirty)
+            prepare();
+
         updateImpl<0>(std::make_tuple(values...));
         statement->execute();
+    }
+
+    template<typename ...T>
+    void unpreparedUpdate(T... values)
+    {
+        sql = statements::Update(tablename, fields, std::make_tuple(values...));
+        statement->prepare(sql);
+
+        updateImpl<0>(std::make_tuple(values...));
+        statement->execute();
+        statementDirty = true;
     }
 
     SQLiteStatement *getStatement()
