@@ -27,9 +27,9 @@ public:
     }
 
     FieldDef<FieldType::Integer> fieldId{"id", PrimaryKey};
-    FieldDef<FieldType::Text> fieldText{"text"};
-    FieldDef<FieldType::Integer> fieldCount{"count"};
-    FieldDef<FieldType::Real> fieldValue{"value"};
+    FieldDef<FieldType::Text> fieldText {"text"};
+    FieldDef<FieldType::Integer> fieldCount {"count"};
+    FieldDef<FieldType::Real> fieldValue {"value"};
 };
 
 TEST_F(OptionalStatements, FieldsFormat)
@@ -86,69 +86,6 @@ TEST_F(OptionalStatements, Unpack)
     ASSERT_EQ(fieldplaceholders, "value = ?");
 }
 
-TEST_F(OptionalStatements, UnpackOptionals)
-{
-    boost::optional<int> vid{1};
-    boost::optional<std::string> vtext;
-    boost::optional<double> vvalue{10.0};
-
-    std::string fields = sqlite::statements::unpackFieldNamesOpt(
-            std::make_tuple(fieldId, fieldText, fieldValue),
-            std::make_tuple(vid, vtext, vvalue));
-
-    auto placeholders = sqlite::statements::unpackFieldPlaceholdersOpt(
-            std::make_tuple(fieldId, fieldText, fieldValue),
-            std::make_tuple(vid, vtext, vvalue));
-    auto fieldplaceholders = sqlite::statements::unpackFieldsAndPlaceholdersOpt(
-            std::make_tuple(fieldId, fieldText, fieldValue),
-            std::make_tuple(vid, vtext, vvalue));
-    ASSERT_EQ(fields, "id,value");
-    ASSERT_EQ(placeholders, "?,?");
-    ASSERT_EQ(fieldplaceholders, "id = ?,value = ?");
-
-    vvalue.reset();
-    fields = sqlite::statements::unpackFieldNamesOpt(
-            std::make_tuple(fieldId, fieldText, fieldValue),
-            std::make_tuple(vid, vtext, vvalue));
-    placeholders = sqlite::statements::unpackFieldPlaceholdersOpt(
-            std::make_tuple(fieldId, fieldText, fieldValue),
-            std::make_tuple(vid, vtext, vvalue));
-    fieldplaceholders = sqlite::statements::unpackFieldsAndPlaceholdersOpt(
-            std::make_tuple(fieldId, fieldText, fieldValue),
-            std::make_tuple(vid, vtext, vvalue));
-    ASSERT_EQ(fields, "id");
-    ASSERT_EQ(placeholders, "?");
-    ASSERT_EQ(fieldplaceholders, "id = ?");
-
-    vid.reset();
-    fields = sqlite::statements::unpackFieldNamesOpt(
-            std::make_tuple(fieldId, fieldText, fieldValue),
-            std::make_tuple(vid, vtext, vvalue));
-    placeholders = sqlite::statements::unpackFieldPlaceholdersOpt(
-            std::make_tuple(fieldId, fieldText, fieldValue),
-            std::make_tuple(vid, vtext, vvalue));
-    fieldplaceholders = sqlite::statements::unpackFieldsAndPlaceholdersOpt(
-            std::make_tuple(fieldId, fieldText, fieldValue),
-            std::make_tuple(vid, vtext, vvalue));
-    ASSERT_EQ(fields, "");
-    ASSERT_EQ(placeholders, "");
-    ASSERT_EQ(fieldplaceholders, "");
-
-    vvalue = 0.1;
-    fields = sqlite::statements::unpackFieldNamesOpt(
-            std::make_tuple(fieldId, fieldText, fieldValue),
-            std::make_tuple(vid, vtext, vvalue));
-    placeholders = sqlite::statements::unpackFieldPlaceholdersOpt(
-            std::make_tuple(fieldId, fieldText, fieldValue),
-            std::make_tuple(vid, vtext, vvalue));
-    fieldplaceholders = sqlite::statements::unpackFieldsAndPlaceholdersOpt(
-            std::make_tuple(fieldId, fieldText, fieldValue),
-            std::make_tuple(vid, vtext, vvalue));
-    ASSERT_EQ(fields, "value");
-    ASSERT_EQ(placeholders, "?");
-    ASSERT_EQ(fieldplaceholders, "value = ?");
-}
-
 TEST_F(OptionalStatements, InsertFormatter)
 {
     boost::optional<FieldDef<FieldType::Text>> text;
@@ -160,10 +97,10 @@ TEST_F(OptionalStatements, InsertFormatter)
     ASSERT_EQ(statements::details::toString(text), "text");
 
     sqlite::statements::Insert
-            insert("tab", std::make_tuple(text, count, value));
+            insert("tab", text, count, value);
 
-    std::string exp{
-            "INSERT INTO tab(text) VALUES(?);"
+    std::string exp {
+        "INSERT INTO tab(text) VALUES(?);"
     };
 
     ASSERT_EQ(exp, insert.string());
@@ -174,9 +111,9 @@ TEST_F(OptionalStatements, Insert)
     auto createTable = makeCreateTableStatement2(db, "Insert1", fieldId, fieldText, fieldCount, fieldValue);
     ASSERT_NO_THROW(createTable.execute());
 
-    boost::optional<std::string> text{"sampleText"};
-    boost::optional<int> count{1};
-    boost::optional<double> value{0.1};
+    boost::optional<std::string> text {"sampleText"};
+    boost::optional<int> count {1};
+    boost::optional<double> value { 0.1 };
 
     auto insertStatement = makeInsertStatement(fieldId, fieldText, fieldCount, fieldValue);
     insertStatement.replaceOnConflict();
@@ -212,7 +149,7 @@ TEST_F(OptionalStatements, Insert)
     count.reset();
     value.reset();
 
-    ASSERT_NO_THROW(insertStatement.prepareAndInsert(1, text, count, value));
+    ASSERT_NO_THROW(insertStatement.insert(1, text, count, value));
 
     select.exec([&rId, &rText, &rCount, &rValue](int id, std::string text, int count, double value) {
         rId = id;
@@ -268,7 +205,7 @@ TEST_F(OptionalStatements, Issue6InsertMultipleOptionals)
     select.prepare();
 
     int count = 0;
-    auto countFunction = [&count](int id, std::string, int, double) {
+    auto countFunction = [&count](int id, std::string, int, double){
         ++count;
         return true;
     };
@@ -299,7 +236,7 @@ TEST_F(OptionalStatements, Issue6InsertMultipleOptionals)
     int rcountvalue;
     double rvalue;
     w.bind(2);
-    select.exec([&rtext, &rvalue, &rcountvalue](int id, std::string t, int c, double v) {
+    select.exec([&rtext, &rvalue, &rcountvalue](int id, std::string t, int c, double v){
         rtext = t;
         rcountvalue = c;
         rvalue = v;
@@ -310,4 +247,3 @@ TEST_F(OptionalStatements, Issue6InsertMultipleOptionals)
     ASSERT_EQ(rcountvalue, 0);
     ASSERT_EQ(rvalue, 0);
 }
-
