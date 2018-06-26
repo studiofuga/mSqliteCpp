@@ -67,6 +67,24 @@ std::string ne(const FieldDef <FT> &field)
     return field.name() + " <> ?";
 }
 
+template <typename FT>
+class eq_ {
+    const FieldDef <FT> fld;
+public:
+    eq_(FieldDef <FT> f) : fld(std::move(f)) {}
+
+    std::string operator() (int indx = 0){
+        std::ostringstream ss;
+        ss << fld.name() << " = ?" << indx+1;
+        return ss.str();
+    }
+};
+
+template <typename FT>
+eq_<FT> makeEq(FieldDef<FT> f) {
+    return eq_<FT>(f);
+}
+
 template<typename FT>
 std::string lt(const FieldDef <FT> &field)
 {

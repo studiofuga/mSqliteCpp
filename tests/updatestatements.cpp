@@ -110,17 +110,21 @@ TEST_F(UpdateStatements, updateWithOptional)
 
     updateStatement.attach(db, tablename);
 
-    Where<decltype(fldId)> where;
+    auto where = makeWhere(updateStatement.getStatement(), op::makeEq(fldId));
 
-    where.attach(updateStatement.getStatement(), op::eq(fldId));
-    updateStatement.prepare();
+    std::cout << "Where\n";
+    updateStatement.where(where);
 
     int id = 1;
     boost::optional<int> id2{20}, value;
     boost::optional<std::string> name;
 
+    std::cout << "Prepare\n";
+    ASSERT_NO_THROW(updateStatement.prepare(id2, name, value));
+    std::cout << "bind\n";
     ASSERT_NO_THROW(where.bind(id));
-    ASSERT_NO_THROW(updateStatement.unpreparedUpdate(id2, name, value));
+    std::cout << "UPDATE\n";
+    ASSERT_NO_THROW(updateStatement.update(id2, name, value));
 
     SelectStatement<
             decltype(fldId), decltype(fldId2), decltype(fldName), decltype(fldValue)
