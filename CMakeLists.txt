@@ -12,6 +12,7 @@ endif (NOT ${CMAKE_CURRENT_LIST_DIR} STREQUAL ${CMAKE_SOURCE_DIR})
 OPTION(ENABLE_TEST "Enable Tests" ON)
 OPTION(ENABLE_PROFILER "Enable Profiler" ON)
 OPTION(ENABLE_SQLITE_AMALGAMATION "Compile SQLite Amalgamation" OFF)
+OPTION(ENABLE_CODECOVERAGE "Enable Code Coverage tests" OFF)
 
 set(CMAKE_CXX_STANDARD 14)
 
@@ -73,6 +74,27 @@ else (ENABLE_SQLITE_AMALGAMATION)
     add_definitions(-DBUILD_MSQLITECPP)
     set (LINK_SHARED SHARED)
 endif (ENABLE_SQLITE_AMALGAMATION)
+
+if (ENABLE_CODECOVERAGE)
+    message ("Code Coverage enabled")
+
+    find_program( GCOV_PATH gcov )
+    find_program( LCOV_PATH lcov )
+    find_program( GENHTML_PATH genhtml )
+
+    if(GCOV_PATH-NOTFOUND)
+        message(FATAL_ERROR "gcov not found" )
+    endif(GCOV_PATH-NOTFOUND)
+    if(LCOV_PATH-NOTFOUND)
+        message(FATAL_ERROR "lcov not found" )
+    endif(LCOV_PATH-NOTFOUND)
+    if(GENHTML_PATH-NOTFOUND)
+        message(FATAL_ERROR "genhtml not found" )
+    endif(GENHTML_PATH-NOTFOUND)
+
+    set (CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} --coverage")
+    set (CMAKE_C_FLAGS "${CMAKE_C_FLAGS} --coverage")
+endif (ENABLE_CODECOVERAGE)
 
 link_directories(${MSQLITECPP_ROOT})
 

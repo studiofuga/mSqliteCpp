@@ -38,3 +38,15 @@ target_link_libraries(runTests msqlitecpp gtest gtest_main)
 add_custom_target(check
         COMMAND runTests --gtest_output=xml:gtestresults.xml
         DEPENDS runTests)
+
+if (ENABLE_CODECOVERAGE)
+    add_custom_target(codecoverage
+            DEPENDS runTests
+            COMMAND runTests --gtest_output=xml:gtestresults.xml || true
+            COMMAND lcov -t "CodeCoverage Tests" -o unittests.info -c -d ${CMAKE_BINARY_DIR}
+            COMMAND lcov --remove unittests.info '/usr/include/*' '*/googletest/*' > unittests_rm.info
+            COMMAND mv unittests_rm.info unittests.info
+            COMMAND genhtml -o codecoverage unittests.info
+            )
+endif (ENABLE_CODECOVERAGE)
+
