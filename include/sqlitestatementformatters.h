@@ -132,7 +132,7 @@ unpackFieldNamesOpt_impl(const std::tuple<Ts...> &def,
 }
 
 template <typename T>
-std::string formatFieldPlaceholder (const T&t, const std::string &sep, size_t I = 0)
+std::string formatFieldPlaceholder3 (const T&t, const std::string &sep, size_t I = 0)
 {
     std::ostringstream ss;
     ss << sep << "?" << I+1;
@@ -140,7 +140,7 @@ std::string formatFieldPlaceholder (const T&t, const std::string &sep, size_t I 
 }
 
 template <typename F, typename T>
-std::string formatFieldPlaceholder (const F &f, const T&t, const std::string &sep, size_t I = 0)
+std::string formatFieldPlaceholder4 (const F &f, const T&t, const std::string &sep, size_t I = 0)
 {
     std::ostringstream ss;
     ss << sep << "?" << I+1;
@@ -148,7 +148,7 @@ std::string formatFieldPlaceholder (const F &f, const T&t, const std::string &se
 }
 
 template <typename T>
-std::string formatFieldPlaceholder (const boost::optional<T> &t, const std::string &sep, size_t I = 0)
+std::string formatFieldPlaceholder3 (const boost::optional<T> &t, const std::string &sep, size_t I = 0)
 {
     if (t) {
         std::ostringstream ss;
@@ -159,7 +159,7 @@ std::string formatFieldPlaceholder (const boost::optional<T> &t, const std::stri
 }
 
 template <typename F, typename T>
-std::string formatFieldPlaceholder (const F &f, const boost::optional<T> &t, const std::string &sep, size_t I = 0)
+std::string formatFieldPlaceholder4 (const F &f, const boost::optional<T> &t, const std::string &sep, size_t I = 0)
 {
     if (t) {
         std::ostringstream ss;
@@ -186,7 +186,7 @@ std::string
 unpackFieldPlaceholders_impl(const std::tuple<Ts...> &def, size_t count = 0,
                              typename std::enable_if<I < sizeof...(Ts)>::type * = 0)
 {
-    auto fld = formatFieldPlaceholder(std::get<I>(def), (count > 0 ? "," : ""),I);
+    auto fld = formatFieldPlaceholder3(std::get<I>(def), (count > 0 ? "," : ""),I);
     if (!fld.empty())
         ++count;
     return  fld + unpackFieldPlaceholders_impl<I + 1, Ts...>(def, count);
@@ -213,7 +213,7 @@ unpackFieldPlaceholdersOpt_impl(const std::tuple<Ts...> &def,
                                 size_t count = 0,
                                 typename std::enable_if<I < sizeof...(Ts)>::type * = 0)
 {
-    auto fld = formatFieldPlaceholder(std::get<I>(def), std::get<I>(values), (count > 0 ? "," : ""),I);
+    auto fld = formatFieldPlaceholder4(std::get<I>(def), std::get<I>(values), (count > 0 ? "," : ""),I);
     if (!fld.empty())
         ++count;
     return  fld + unpackFieldPlaceholdersOpt_impl<I + 1, Ts...>(def, values, count);
