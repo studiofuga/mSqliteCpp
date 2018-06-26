@@ -517,7 +517,7 @@ TEST_F(Statements, createWithStatements)
     }
 
     {
-        SQLiteStatement stmt(db, statements::Insert("sample", fldId, fldName, fldValue));
+        SQLiteStatement stmt(db, statements::Insert("sample", std::make_tuple(fldId, fldName, fldValue)));
         ASSERT_NO_THROW(stmt.bind(std::make_tuple(0, "first name", -1.1)));
         ASSERT_NO_THROW(stmt.execute());
         ASSERT_NO_THROW(stmt.bind(std::make_tuple(1, "second name", 1.1)));
@@ -591,7 +591,7 @@ public:
         SQLiteStatement create_stmt(db, "CREATE TABLE ex (id INTEGER, n TEXT, v DOUBLE);");
         create_stmt.executeStep();
 
-        SQLiteStatement stmt(db, statements::Insert("ex", fldId, fldName, fldValue));
+        SQLiteStatement stmt(db, statements::Insert("ex", std::make_tuple(fldId, fldName, fldValue)));
         stmt.bind(std::make_tuple(1, "name1", 2.0));
         stmt.execute();
         stmt.bind(std::make_tuple(2, "name2", 4.0));
@@ -622,7 +622,7 @@ TEST_F(SelectStatements, join)
     SQLiteStatement create_stmt(db, "CREATE TABLE ex2 (jid INTEGER, name TEXT, value DOUBLE);");
     create_stmt.execute();
 
-    SQLiteStatement stmt(db, statements::Insert("ex2", jfldId, jfldName, jfldValue));
+    SQLiteStatement stmt(db, statements::Insert("ex2", std::make_tuple(jfldId, jfldName, jfldValue)));
     stmt.bind(std::make_tuple(1, "a", -2.0));
     stmt.execute();
     stmt.bind(std::make_tuple(2, "b", -4.0));
@@ -680,7 +680,7 @@ protected:
         SQLiteStatement create_stmt(db, "CREATE TABLE ex (id INTEGER, n TEXT, v DOUBLE);");
         create_stmt.executeStep();
 
-        SQLiteStatement stmt(db, statements::Insert("ex", fldId, fldName, fldValue));
+        SQLiteStatement stmt(db, statements::Insert("ex", std::make_tuple(fldId, fldName, fldValue)));
         stmt.bind(std::make_tuple(1, "name1", 2.0));
         stmt.execute();
         stmt.bind(std::make_tuple(2, "name2", 4.0));

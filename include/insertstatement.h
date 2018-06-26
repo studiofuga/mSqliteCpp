@@ -102,6 +102,20 @@ public:
         statement->execute();
     }
 
+    template<typename ...T>
+    void prepareAndInsert(T... values)
+    {
+        auto insertStatement = statements::Insert(tablename, fields, std::make_tuple(values...));
+        if (do_replace) {
+            insertStatement.doReplace();
+        }
+        statement = std::make_shared<SQLiteStatement>(db, insertStatement);
+
+        std::cout << insertStatement.string() << "\n";
+        insertImpl<0>(std::make_tuple(values...));
+        statement->execute();
+    }
+
 };
 
 template<typename ...FIELDS>

@@ -41,7 +41,7 @@ protected:
         SQLiteStatement create_stmt(db, "CREATE TABLE " + tablename + " (id INTEGER, id2 INTEGER, n TEXT, v INTEGER);");
         create_stmt.executeStep();
 
-        SQLiteStatement stmt(db, statements::Insert(tablename, fldId, fldId2, fldName, fldValue));
+        SQLiteStatement stmt(db, statements::Insert(tablename, std::make_tuple(fldId, fldId2, fldName, fldValue)));
         stmt.bind(std::make_tuple(1, 1, "name1", 2));
         stmt.execute();
         stmt.bind(std::make_tuple(1, 2, "name2", 4));

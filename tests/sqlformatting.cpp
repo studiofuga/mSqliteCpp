@@ -114,7 +114,7 @@ TEST(SqlFormatting, insert)
     auto fldName = sqlite::makeFieldDef("name", sqlite::FieldType::Text());
     auto fldValue = sqlite::makeFieldDef("value", sqlite::FieldType::Real());
 
-    auto i = sqlite::statements::Insert("Table", fldId, fldName, fldValue);
+    auto i = sqlite::statements::Insert("Table", std::make_tuple(fldId, fldName, fldValue));
 
     ASSERT_EQ(i.string(), "INSERT INTO Table(id,name,value) VALUES(?,?,?);");
 }
