@@ -61,7 +61,7 @@ set(SOURCE_FILES
         src/sqlitestorage.cpp
         src/sqlitetransaction.cpp
         src/sqlitestatement.cpp
-        )
+        include/operators.h)
 
 if (ENABLE_SQLITE_AMALGAMATION)
     set (SOURCE_FILES ${SOURCE_FILES}

@@ -2,12 +2,14 @@
 // Created by Federico Fuga on 07/04/18.
 //
 
-#include <gtest/gtest.h>
 #include <clauses.h>
 #include <sqlitefieldsop.h>
 #include <createstatement.h>
 #include <selectstatement.h>
 #include "updatestatement.h"
+#include "operators.h"
+
+#include <gtest/gtest.h>
 
 using namespace sqlite;
 
@@ -110,20 +112,16 @@ TEST_F(UpdateStatements, updateWithOptional)
 
     updateStatement.attach(db, tablename);
 
-    auto where = makeWhere(updateStatement.getStatement(), op::makeEq(fldId));
+    auto where = makeWhere(updateStatement.getStatement(), operators::eq(fldId));
 
-    std::cout << "Where\n";
     updateStatement.where(where);
 
     int id = 1;
     boost::optional<int> id2{20}, value;
     boost::optional<std::string> name;
 
-    std::cout << "Prepare\n";
     ASSERT_NO_THROW(updateStatement.prepare(id2, name, value));
-    std::cout << "bind\n";
     ASSERT_NO_THROW(where.bind(id));
-    std::cout << "UPDATE\n";
     ASSERT_NO_THROW(updateStatement.update(id2, name, value));
 
     SelectStatement<
@@ -133,7 +131,7 @@ TEST_F(UpdateStatements, updateWithOptional)
     Where<std::string, decltype(fldId)> selectWhere;
     Where<std::string, decltype(fldId)> selectWhereOthers;
 
-    selectWhere.attach(selectStatement.getStatement(), op::eq(fldId));
+    selectWhere.attach(selectStatement.getStatement(), operators::eq(fldId)());
     selectStatement.where(selectWhere);
     selectStatement.prepare();
 
