@@ -161,11 +161,8 @@ TEST_F(OptionalStatements, Insert)
 
     ASSERT_EQ(rId, 1);
     ASSERT_EQ(rText, "NewText");
-    ASSERT_EQ(rCount, 1);
-    ASSERT_EQ(rValue, 0.1);
-
-// update again...
-    // ** now update
+    ASSERT_EQ(rCount, 0);
+    ASSERT_EQ(rValue, 0);
 
     text.reset();
     count.reset();
@@ -182,8 +179,8 @@ TEST_F(OptionalStatements, Insert)
     });
 
     ASSERT_EQ(rId, 1);
-    ASSERT_EQ(rText, "NewText");
-    ASSERT_EQ(rCount, 1);
+    ASSERT_EQ(rText, "");
+    ASSERT_EQ(rCount, 0);
     ASSERT_EQ(rValue, 1000);
 
 }
