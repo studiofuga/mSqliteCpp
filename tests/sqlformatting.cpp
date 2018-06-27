@@ -79,31 +79,31 @@ TEST(SqlFormatting, select)
 
     {
         sqlite::statements::Select select("tbl", fldId, fldName, fldValue);
-        ASSERT_EQ(select.string(), "SELECT id,name,value FROM tbl;");
+        ASSERT_EQ(select.string(), "SELECT id,name,value FROM tbl");
         ASSERT_NO_THROW(sqlite::SQLiteStatement(db, select));
     }
 
     {
         auto select = sqlite::statements::Select("tbl", fldId, fldName).where(sqlite::op::eq(fldId));
-        ASSERT_EQ(select.string(), "SELECT id,name FROM tbl WHERE id = ?;");
+        ASSERT_EQ(select.string(), "SELECT id,name FROM tbl WHERE id = ?");
         ASSERT_NO_THROW(sqlite::SQLiteStatement(db, select));
     }
 
     {
         auto select = sqlite::statements::Select("tbl", fldId, fldName).groupBy(fldValue);
-        ASSERT_EQ(select.string(), "SELECT id,name FROM tbl GROUP BY value;");
+        ASSERT_EQ(select.string(), "SELECT id,name FROM tbl GROUP BY value");
         ASSERT_NO_THROW(sqlite::SQLiteStatement(db, select));
     }
 
     {
         auto select = sqlite::statements::Select("tbl", fldName, sqlite::op::sum(fldValue));
-        ASSERT_EQ(select.string(),"SELECT name,SUM(value) FROM tbl;");
+        ASSERT_EQ(select.string(),"SELECT name,SUM(value) FROM tbl");
         ASSERT_NO_THROW(sqlite::SQLiteStatement(db, select));
     }
 
     {
         auto select = sqlite::statements::Select("tbl", fldName).distinct();
-        ASSERT_EQ(select.string(),"SELECT DISTINCT name FROM tbl;");
+        ASSERT_EQ(select.string(),"SELECT DISTINCT name FROM tbl");
         ASSERT_NO_THROW(sqlite::SQLiteStatement(db, select));
     }
 }
@@ -116,16 +116,16 @@ TEST(SqlFormatting, insert)
 
     auto i = sqlite::statements::Insert("Table", std::make_tuple(fldId, fldName, fldValue));
 
-    ASSERT_EQ(i.string(), "INSERT INTO Table(id,name,value) VALUES(?1,?2,?3);");
+    ASSERT_EQ(i.string(), "INSERT INTO Table(id,name,value) VALUES(?1,?2,?3)");
 }
 
 TEST(SqlFormatting, deleteStatement)
 {
     sqlite::statements::Delete d("MyTable");
-    ASSERT_EQ(d.string(), "DELETE FROM MyTable;");
+    ASSERT_EQ(d.string(), "DELETE FROM MyTable");
 
     d.where("id = ?");
-    ASSERT_EQ(d.string(), "DELETE FROM MyTable WHERE id = ?;");
+    ASSERT_EQ(d.string(), "DELETE FROM MyTable WHERE id = ?");
 }
 
 TEST(SqlFormatting, updateStatement)
@@ -134,13 +134,13 @@ TEST(SqlFormatting, updateStatement)
     auto fldValue = sqlite::makeFieldDef("value", sqlite::FieldType::Real());
     sqlite::statements::Update u("MyTable",std::make_tuple(fldName, fldValue));
 
-    ASSERT_EQ(u.string(), "UPDATE MyTable SET name = ?1,value = ?2;");
+    ASSERT_EQ(u.string(), "UPDATE MyTable SET name = ?1,value = ?2");
 
     u.where("id = ?");
-    ASSERT_EQ(u.string(), "UPDATE MyTable SET name = ?1,value = ?2 WHERE id = ?;");
+    ASSERT_EQ(u.string(), "UPDATE MyTable SET name = ?1,value = ?2 WHERE id = ?");
 
     u.orAction(sqlite::statements::Update::OrAction::Rollback);
-    ASSERT_EQ(u.string(), "UPDATE OR ROLLBACK MyTable SET name = ?1,value = ?2 WHERE id = ?;");
+    ASSERT_EQ(u.string(), "UPDATE OR ROLLBACK MyTable SET name = ?1,value = ?2 WHERE id = ?");
 }
 
 TEST(SqlFormatting, ForeignKey)
@@ -187,12 +187,12 @@ TEST(SqlFormatting, createTableStatement)
     auto fldValue = sqlite::makeFieldDef("value", sqlite::FieldType::Real());
 
     sqlite::statements::CreateTable c ("MyTable", fldId, fldName, fldValue);
-    ASSERT_EQ(c.string(), "CREATE TABLE MyTable (id INTEGER PRIMARY KEY, name TEXT, value REAL);");
+    ASSERT_EQ(c.string(), "CREATE TABLE MyTable (id INTEGER PRIMARY KEY, name TEXT, value REAL)");
 
     sqlite::statements::CreateTable::TableConstraint::ForeignKey constraint("u", std::make_tuple(fldId), "x", std::make_tuple("y"));
     c.setConstraint(constraint);
     ASSERT_EQ(c.string(), "CREATE TABLE MyTable (id INTEGER PRIMARY KEY, name TEXT, value REAL,"
-                          " CONSTRAINT u FOREIGN KEY(id) REFERENCES x(y));");
+                          " CONSTRAINT u FOREIGN KEY(id) REFERENCES x(y))");
 }
 
 TEST(SqlFormatting, createIndex)
@@ -201,8 +201,8 @@ TEST(SqlFormatting, createIndex)
     auto fldName = sqlite::makeFieldDef("name", sqlite::FieldType::Text());
 
     sqlite::statements::CreateIndex createIndex1("idx", "mytable", fldId, fldName);
-    ASSERT_EQ(createIndex1.string(), "CREATE INDEX idx ON mytable(id,name);");
+    ASSERT_EQ(createIndex1.string(), "CREATE INDEX idx ON mytable(id,name)");
 
     sqlite::statements::CreateIndex createIndex2(sqlite::statements::CreateIndex::Unique, "idx", "mytable", fldId, fldName);
-    ASSERT_EQ(createIndex2.string(), "CREATE UNIQUE INDEX idx ON mytable(id,name);");
+    ASSERT_EQ(createIndex2.string(), "CREATE UNIQUE INDEX idx ON mytable(id,name)");
 }

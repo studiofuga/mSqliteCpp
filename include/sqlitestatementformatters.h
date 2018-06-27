@@ -438,7 +438,7 @@ public:
     std::string string() const override
     {
         std::ostringstream ss;
-        ss << mSelectOp << mSelectBase << mWhere << mGroupBy << ";";
+        ss << mSelectOp << mSelectBase << mWhere << mGroupBy << "";
         return ss.str();
     }
 
@@ -471,7 +471,7 @@ public:
     {
         std::ostringstream ss;
         ss << "CREATE TABLE " << mName << " ("
-           << mStatementString << mConstraintString << ");";
+           << mStatementString << mConstraintString << ")";
         return ss.str();
     }
 
@@ -628,7 +628,7 @@ public:
     {
         std::ostringstream ss;
         ss << mAction << " " << mName << " ON " << mTableName << "("
-           << mFieldsPack << ");";
+           << mFieldsPack << ")";
         return ss.str();
     }};
 
@@ -646,7 +646,7 @@ public:
 
         ss << "INTO " << tablename << "("
            << unpackFieldNames(flds...) << ") VALUES("
-           << unpackFieldPlaceholders(flds...) << ");";
+           << unpackFieldPlaceholders(flds...) << ")";
 
 
         mStatementString = ss.str();
@@ -690,7 +690,7 @@ public:
     std::string string() const override
     {
         std::ostringstream ss;
-        ss << mAction << mWhere << ";";
+        ss << mAction << mWhere;
         return ss.str();
     }
 };
@@ -735,7 +735,7 @@ public:
         std::ostringstream ss;
         ss << mAction
            << mDefinition
-           << mWhere << ";";
+           << mWhere;
         return ss.str();
     }
 

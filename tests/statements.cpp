@@ -50,7 +50,7 @@ TEST_F(Statements, CreateTable)
     ASSERT_NO_THROW(cdep.execute());
 
     ASSERT_EQ(cdep.statementString(),
-              "CREATE TABLE other (id2 INTEGER, text TEXT, CONSTRAINT u FOREIGN KEY(id2) REFERENCES other(id));"
+              "CREATE TABLE other (id2 INTEGER, text TEXT, CONSTRAINT u FOREIGN KEY(id2) REFERENCES other(id))"
     );
 
 }
@@ -98,7 +98,7 @@ TEST_F(Statements, FixCreateTableInvertedAttachConstraint)
     create.setTableConstraint(unique);
 
     ASSERT_EQ(create.statementString(),
-              "CREATE TABLE sample (id INTEGER NOT NULL, name TEXT NOT NULL, v REAL NOT NULL, CONSTRAINT u UNIQUE (id,name));"
+              "CREATE TABLE sample (id INTEGER NOT NULL, name TEXT NOT NULL, v REAL NOT NULL, CONSTRAINT u UNIQUE (id,name))"
     );
 
     // here we invert the two functions
@@ -112,7 +112,7 @@ TEST_F(Statements, FixCreateTableInvertedAttachConstraint)
     create2.attach(db, "sample");
 
     ASSERT_EQ(create2.statementString(),
-              "CREATE TABLE sample (id INTEGER NOT NULL, name TEXT NOT NULL, v REAL NOT NULL, CONSTRAINT u2 UNIQUE (id,name));"
+              "CREATE TABLE sample (id INTEGER NOT NULL, name TEXT NOT NULL, v REAL NOT NULL, CONSTRAINT u2 UNIQUE (id,name))"
     );
 }
 
@@ -131,7 +131,7 @@ TEST_F(Statements, FixCreateTableMultipleConstraint)
 
     ASSERT_EQ(create.statementString(),
               "CREATE TABLE sample (id INTEGER NOT NULL, name TEXT NOT NULL, v REAL NOT NULL, CONSTRAINT u UNIQUE (id,name),"
-              " CONSTRAINT u2 UNIQUE (v));"
+              " CONSTRAINT u2 UNIQUE (v))"
     );
 }
 
@@ -150,28 +150,28 @@ TEST_F(Statements, createIndex)
     CreateIndexStatement<decltype(fldId), decltype(fldName)> createIndex2("unqIdx", fldId, fldName);
 
     createIndex2.attach(db, "mytable").unique();
-    ASSERT_EQ(createIndex2.statementString(), "CREATE UNIQUE INDEX unqIdx ON mytable(id,name);");
+    ASSERT_EQ(createIndex2.statementString(), "CREATE UNIQUE INDEX unqIdx ON mytable(id,name)");
     ASSERT_NO_THROW(createIndex2.execute());
 
     auto ind3 = makeCreateIndexStatement(db, "idx3", "mytable", fldId, fldName);
-    ASSERT_EQ(ind3.statementString(), "CREATE INDEX idx3 ON mytable(id,name);");
+    ASSERT_EQ(ind3.statementString(), "CREATE INDEX idx3 ON mytable(id,name)");
     ASSERT_NO_THROW(ind3.execute());
 
     auto uq = makeCreateUniqueIndexStatement(db, "unqIdx4", "mytable", fldId, fldName);
-    ASSERT_EQ(uq.statementString(), "CREATE UNIQUE INDEX unqIdx4 ON mytable(id,name);");
+    ASSERT_EQ(uq.statementString(), "CREATE UNIQUE INDEX unqIdx4 ON mytable(id,name)");
     ASSERT_NO_THROW(uq.execute());
 }
 
 TEST_F(Statements, create)
 {
     {
-        SQLiteStatement stmt(db, "CREATE TABLE sample (id INTEGER, name TEXT, v DOUBLE);");
+        SQLiteStatement stmt(db, "CREATE TABLE sample (id INTEGER, name TEXT, v DOUBLE)");
 
         ASSERT_NO_THROW(stmt.executeStep([]() { return true; }));
     }
 
     {
-        SQLiteStatement stmt(db, "INSERT INTO sample VALUES (?,?,?);");
+        SQLiteStatement stmt(db, "INSERT INTO sample VALUES (?,?,?)");
 
         ASSERT_NO_THROW(stmt.bind(1, 0));
         ASSERT_NO_THROW(stmt.bind(2, std::string{"name"}));
@@ -181,7 +181,7 @@ TEST_F(Statements, create)
     }
 
     {
-        SQLiteStatement stmt(db, "INSERT INTO sample VALUES (?,?,?);");
+        SQLiteStatement stmt(db, "INSERT INTO sample VALUES (?,?,?)");
 
         ASSERT_NO_THROW(stmt.bind(1, 1));
         ASSERT_NO_THROW(stmt.bind(2, std::string{"name_1"}));
@@ -191,7 +191,7 @@ TEST_F(Statements, create)
     }
 
     {
-        SQLiteStatement stmt(db, "SELECT id, name, v FROM sample;");
+        SQLiteStatement stmt(db, "SELECT id, name, v FROM sample");
 
         int count = 0;
         ASSERT_NO_THROW(stmt.execute([&count]() {
@@ -211,7 +211,7 @@ TEST_F(Statements, typedCreate)
 
     {
         SQLiteStatement stmt(db,
-                             "CREATE TABLE sample (id INTEGER PRIMARY KEY, name TEXT NOT NULL, value DOUBLE NOT NULL);");
+                             "CREATE TABLE sample (id INTEGER PRIMARY KEY, name TEXT NOT NULL, value DOUBLE NOT NULL)");
         ASSERT_NO_THROW(stmt.execute());
     }
 
@@ -230,15 +230,15 @@ TEST_F(Statements, typedCreate)
 TEST_F(Statements, statementExecuteFail)
 {
     SQLiteStatement stmt(db,
-                         "CREATE TABLE sample (id INTEGER PRIMARY KEY, name TEXT);");
+                         "CREATE TABLE sample (id INTEGER PRIMARY KEY, name TEXT)");
     ASSERT_NO_THROW(stmt.execute());
 
     stmt.attach(db,
-                "INSERT INTO sample VALUES (0, 'AAA'),(1,'BBB'),(2,'CCC');");
+                "INSERT INTO sample VALUES (0, 'AAA'),(1,'BBB'),(2,'CCC')");
     ASSERT_NO_THROW(stmt.execute());
 
     // fails at mid
-    stmt.attach(db, "SELECT * from SAMPLE;");
+    stmt.attach(db, "SELECT * from SAMPLE");
     ASSERT_TRUE(stmt.execute());
     ASSERT_FALSE(stmt.execute([]() {
         return false;
@@ -257,15 +257,15 @@ TEST_F(Statements, statementExecuteFail)
 TEST_F(Statements, insertFromQuery)
 {
     SQLiteStatement stmt(db,
-                         "CREATE TABLE sample (id INTEGER PRIMARY KEY, name TEXT);");
+                         "CREATE TABLE sample (id INTEGER PRIMARY KEY, name TEXT)");
     ASSERT_NO_THROW(stmt.execute());
 
     stmt.attach(db,
-                "INSERT INTO sample VALUES (0, 'AAA'),(1,'BBB'),(2,'CCC');");
+                "INSERT INTO sample VALUES (0, 'AAA'),(1,'BBB'),(2,'CCC')");
     ASSERT_NO_THROW(stmt.execute());
 
     stmt.attach(db,
-                "CREATE TABLE newsample (id INTEGER PRIMARY KEY, relid INTEGER, name TEXT);");
+                "CREATE TABLE newsample (id INTEGER PRIMARY KEY, relid INTEGER, name TEXT)");
     ASSERT_NO_THROW(stmt.execute());
 
 
@@ -286,7 +286,7 @@ TEST_F(Statements, selectStatements1)
 
     {
         SQLiteStatement stmt(db,
-                             "CREATE TABLE sample (id INTEGER PRIMARY KEY, name TEXT NOT NULL, value DOUBLE NOT NULL);");
+                             "CREATE TABLE sample (id INTEGER PRIMARY KEY, name TEXT NOT NULL, value DOUBLE NOT NULL)");
         ASSERT_NO_THROW(stmt.execute());
     }
 
@@ -456,7 +456,7 @@ TEST_F(Statements, selectStatementsWhere)
 TEST_F(Statements, casts)
 {
     {
-        SQLiteStatement stmt(db, "CREATE TABLE sample (id INTEGER, vint INTEGER, name TEXT, vreal DOUBLE);");
+        SQLiteStatement stmt(db, "CREATE TABLE sample (id INTEGER, vint INTEGER, name TEXT, vreal DOUBLE)");
         ASSERT_NO_THROW(stmt.executeStep([]() { return true; }));
     }
 
@@ -464,7 +464,7 @@ TEST_F(Statements, casts)
     double dmax = std::numeric_limits<double>::max();
     // long
     {
-        SQLiteStatement stmt(db, "INSERT INTO sample VALUES (?,?,?,?);");
+        SQLiteStatement stmt(db, "INSERT INTO sample VALUES (?,?,?,?)");
 
         ASSERT_NO_THROW(stmt.bind(1, 1));
         ASSERT_NO_THROW(stmt.bind(2, lmax));
@@ -475,7 +475,7 @@ TEST_F(Statements, casts)
     }
 
     {
-        SQLiteStatement stmt(db, "SELECT vint, vreal FROM sample WHERE id == ?;");
+        SQLiteStatement stmt(db, "SELECT vint, vreal FROM sample WHERE id == ?");
 
         stmt.bind(1, 1);
 
@@ -496,13 +496,13 @@ TEST_F(Statements, casts)
 TEST_F(Statements, move)
 {
     {
-        SQLiteStatement stmt(db, "CREATE TABLE sample (id INTEGER, name TEXT, v DOUBLE);");
+        SQLiteStatement stmt(db, "CREATE TABLE sample (id INTEGER, name TEXT, v DOUBLE)");
 
         ASSERT_NO_THROW(stmt.executeStep([]() { return true; }));
     }
 
     SQLiteStatement s;
-    s = std::move(SQLiteStatement(db, "INSERT INTO sample VALUES (?,?,?);"));
+    s = std::move(SQLiteStatement(db, "INSERT INTO sample VALUES (?,?,?)"));
 }
 
 TEST_F(Statements, createWithStatements)
@@ -512,7 +512,7 @@ TEST_F(Statements, createWithStatements)
     auto fldValue = sqlite::makeFieldDef("value", sqlite::FieldType::Real());
 
     {
-        SQLiteStatement stmt(db, "CREATE TABLE sample (id INTEGER, name TEXT, value DOUBLE);");
+        SQLiteStatement stmt(db, "CREATE TABLE sample (id INTEGER, name TEXT, value DOUBLE)");
         ASSERT_NO_THROW(stmt.execute());
     }
 
@@ -557,7 +557,7 @@ TEST_F(Statements, createWithStatements)
 TEST_F(Statements, failAndRepeat)
 {
     // Check that a failing statement is correctly reset after
-    SQLiteStatement create(db, "CREATE TABLE sample (id INTEGER PRIMARY KEY, name TEXT);");
+    SQLiteStatement create(db, "CREATE TABLE sample (id INTEGER PRIMARY KEY, name TEXT)");
     ASSERT_NO_THROW(create.execute());
 
     SQLiteStatement stmt(db, "INSERT INTO sample VALUES (?, ?);");
@@ -588,7 +588,7 @@ public:
         db = std::make_shared<SQLiteStorage>(":memory:");
         db->open();
 
-        SQLiteStatement create_stmt(db, "CREATE TABLE ex (id INTEGER, n TEXT, v DOUBLE);");
+        SQLiteStatement create_stmt(db, "CREATE TABLE ex (id INTEGER, n TEXT, v DOUBLE)");
         create_stmt.executeStep();
 
         SQLiteStatement stmt(db, statements::Insert("ex", std::make_tuple(fldId, fldName, fldValue)));
@@ -619,7 +619,7 @@ TEST_F(SelectStatements, join)
     FieldDef<FieldType::Text> jfldName = sqlite::makeFieldDef("name", sqlite::FieldType::Text());
     FieldDef<FieldType::Real> jfldValue = sqlite::makeFieldDef("value", sqlite::FieldType::Real());
 
-    SQLiteStatement create_stmt(db, "CREATE TABLE ex2 (jid INTEGER, name TEXT, value DOUBLE);");
+    SQLiteStatement create_stmt(db, "CREATE TABLE ex2 (jid INTEGER, name TEXT, value DOUBLE)");
     create_stmt.execute();
 
     SQLiteStatement stmt(db, statements::Insert("ex2", std::make_tuple(jfldId, jfldName, jfldValue)));

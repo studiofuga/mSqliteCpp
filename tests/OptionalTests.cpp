@@ -100,7 +100,7 @@ TEST_F(OptionalStatements, InsertFormatter)
             insert("tab", text, count, value);
 
     std::string exp {
-        "INSERT INTO tab(text) VALUES(?1);"
+        "INSERT INTO tab(text) VALUES(?1)"
     };
 
     ASSERT_EQ(exp, insert.string());
