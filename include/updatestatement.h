@@ -119,6 +119,18 @@ public:
     }
 };
 
+template<typename ...FIELDS>
+UpdateStatement<FIELDS...> makeUpdateStatement(FIELDS... fields) {
+    return UpdateStatement<FIELDS...>(fields...);
+}
+
+template<typename ...FIELDS>
+UpdateStatement<FIELDS...> makeUpdateStatement2(std::shared_ptr<SQLiteStorage> db, std::string table, FIELDS... fields) {
+    auto u = UpdateStatement<FIELDS...>(fields...);
+    u.attach(db, table);
+    return u;
+}
+
 }
 
 #endif //SQLITE_UPDATESTATEMENT_H
