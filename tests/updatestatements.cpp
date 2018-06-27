@@ -67,7 +67,7 @@ TEST_F(UpdateStatements, update)
 
     SelectStatement<decltype(fldId)> allZero(fldId);
     allZero.attach(db, tablename);
-    Where<std::string, decltype(fldValue)> allZeroWhere;
+    Where<decltype(fldValue)> allZeroWhere;
     allZeroWhere.attach(allZero.getStatement(), op::ne(fldValue));
     allZero.where(allZeroWhere);
     allZero.prepare();
@@ -80,7 +80,7 @@ TEST_F(UpdateStatements, update)
     ASSERT_FALSE(f);
 
     // update ID=1 value=1
-    Where<std::string, decltype(fldId)> where;
+    Where<decltype(fldId)> where;
     where.attach(statement.getStatement(), op::eq(fldId));
     ASSERT_NO_THROW(statement.where(where));
     ASSERT_NO_THROW(statement.prepare());
@@ -90,7 +90,7 @@ TEST_F(UpdateStatements, update)
 
     SelectStatement<decltype(fldValue)> checker(fldValue);
     checker.attach(db, tablename);
-    Where<std::string, decltype(fldValue)> checkerWhere;
+    Where<decltype(fldValue)> checkerWhere;
     checkerWhere.attach(checker.getStatement(), op::eq(fldId));
     checker.where(checkerWhere);
     checker.prepare();
@@ -128,8 +128,8 @@ TEST_F(UpdateStatements, updateWithOptional)
             decltype(fldId), decltype(fldId2), decltype(fldName), decltype(fldValue)
     > selectStatement(fldId, fldId2, fldName, fldValue);
     selectStatement.attach(db, tablename);
-    Where<std::string, decltype(fldId)> selectWhere;
-    Where<std::string, decltype(fldId)> selectWhereOthers;
+    Where<decltype(fldId)> selectWhere;
+    Where<decltype(fldId)> selectWhereOthers;
 
     selectWhere.attach(selectStatement.getStatement(), operators::eq(fldId)());
     selectStatement.where(selectWhere);

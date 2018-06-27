@@ -328,7 +328,7 @@ TEST_F(Statements, selectStatements1)
 
     // Now we add a where clause
 
-    Where<std::string, decltype(fldId)> where(selectStatement.getStatement(), op::eq(fldId));
+    Where<decltype(fldId)> where(selectStatement.getStatement(), op::eq(fldId));
     ASSERT_NO_THROW(selectStatement.where(where));
     ASSERT_NO_THROW(selectStatement.prepare());
 
@@ -412,8 +412,8 @@ TEST_F(Statements, selectStatementsWhere)
     };
 
     // reuse another where
-    Where<std::string, decltype(fldId)> where1(selectStatement.getStatement(), op::eq(fldId));
-    Where<std::string, decltype(fldId), decltype(fldValue)> where2(selectStatement.getStatement(),
+    Where<decltype(fldId)> where1(selectStatement.getStatement(), op::eq(fldId));
+    Where<decltype(fldId), decltype(fldValue)> where2(selectStatement.getStatement(),
                                                       op::and_(op::eq(fldId), op::eq(fldValue)));
 
     ASSERT_NO_THROW(where1.attach(selectStatement.getStatement(), op::eq(fldId)));
@@ -700,7 +700,7 @@ TEST_F(DeleteStatements, exec)
     DeleteStatement deleteStatement;
     ASSERT_NO_THROW(deleteStatement.attach(db, "ex"));
 
-    Where<std::string, decltype(fldId)> whereClause(deleteStatement.getStatement(), op::eq(fldId));
+    Where<decltype(fldId)> whereClause(deleteStatement.getStatement(), op::eq(fldId));
     ASSERT_NO_THROW(deleteStatement.where(whereClause));
     ASSERT_NO_THROW(deleteStatement.prepare());
     ASSERT_NO_THROW(whereClause.bind(1));
@@ -722,7 +722,7 @@ TEST_F(DeleteStatements, whereReset)
     DeleteStatement deleteStatement;
     ASSERT_NO_THROW(deleteStatement.attach(db, "ex"));
 
-    Where<std::string, decltype(fldId)> whereClause(deleteStatement.getStatement(), op::eq(fldId));
+    Where<decltype(fldId)> whereClause(deleteStatement.getStatement(), op::eq(fldId));
     ASSERT_NO_THROW(deleteStatement.where(whereClause));
     ASSERT_NO_THROW(deleteStatement.prepare());
     ASSERT_NO_THROW(whereClause.bind(1));
@@ -738,7 +738,7 @@ TEST_F(DeleteStatements, whereReset)
 
     // Use another where statement
 
-    Where<std::string, decltype(fldName)> whereClause2(deleteStatement.getStatement(), op::eq(fldName));
+    Where<decltype(fldName)> whereClause2(deleteStatement.getStatement(), op::eq(fldName));
     ASSERT_NO_THROW(deleteStatement.where(whereClause2));
     ASSERT_NO_THROW(deleteStatement.prepare());
     ASSERT_NO_THROW(whereClause2.bind("first"));
