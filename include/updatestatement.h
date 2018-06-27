@@ -87,6 +87,8 @@ public:
         statementDirty = false;
     }
 
+    std::string sqlString() const { return sql.string(); }
+
     template<typename W>
     void where(W &w)
     {
