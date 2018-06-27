@@ -101,7 +101,6 @@ public:
         if (statementDirty)
             prepare();
 
-        std::cout << sql.string() << "\n";
         updateImpl<0>(std::make_tuple(values...));
         statement->execute();
     }
@@ -109,7 +108,6 @@ public:
     template<typename ...T>
     void unpreparedUpdate(T... values)
     {
-        std::cout << sql.string() << "\n";
         updateImpl<0>(std::make_tuple(values...));
         statement->execute();
         statementDirty = true;

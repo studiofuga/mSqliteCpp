@@ -159,7 +159,6 @@ TEST_F(UpdateStatements, updateWithOptional)
 
     bool ok = true;
     selectStatement.exec([&ok](int id, int id2, std::string name, int value) {
-        std::cout << id << "," << id2 << "," << name << "," << value << "\n";
         if (id != 1 && id2 == 20)
             ok = false;
         return true;

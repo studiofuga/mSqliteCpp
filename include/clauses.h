@@ -25,7 +25,6 @@ class Where {
     template<size_t I, typename ...Vs>
     void bindImpl(std::tuple<Vs...> t, typename std::enable_if<I < sizeof...(Vs)>::type * = 0)
     {
-        std:: cout << "BIND: " << I+1+bindOffset << " = " << std::get<I>(t) << "\n";
         statement->bind(I + 1 + bindOffset, std::get<I>(t));  // bind are 1-based, index are 0 based
         bindImpl<I + 1>(t);
     };
