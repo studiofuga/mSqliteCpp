@@ -104,6 +104,8 @@ public:
         static_assert(sizeof(T) == 0, "Generic version of get is undefined");
     }
 
+    bool isNull(int idx);
+
     FieldType::Type columnType(int idx);
 
     int columnCount();

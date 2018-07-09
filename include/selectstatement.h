@@ -5,6 +5,8 @@
 #ifndef SQLITE_SELECTSTATEMENT_H
 #define SQLITE_SELECTSTATEMENT_H
 
+#include <boost/optional.hpp>
+
 #include <functional>
 #include <tuple>
 #include <type_traits>
@@ -31,15 +33,29 @@ private:
      * @return The returned value as from SQLiteStatement::get<T>(I);
      */
     template<std::size_t I>
-    auto getValue()
+    auto getValues()
     {
         return statement.get<decltype(std::get<I>(fields).rawType())>(I);
+    };
+
+    template<std::size_t I>
+    auto getValuesOpt()
+    {
+        if (statement.isNull(I))
+            return boost::optional<decltype(std::get<I>(fields).rawType())>();
+        return boost::make_optional(statement.get<decltype(std::get<I>(fields).rawType())>(I));
     };
 
     template<typename F, std::size_t ...Is>
     bool execImpl(F func, std::index_sequence<Is...> const &i)
     {
-        return func(getValue<Is>()...);
+        return func(getValues<Is>()...);
+    };
+
+    template<typename F, std::size_t ...Is>
+    bool execImplOpt(F func, std::index_sequence<Is...> const &i)
+    {
+        return func(getValuesOpt<Is>()...);
     };
 public:
     explicit SelectStatement(Fs... f)
@@ -93,6 +109,14 @@ public:
     {
         statement.execute([this, func]() {
             return execImpl(func, std::make_index_sequence<sizeof...(Fs)>{});
+        });
+    }
+
+    template<typename F>
+    void execOpt(F func)
+    {
+        statement.execute([this, func]() {
+            return execImplOpt(func, std::make_index_sequence<sizeof...(Fs)>{});
         });
     }
 };

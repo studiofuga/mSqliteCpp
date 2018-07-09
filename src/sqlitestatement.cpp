@@ -209,6 +209,11 @@ FieldType::Type SQLiteStatement::columnType(int idx)
     throw std::runtime_error("Unhandled sqlite3 type");
 }
 
+bool SQLiteStatement::isNull(int idx)
+{
+    return sqlite3_column_type(p->stmt, idx) == SQLITE_NULL;
+}
+
 int SQLiteStatement::columnCount()
 {
     return sqlite3_column_count(p->stmt);

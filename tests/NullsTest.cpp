@@ -22,9 +22,9 @@ public:
     }
 
     FieldDef<FieldType::Integer> fieldId{"id", PrimaryKey};
-    FieldDef<FieldType::Text> fieldText {"text"};
-    FieldDef<FieldType::Integer> fieldCount {"count"};
-    FieldDef<FieldType::Real> fieldValue {"value"};
+    FieldDef<FieldType::Text> fieldText{"text"};
+    FieldDef<FieldType::Integer> fieldCount{"count"};
+    FieldDef<FieldType::Real> fieldValue{"value"};
 };
 
 
@@ -95,4 +95,47 @@ TEST_F(NullsTest, insert)
     ASSERT_EQ(rText, "");
     ASSERT_EQ(rCount, 0);
     ASSERT_EQ(rValue, 0);
+}
+
+
+TEST_F(NullsTest, selectWithNulls)
+{
+    auto createTable = makeCreateTableStatement2(db, "Insert1", fieldId, fieldText, fieldCount, fieldValue);
+    ASSERT_NO_THROW(createTable.execute());
+
+    auto insertStatement_2 = makeInsertStatement(fieldId, fieldText);
+    insertStatement_2.replaceOnConflict();
+
+    ASSERT_NO_THROW(insertStatement_2.attach(db, "Insert1"));
+    ASSERT_NO_THROW(insertStatement_2.insert(1, "Sample"));
+
+    /*
+    boost::optional<decltype(fieldId)> optId;
+    boost::optional<decltype(fieldText)> optText;
+    boost::optional<decltype(fieldCount)> optCount;
+    boost::optional<decltype(fieldValue)> optValue;
+    auto select = makeSelectStatement(optId, optText, optCount, optValue);*/
+    auto select = makeSelectStatement(fieldId, fieldText, fieldCount, fieldValue);
+    select.attach(db, "Insert1");
+    select.prepare();
+
+    boost::optional<int> rId, rCount;
+    boost::optional<std::string> rText;
+    boost::optional<double> rValue;
+    select.execOpt([&rId, &rText, &rCount, &rValue](boost::optional<int> id, boost::optional<std::string> text,
+                                                 boost::optional<int> count, boost::optional<double> value) {
+        rId = id;
+        rText = text;
+        rCount = count;
+        rValue = value;
+        return true;
+    });
+
+    ASSERT_TRUE(rId.is_initialized());
+    ASSERT_TRUE(rText.is_initialized());
+    ASSERT_FALSE(rCount.is_initialized());
+    ASSERT_FALSE(rValue.is_initialized());
+
+    ASSERT_EQ(rId.value(), 1);
+    ASSERT_EQ(rText.value(), "Sample");
 }
