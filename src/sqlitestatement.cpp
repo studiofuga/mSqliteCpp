@@ -62,7 +62,13 @@ sqlite::SQLiteStatement::attach(std::shared_ptr<SQLiteStorage> db, const sqlite:
 
 void SQLiteStatement::prepare(const sqlite::statements::StatementFormatter &stmt)
 {
-    prepare(stmt.string());
+    try {
+        prepare(stmt.string());
+    } catch (sqlite::SQLiteException &x) {
+        std::ostringstream ss;
+        ss << x.what() << ": " << stmt.string();
+        throw sqlite::SQLiteException(x, ss.str());
+    }
 }
 
 void SQLiteStatement::init(std::shared_ptr<SQLiteStorage> db)

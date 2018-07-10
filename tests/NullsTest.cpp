@@ -109,12 +109,6 @@ TEST_F(NullsTest, selectWithNulls)
     ASSERT_NO_THROW(insertStatement_2.attach(db, "Insert1"));
     ASSERT_NO_THROW(insertStatement_2.insert(1, "Sample"));
 
-    /*
-    boost::optional<decltype(fieldId)> optId;
-    boost::optional<decltype(fieldText)> optText;
-    boost::optional<decltype(fieldCount)> optCount;
-    boost::optional<decltype(fieldValue)> optValue;
-    auto select = makeSelectStatement(optId, optText, optCount, optValue);*/
     auto select = makeSelectStatement(fieldId, fieldText, fieldCount, fieldValue);
     select.attach(db, "Insert1");
     select.prepare();
