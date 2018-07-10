@@ -7,6 +7,8 @@
 
 #include "sqlitefielddef.h"
 
+#include <boost/optional.hpp>
+
 namespace sqlite {
 namespace operators {
 
@@ -21,6 +23,13 @@ std::string make_oper(const FieldDef <FT> &fld, std::string oper, size_t indx)
 
 }
 
+template <typename OP, typename T>
+std::string format(int indx, const OP& op, boost::optional<T> t) {
+    if (t.is_initialized())
+        return op(indx);
+    return std::string();
+}
+
 template <typename FT>
 class Eq {
     const FieldDef <FT> fld;
@@ -29,6 +38,13 @@ public:
 
     std::string operator() (int indx = 0) const {
         return details::make_oper(fld, "=", indx);
+    }
+
+    template<typename T>
+    std::string format(int indx, boost::optional<T> t) {
+        if (t.is_initialized())
+            return (*this)(indx);
+        return std::string();
     }
 };
 
@@ -40,6 +56,13 @@ public:
 
     std::string operator() (int indx = 0) const {
         return details::make_oper(fld, "<>", indx);
+    }
+
+    template<typename T>
+    std::string format(int indx, boost::optional<T> t) {
+        if (t.is_initialized())
+            return (*this)(indx);
+        return std::string();
     }
 };
 
@@ -58,6 +81,17 @@ class And {
         return (I == 0 ? "" : " AND ") + f(I+idx) + opImpl<I+1>(idx);
     }
 
+    template <size_t I, typename ...Ts, typename std::enable_if<I == sizeof...(Ts), int>::type = 0 >
+    std::string formatImpl(int idx, std::tuple<Ts...> ts) {
+        return std::string();
+    }
+    template <size_t I, typename ...Ts, typename std::enable_if<I < sizeof...(Ts), int>::type = 0 >
+    std::string formatImpl(int idx, std::tuple<Ts...> ts) {
+        auto &t = std::get<I>(ts);
+        if (t.is_initialized())
+            return opImpl<I>(idx);
+        return std::string();
+    }
 
 public:
     And (OPS... f) : fields(std::make_tuple(f...)) {
@@ -65,6 +99,11 @@ public:
 
     std::string operator() (int idx = 0){
         return opImpl<0>(idx);
+    }
+
+    template<typename ...T>
+    std::string format(int indx, boost::optional<T>... t) {
+        return formatImpl<0>(indx, std::make_tuple(t...));
     }
 };
 

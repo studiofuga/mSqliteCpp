@@ -31,7 +31,7 @@ add_executable(runTests
         OptionalTests.cpp
         NullsTest.cpp
         StrongTypeTests.cpp
-        )
+        WhereOptTests.cpp)
 
 target_link_libraries(runTests msqlitecpp gtest gtest_main)
 

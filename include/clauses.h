@@ -6,6 +6,7 @@
 #define SQLITE_CLAUSES_H
 
 #include "sqlitestatement.h"
+#include "operators.h"
 
 #include <string>
 
@@ -119,10 +120,39 @@ public:
     }
 };
 
+template<typename OP>
+class WhereOpt {
+    SQLiteStatement *statement;
+    OP condition;
+
+public:
+    WhereOpt() = default;
+    WhereOpt(OP cond)
+            : condition(std::move(cond)) {
+    }
+
+    template <typename ...Vs>
+    std::string format(Vs... v) {
+        auto condformat = condition.format(0, v...);
+        if (condformat.empty()) {
+            condformat = "TRUE";
+        }
+        std::ostringstream ss;
+        ss << "WHERE " << condformat;
+        return ss.str();
+    }
+};
+
+
 template <typename OP, typename ...Ts>
 WhereExt<OP, Ts...> makeWhere(SQLiteStatement *refStatement, OP op, Ts... t) {
     WhereExt<OP,Ts...> w(refStatement, op);
     return w;
+};
+
+template <typename OP>
+WhereOpt<OP> makeWhereOpt(OP op) {
+    return WhereOpt<OP>(op);
 };
 
 template <typename ...Ts>
