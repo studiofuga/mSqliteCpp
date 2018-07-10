@@ -10,6 +10,7 @@
 #include <list>
 #include <thread>
 #include <mutex>
+#include <sstream>
 
 namespace sqlite {
 class SQLiteTable;
@@ -24,6 +25,22 @@ public:
     {
         mErrmsg = sqlite3_errmsg(db);
         mCode = sqlite3_errcode(db);
+    }
+
+    explicit SQLiteException(sqlite3 *db, std::string details) : std::runtime_error("")
+    {
+        std::ostringstream ss;
+        ss << details << ": " << sqlite3_errmsg(db);
+        mErrmsg = ss.str();
+        mCode = sqlite3_errcode(db);
+    }
+
+    explicit SQLiteException(const SQLiteException &x, std::string details) : std::runtime_error("")
+    {
+        std::ostringstream ss;
+        ss << details << ": " << x.what();
+        mErrmsg = ss.str();
+        mCode = x.code();
     }
 
     const char *what() const noexcept override
