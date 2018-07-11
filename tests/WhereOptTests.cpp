@@ -47,10 +47,14 @@ TEST(WhereOptTests, formatOptionalUnaryOperator)
     boost::optional<int> fieldSet{1};
     boost::optional<int> fieldNotSet;
 
-//    operators::UnaryOp<decltype(fldId)> oper(std::string {"###"}, fldId);
     auto oper = operators::makeOper(fldId, "###");
     EXPECT_EQ(operators::format(0, oper, fieldSet), "id ### ?1");
     EXPECT_EQ(operators::format(0, oper,  fieldNotSet), "");
+
+    // alternate definition
+    operators::UnaryOp<decltype(fldId)> oper2(fldId, "!");
+    EXPECT_EQ(operators::format(0, oper2, fieldSet), "id ! ?1");
+    EXPECT_EQ(operators::format(0, oper2,  fieldNotSet), "");
 }
 
 TEST(WhereOptTests, formatOptionalRelationalOperators)

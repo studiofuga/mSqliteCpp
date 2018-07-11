@@ -17,7 +17,7 @@ namespace operators {
 
 namespace details {
 template<typename FT>
-std::string make_oper(const FieldDef <FT> &fld, std::string oper, size_t indx)
+std::string make_oper(const FT &fld, std::string oper, size_t indx)
 {
     std::ostringstream ss;
     ss << fld.name() << " " << oper << " ?" << indx + 1;
@@ -38,9 +38,9 @@ std::string format(int indx, const OP &op, boost::optional<T> t)
 template<typename FT>
 class UnaryOp {
     const std::string sep;
-    const FieldDef <FT> fld;
+    const FT fld;
 public:
-    UnaryOp(FieldDef <FT> f, const std::string &separator)
+    UnaryOp(FT f, const std::string &separator)
             : sep(separator),
               fld(std::move(f))
     {}
@@ -169,44 +169,43 @@ public:
     }
 };
 
-
 template <typename FT>
-UnaryOp<FT> makeOper(const FieldDef<FT> &field, std::string separator) {
+UnaryOp<FT> makeOper(const FT &field, std::string separator) {
     return UnaryOp<FT>(field, separator);
 }
 
 template<typename FT>
-UnaryOp<FT> ne(const FieldDef <FT> &field)
+UnaryOp<FT> ne(const FT &field)
 {
     return makeOper(field, "<>");
 }
 
 template<typename FT>
-UnaryOp<FT> eq(FieldDef <FT> field)
+UnaryOp<FT> eq(FT field)
 {
     return makeOper(field, "=");
 }
 
 template<typename FT>
-UnaryOp<FT> lt(FieldDef <FT> f)
+UnaryOp<FT> lt(FT f)
 {
     return makeOper(f, "<");
 }
 
 template<typename FT>
-UnaryOp<FT> le(FieldDef <FT> f)
+UnaryOp<FT> le(FT f)
 {
     return makeOper(f, "<=");
 }
 
 template<typename FT>
-UnaryOp<FT> gt(FieldDef <FT> f)
+UnaryOp<FT> gt(FT f)
 {
     return makeOper(f, ">");
 }
 
 template<typename FT>
-UnaryOp<FT> ge(FieldDef <FT> f)
+UnaryOp<FT> ge(FT f)
 {
     return makeOper(f, ">=");
 }
