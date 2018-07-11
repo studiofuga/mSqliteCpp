@@ -60,142 +60,6 @@ public:
     }
 };
 
-template<typename FT>
-class Eq {
-    const FieldDef <FT> fld;
-public:
-    Eq(FieldDef <FT> f) : fld(std::move(f))
-    {}
-
-    std::string operator()(int indx = 0) const
-    {
-        return details::make_oper(fld, "=", indx);
-    }
-
-    template<typename T>
-    std::string format(int indx, boost::optional<T> t)
-    {
-        if (t.is_initialized()) {
-            return (*this)(indx);
-        }
-        return std::string();
-    }
-};
-
-template<typename FT>
-class Ne {
-    const FieldDef <FT> fld;
-public:
-    Ne(FieldDef <FT> f) : fld(std::move(f))
-    {}
-
-    std::string operator()(int indx = 0) const
-    {
-        return details::make_oper(fld, "<>", indx);
-    }
-
-    template<typename T>
-    std::string format(int indx, boost::optional<T> t)
-    {
-        if (t.is_initialized()) {
-            return (*this)(indx);
-        }
-        return std::string();
-    }
-};
-
-/** @brief Implements the Less Than "<" operator with optionals */
-template<typename FT>
-class Lt {
-    const FieldDef <FT> fld;
-public:
-    Lt(FieldDef <FT> f) : fld(std::move(f))
-    {}
-
-    std::string operator()(int indx = 0) const
-    {
-        return details::make_oper(fld, "<", indx);
-    }
-
-    template<typename T>
-    std::string format(int indx, boost::optional<T> t)
-    {
-        if (t.is_initialized()) {
-            return (*this)(indx);
-        }
-        return std::string();
-    }
-};
-
-/** @brief Implements the Less or Equal "<=" operator with optionals */
-template<typename FT>
-class Le {
-    const FieldDef <FT> fld;
-public:
-    Le(FieldDef <FT> f) : fld(std::move(f))
-    {}
-
-    std::string operator()(int indx = 0) const
-    {
-        return details::make_oper(fld, "<=", indx);
-    }
-
-    template<typename T>
-    std::string format(int indx, boost::optional<T> t)
-    {
-        if (t.is_initialized()) {
-            return (*this)(indx);
-        }
-        return std::string();
-    }
-};
-
-/** @brief Implements the Greater Than ">" operator with optionals */
-template<typename FT>
-class Gt {
-    const FieldDef <FT> fld;
-public:
-    Gt(FieldDef <FT> f) : fld(std::move(f))
-    {}
-
-    std::string operator()(int indx = 0) const
-    {
-        return details::make_oper(fld, ">", indx);
-    }
-
-    template<typename T>
-    std::string format(int indx, boost::optional<T> t)
-    {
-        if (t.is_initialized()) {
-            return (*this)(indx);
-        }
-        return std::string();
-    }
-};
-
-/** @brief Implements the Greater than or Equal to ">=" operator with optionals */
-template<typename FT>
-class Ge {
-    const FieldDef <FT> fld;
-public:
-    Ge(FieldDef <FT> f) : fld(std::move(f))
-    {}
-
-    std::string operator()(int indx = 0) const
-    {
-        return details::make_oper(fld, ">=", indx);
-    }
-
-    template<typename T>
-    std::string format(int indx, boost::optional<T> t)
-    {
-        if (t.is_initialized()) {
-            return (*this)(indx);
-        }
-        return std::string();
-    }
-};
-
 template<typename ...OPS>
 class And {
     const std::tuple<OPS...> fields;
@@ -312,39 +176,39 @@ UnaryOp<FT> makeOper(const FieldDef<FT> &field, std::string separator) {
 }
 
 template<typename FT>
-Ne<FT> ne(const FieldDef <FT> &field)
+UnaryOp<FT> ne(const FieldDef <FT> &field)
 {
-    return Ne<FT>(field);
+    return makeOper(field, "<>");
 }
 
 template<typename FT>
-Eq<FT> eq(FieldDef <FT> f)
+UnaryOp<FT> eq(FieldDef <FT> field)
 {
-    return Eq<FT>(f);
+    return makeOper(field, "=");
 }
 
 template<typename FT>
-Lt<FT> lt(FieldDef <FT> f)
+UnaryOp<FT> lt(FieldDef <FT> f)
 {
-    return Lt<FT>(f);
+    return makeOper(f, "<");
 }
 
 template<typename FT>
-Le<FT> le(FieldDef <FT> f)
+UnaryOp<FT> le(FieldDef <FT> f)
 {
-    return Le<FT>(f);
+    return makeOper(f, "<=");
 }
 
 template<typename FT>
-Gt<FT> gt(FieldDef <FT> f)
+UnaryOp<FT> gt(FieldDef <FT> f)
 {
-    return Gt<FT>(f);
+    return makeOper(f, ">");
 }
 
 template<typename FT>
-Ge<FT> ge(FieldDef <FT> f)
+UnaryOp<FT> ge(FieldDef <FT> f)
 {
-    return Ge<FT>(f);
+    return makeOper(f, ">=");
 }
 
 template<typename ...OPS>
