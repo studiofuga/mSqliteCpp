@@ -9,6 +9,8 @@
 
 #include <boost/optional.hpp>
 
+#include <iostream>
+
 namespace sqlite {
 namespace operators {
 
@@ -82,15 +84,20 @@ class And {
     }
 
     template <size_t I, typename ...Ts, typename std::enable_if<I == sizeof...(Ts), int>::type = 0 >
-    std::string formatImpl(int idx, std::tuple<Ts...> ts) {
+    std::string formatImpl(int idx, std::tuple<Ts...> ts, int count = 0) {
         return std::string();
     }
     template <size_t I, typename ...Ts, typename std::enable_if<I < sizeof...(Ts), int>::type = 0 >
-    std::string formatImpl(int idx, std::tuple<Ts...> ts) {
-        auto &t = std::get<I>(ts);
-        if (t.is_initialized())
-            return opImpl<I>(idx);
-        return std::string();
+    std::string formatImpl(int idx, std::tuple<Ts...> ts, int count = 0) {
+        auto &value = std::get<I>(ts);
+        auto &field = std::get<I>(fields);
+        std::ostringstream ss;
+        if (value.is_initialized()) {
+            ss << (count == 0 ? "" : " AND ") + field(I+idx);
+            ++count;
+        }
+        ss << formatImpl<I+1>(idx, ts, count);
+        return  ss.str();
     }
 
 public:
