@@ -135,11 +135,9 @@ public:
     std::string format(Vs... v) {
         auto condformat = condition.format(0, v...);
         if (condformat.empty()) {
-            condformat = "TRUE";
+            condformat = "1";
         }
-        std::ostringstream ss;
-        ss << "WHERE " << condformat;
-        return ss.str();
+        return condformat;
     }
 };
 

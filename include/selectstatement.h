@@ -57,6 +57,32 @@ private:
     {
         return func(getValuesOpt<Is>()...);
     };
+
+    template <typename T>
+    bool bindValue(int idx, const T& t) {
+        sqlite::bind(statement, idx+1, t);
+        return true;
+    }
+
+    template <typename T>
+    bool bindValue(int idx, const boost::optional<T> & t) {
+        if (t) {
+            sqlite::bind(statement, idx+1, t.value());
+            return true;
+        }
+        return false;
+    }
+
+    template <size_t I = 0, typename ...Vs, typename std::enable_if<I == sizeof...(Vs), int>::type = 0>
+    void bindImpl(std::tuple<Vs...>, size_t = 0)
+    {
+    }
+
+    template <size_t I = 0, typename ...Vs, typename std::enable_if<I < sizeof...(Vs), int>::type = 0>
+    void bindImpl(std::tuple<Vs...> vs, size_t offs = 0) {
+        bindValue(I+offs, std::get<I>(vs));
+        bindImpl<I+1>(vs,offs);
+    };
 public:
     explicit SelectStatement(Fs... f)
             : fields(std::make_tuple(f...))
@@ -89,6 +115,11 @@ public:
         sql.where(w.toText());
     }
 
+    void where(std::string s)
+    {
+        sql.where(s);
+    }
+
     void where()
     {
         sql.where("");
@@ -118,6 +149,11 @@ public:
         statement.execute([this, func]() {
             return execImplOpt(func, std::make_index_sequence<sizeof...(Fs)>{});
         });
+    }
+
+    template <typename ...Vs>
+    void bind(Vs... values) {
+        bindImpl<0>(std::make_tuple(values...), 0);
     }
 };
 
