@@ -40,6 +40,19 @@ TEST(WhereOptTests, formatOptionalOperators)
     EXPECT_EQ(operators::format(0, operators::ge(fldId),fieldNotSet), "");
 }
 
+TEST(WhereOptTests, formatOptionalUnaryOperator)
+{
+    auto fldId = sqlite::makeFieldDef("id", sqlite::FieldType::Integer());
+
+    boost::optional<int> fieldSet{1};
+    boost::optional<int> fieldNotSet;
+
+//    operators::UnaryOp<decltype(fldId)> oper(std::string {"###"}, fldId);
+    auto oper = operators::makeOper(fldId, "###");
+    EXPECT_EQ(operators::format(0, oper, fieldSet), "id ### ?1");
+    EXPECT_EQ(operators::format(0, oper,  fieldNotSet), "");
+}
+
 TEST(WhereOptTests, formatOptionalRelationalOperators)
 {
     auto fldId = sqlite::makeFieldDef("id", sqlite::FieldType::Integer());
