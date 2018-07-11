@@ -14,7 +14,7 @@
 
 using namespace sqlite;
 
-TEST(WhereOptTests, formatOptionalOperatorsEq)
+TEST(WhereOptTests, formatOptionalOperators)
 {
     auto fldId = sqlite::makeFieldDef("id", sqlite::FieldType::Integer());
 
@@ -23,9 +23,24 @@ TEST(WhereOptTests, formatOptionalOperatorsEq)
 
     EXPECT_EQ(operators::format(0, operators::eq(fldId),fieldSet), "id = ?1");
     EXPECT_EQ(operators::format(0, operators::eq(fldId),fieldNotSet), "");
+
+    EXPECT_EQ(operators::format(0, operators::ne(fldId),fieldSet), "id <> ?1");
+    EXPECT_EQ(operators::format(0, operators::ne(fldId),fieldNotSet), "");
+
+    EXPECT_EQ(operators::format(0, operators::lt(fldId),fieldSet), "id < ?1");
+    EXPECT_EQ(operators::format(0, operators::lt(fldId),fieldNotSet), "");
+
+    EXPECT_EQ(operators::format(0, operators::le(fldId),fieldSet), "id <= ?1");
+    EXPECT_EQ(operators::format(0, operators::le(fldId),fieldNotSet), "");
+
+    EXPECT_EQ(operators::format(0, operators::gt(fldId),fieldSet), "id > ?1");
+    EXPECT_EQ(operators::format(0, operators::gt(fldId),fieldNotSet), "");
+
+    EXPECT_EQ(operators::format(0, operators::ge(fldId),fieldSet), "id >= ?1");
+    EXPECT_EQ(operators::format(0, operators::ge(fldId),fieldNotSet), "");
 }
 
-TEST(WhereOptTests, formatOptionalOperatorsAnd)
+TEST(WhereOptTests, formatOptionalRelationalOperators)
 {
     auto fldId = sqlite::makeFieldDef("id", sqlite::FieldType::Integer());
     auto fldId2 = sqlite::makeFieldDef("id2", sqlite::FieldType::Integer());
@@ -33,11 +48,17 @@ TEST(WhereOptTests, formatOptionalOperatorsAnd)
     boost::optional<int> fieldSet{1};
     boost::optional<int> fieldNotSet;
 
-    auto opAnd = operators::and_ (operators::eq(fldId), operators::eq(fldId2));
-    EXPECT_EQ(opAnd.format(0, fieldSet, fieldSet), "id = ?1 AND id2 = ?2");
+    auto opAnd = operators::and_ (operators::eq(fldId), operators::ne(fldId2));
+    EXPECT_EQ(opAnd.format(0, fieldSet, fieldSet), "id = ?1 AND id2 <> ?2");
     EXPECT_EQ(opAnd.format(0, fieldSet, fieldNotSet), "id = ?1");
-    EXPECT_EQ(opAnd.format(0, fieldNotSet, fieldSet), "id2 = ?2");
+    EXPECT_EQ(opAnd.format(0, fieldNotSet, fieldSet), "id2 <> ?2");
     EXPECT_EQ(opAnd.format(0, fieldNotSet, fieldNotSet), "");
+    
+    auto opOr = operators::or_ (operators::lt(fldId), operators::ge(fldId2));
+    EXPECT_EQ(opOr.format(0, fieldSet, fieldSet), "id < ?1 OR id2 >= ?2");
+    EXPECT_EQ(opOr.format(0, fieldSet, fieldNotSet), "id < ?1");
+    EXPECT_EQ(opOr.format(0, fieldNotSet, fieldSet), "id2 >= ?2");
+    EXPECT_EQ(opOr.format(0, fieldNotSet, fieldNotSet), "");
 }
 
 TEST(WhereOptTests, formatWhereCase1)
@@ -319,5 +340,36 @@ TEST_F(WhereOptTestsWithStatements, DeleteCase4)
     });
 
     EXPECT_EQ(count, 3);
+}
+
+TEST_F(WhereOptTestsWithStatements, DeleteCase5)
+{
+    auto s = makeSelectStatement(fldId1);
+    s.attach(db, TableName);
+
+    DeleteStatement d;
+    d.attach(db, TableName);
+
+    auto w = makeWhereOpt(operators::or_(operators::eq(fldId1), operators::ne(fldId2)));
+
+    boost::optional<int> field1{1};
+    boost::optional<int> field2{3};
+
+    // delete case 5: id1 = 2 AND id2 <> 3 => results 1
+
+    d.where(w.format(field1, field2));
+    d.prepare();
+    d.bind(field1, field2);
+    ASSERT_NO_THROW(d.exec());
+
+    s.prepare();
+
+    int count = 0;
+    s.exec([&count](int) {
+        ++count;
+        return true;
+    });
+
+    EXPECT_EQ(count, 1);
 }
 
