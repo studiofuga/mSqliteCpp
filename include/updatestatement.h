@@ -89,6 +89,12 @@ public:
 
     std::string sqlString() const { return sql.string(); }
 
+    void where()
+    {
+        whereText.clear();
+        sql.where(whereText);
+    }
+
     template<typename W>
     void where(W &w)
     {

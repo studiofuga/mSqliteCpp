@@ -100,7 +100,7 @@ TEST_F(UpdateStatements, update)
 
     f = false;
     checker.exec([&f](int value) {
-        f= (value == 1);
+        f = (value == 1);
         return true;
     });
     ASSERT_TRUE(f);
@@ -161,8 +161,9 @@ TEST_F(UpdateStatements, updateWithOptional)
 
     bool ok = true;
     selectStatement.exec([&ok](int id, int id2, std::string name, int value) {
-        if (id != 1 && id2 == 20)
+        if (id != 1 && id2 == 20) {
             ok = false;
+        }
         return true;
     });
 
@@ -177,13 +178,14 @@ TEST_F(UpdateStatements, updateWithOptionalMore)
 
     updateStatement.attach(db, tablename);
 
-    auto where = makeWhere(updateStatement.getStatement(), operators::and_(operators::eq(fldId),operators::eq(fldId2)));
+    auto where = makeWhere(updateStatement.getStatement(),
+                           operators::and_(operators::eq(fldId), operators::eq(fldId2)));
 
     updateStatement.where(where);
 
     int id = 3, id2 = 3;
     boost::optional<int> value = 1000;
-    boost::optional<std::string> name {"aaa"};
+    boost::optional<std::string> name{"aaa"};
 
     ASSERT_NO_THROW(updateStatement.prepare(name, value));
     ASSERT_NO_THROW(where.bind(id, id2));
@@ -203,20 +205,22 @@ TEST_F(UpdateStatements, updateWithOptionalMore)
     int rid_2, rid2_2, rvalue_2;
     int rid_3, rid2_3, rvalue_3;
     bool ok = true;
-    selectStatement.exec([&rid_2, &rid_3, &rid2_2, &rid2_3, &rvalue_2, &rvalue_3, &ok](int id, int id2, std::string name, int value) {
-        if (id2 == 2) {
-            rid_2 = id;
-            rid2_2 = id2;
-            rvalue_2 = value;
-        } else if (id2 == 3){
-            rid_3 = id;
-            rid2_3 = id2;
-            rvalue_3 = value;
-        } else {
-            ok = false;
-        }
-        return true;
-    });
+    selectStatement.exec(
+            [&rid_2, &rid_3, &rid2_2, &rid2_3, &rvalue_2, &rvalue_3, &ok](int id, int id2, std::string name,
+                                                                          int value) {
+                if (id2 == 2) {
+                    rid_2 = id;
+                    rid2_2 = id2;
+                    rvalue_2 = value;
+                } else if (id2 == 3) {
+                    rid_3 = id;
+                    rid2_3 = id2;
+                    rvalue_3 = value;
+                } else {
+                    ok = false;
+                }
+                return true;
+            });
 
     ASSERT_TRUE(ok);
     ASSERT_EQ(rid_2, id);
@@ -227,5 +231,56 @@ TEST_F(UpdateStatements, updateWithOptionalMore)
     ASSERT_EQ(rvalue_3, 1000);
 }
 
+
+TEST_F(UpdateStatements, WhereReset)
+{
+    UpdateStatement<
+            decltype(fldValue)
+    > updateStatement(fldValue);
+
+    updateStatement.attach(db, tablename);
+
+    auto where = makeWhere(updateStatement.getStatement(), operators::eq(fldId));
+
+    updateStatement.where(where);
+
+    int id = 1;
+    int value = 10;
+
+    ASSERT_NO_THROW(updateStatement.prepare());
+    ASSERT_NO_THROW(where.bind(id));
+    ASSERT_NO_THROW(updateStatement.update(value));
+
+    SelectStatement<
+            decltype(fldValue)
+    > selectStatement(fldValue);
+    selectStatement.attach(db, tablename);
+    selectStatement.prepare();
+
+    size_t count = 0;
+    selectStatement.exec([&count](int value) {
+        if (value == 10) {
+            ++count;
+        }
+        return true;
+    });
+
+    ASSERT_EQ(count, 1);
+
+    updateStatement.where();
+    ASSERT_NO_THROW(updateStatement.prepare());
+    value = 0;
+    ASSERT_NO_THROW(updateStatement.update(value));
+
+    count = 0;
+    selectStatement.exec([&count](int value) {
+        if (value == 0) {
+            ++count;
+        }
+        return true;
+    });
+
+    ASSERT_EQ(count, 4);
+}
 
 
