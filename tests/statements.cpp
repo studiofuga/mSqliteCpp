@@ -22,9 +22,9 @@ protected:
     std::shared_ptr<SQLiteStorage> db;
 public:
     Statements()
-            : fldId("id", sqlite::FieldAttribute::NotNull),
-              fldName("name", sqlite::FieldAttribute::NotNull),
-              fldValue("v", sqlite::FieldAttribute::NotNull)
+            : fldId("id", sqlite::NotNull),
+              fldName("name", sqlite::NotNull),
+              fldValue("v", sqlite::NotNull)
     {
         db = std::make_shared<SQLiteStorage>(":memory:");
         db->open();
@@ -611,6 +611,43 @@ TEST_F(SelectStatements, execute)
     });
 
     ASSERT_EQ(count, 3);
+}
+
+TEST(SelectStatementsWithDef, selectWithDefaultValues)
+{
+    FieldDef<FieldType::Integer> fldIdDef {"id", -1};
+    FieldDef<FieldType::Text> fldNameDef {"n", "(null)"};
+    FieldDef<FieldType::Real> fldValueDef{"v", -1.5};
+
+    auto db = std::make_shared<SQLiteStorage>(":memory:");
+    db->open();
+
+    SQLiteStatement create_stmt(db, "CREATE TABLE ex (id INTEGER, n TEXT, v DOUBLE)");
+    create_stmt.executeStep();;
+
+    InsertStatement<decltype(fldIdDef), decltype(fldNameDef), decltype(fldValueDef)> in(fldIdDef, fldNameDef, fldValueDef);
+    in.attach(db, "ex");
+    in.prepare();
+
+    in.insert();
+
+    SelectStatement<decltype(fldIdDef), decltype(fldNameDef), decltype(fldValueDef)> sel(fldIdDef, fldNameDef, fldValueDef);
+    sel.attach(db, "ex");
+    sel.prepare();
+
+    int id;
+    std::string name;
+    double value;
+    sel.exec([&id, &name, &value](int i, std::string n, double v) {
+        id = i;
+        name = n;
+        value = v;
+        return true;
+    });
+
+    EXPECT_EQ(id, -1);
+    EXPECT_EQ(name, "(null)");
+    EXPECT_EQ(value, -1.5);
 }
 
 TEST_F(SelectStatements, join)

@@ -35,6 +35,9 @@ private:
     template<std::size_t I>
     auto getValues()
     {
+        auto &field = std::get<I>(fields);
+        if (field.hasDefaultValue() && statement.isNull(I))
+            return field.defaultValue();
         return statement.get<decltype(std::get<I>(fields).rawType())>(I);
     };
 

@@ -28,12 +28,27 @@ enum class Type {
 };
 }
 
-enum FieldAttribute : int {
-    PrimaryKey = 0x01,
-    NotNull = 0x02,
-    Unique = 0x04,
-    AutoIncrement = 0x08
+class FieldAttribute {
+    int v = 0;
+public:
+    FieldAttribute() = default;
+    FieldAttribute(int value) : v(value) {}
+    int value() const { return v; }
+
+    bool operator & (const FieldAttribute &r) const {
+        return (v & r.value()) != 0;
+    }
+    FieldAttribute &operator |= (const FieldAttribute &r) {
+        v = v | r.value();
+        return *this;
+    }
 };
+
+const FieldAttribute NoAttributes(0);
+const FieldAttribute PrimaryKey(0x01);
+const FieldAttribute NotNull(0x02);
+const FieldAttribute Unique(0x04);
+const FieldAttribute AutoIncrement(0x08);
 
 template<typename FIELDTYPE>
 class FieldDef;
@@ -59,7 +74,9 @@ template<typename FIELDTYPE>
 class FieldDef {
 private:
     std::string fieldName;
-    int attributes = 0;
+    FieldAttribute attributes = NoAttributes;
+    bool haveDefault = false;
+    typename FIELDTYPE::rawtype defvalue;
 
 public:
     using Type = FIELDTYPE;
@@ -71,12 +88,19 @@ public:
     FieldDef() : fieldName(), attributes()
     {}
 
-    explicit FieldDef(std::string name, int fldattributes = 0)
+    explicit FieldDef(std::string name, FieldAttribute fldattributes = NoAttributes)
             : fieldName(std::move(name)), attributes(fldattributes)
+    {}
+
+    FieldDef(std::string name, typename FIELDTYPE::rawtype defaultValue, FieldAttribute fldattributes = NoAttributes)
+            : fieldName(std::move(name)), attributes(fldattributes), haveDefault(true), defvalue(defaultValue)
     {}
 
     std::string name() const
     { return fieldName; }
+
+    bool hasDefaultValue() const { return haveDefault; }
+    auto defaultValue() const { return defvalue; }
 
     inline std::string sqlType() const
     {
@@ -88,16 +112,16 @@ public:
     {
         std::ostringstream ss;
 
-        if (attributes & FieldAttribute::PrimaryKey) {
+        if (attributes & PrimaryKey) {
             ss << " PRIMARY KEY";
         }
-        if (attributes & FieldAttribute::AutoIncrement) {
+        if (attributes & AutoIncrement) {
             ss << " AUTOINCREMENT";
         }
-        if (attributes & FieldAttribute::NotNull) {
+        if (attributes & NotNull) {
             ss << " NOT NULL";
         }
-        if (attributes & FieldAttribute::Unique) {
+        if (attributes & Unique) {
             ss << " UNIQUE";
         }
 
@@ -106,25 +130,25 @@ public:
 
     FieldDef<FIELDTYPE> &primaryKey()
     {
-        attributes |= FieldAttribute::PrimaryKey;
+        attributes |= PrimaryKey;
         return *this;
     }
 
     FieldDef<FIELDTYPE> &notNull()
     {
-        attributes |= FieldAttribute::NotNull;
+        attributes |= NotNull;
         return *this;
     }
 
     FieldDef<FIELDTYPE> &unique()
     {
-        attributes |= FieldAttribute::Unique;
+        attributes |= Unique;
         return *this;
     }
 
     FieldDef<FIELDTYPE> &autoincrement()
     {
-        attributes |= FieldAttribute::AutoIncrement;
+        attributes |= AutoIncrement;
         return *this;
     }
 
