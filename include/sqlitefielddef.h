@@ -42,6 +42,10 @@ public:
         v = v | r.value();
         return *this;
     }
+
+    friend FieldAttribute operator | (const FieldAttribute &l, const FieldAttribute &r) {
+        return FieldAttribute(l.value() | r.value());
+    }
 };
 
 const FieldAttribute NoAttributes(0);
