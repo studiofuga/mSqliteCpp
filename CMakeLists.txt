@@ -28,16 +28,27 @@ if (Boost_FOUND)
     add_definitions(-DWITH_BOOST)
 endif(Boost_FOUND)
 
-if (${CMAKE_VERSION} VERSION_GREATER 3.8.99)
-    find_package(Doxygen)
-endif (${CMAKE_VERSION} VERSION_GREATER 3.8.99)
+if (ENABLE_SQLITE_AMALGAMATION)
+    find_path(SQLITE_INCLUDE_PATH
+            NAME sqlite3.h
+            PATHS ${SQLITE_INCLUDE_DIRS} ${CMAKE_SOURCE_DIR}/${SQLITE_INCLUDE_DIRS}
+            )
+    find_path(SQLITE_SOURCE_PATH
+            NAME sqlite3.c
+            PATHS ${SQLITE_INCLUDE_DIRS} ${CMAKE_SOURCE_DIR}/${SQLITE_INCLUDE_DIRS}
+            )
+    set (LINK_SHARED STATIC)
+    add_definitions(-DEMBED_MSQLITECPP)
+    add_definitions(-DBUILD_MSQLITECPP)
+else (ENABLE_SQLITE_AMALGAMATION)
+    set (SQLITE_LIB sqlite3)
+    add_definitions(-DBUILD_MSQLITECPP)
+    set (LINK_SHARED SHARED)
+endif (ENABLE_SQLITE_AMALGAMATION)
 
-include_directories(
-        ${MSQLITECPP_ROOT}/include
-        ${Boost_INCLUDE_DIRS}
-        ${SQLITE_INCLUDE_DIRS}
-        ${MSQLITECPP_ROOT}
-)
+if (${CMAKE_VERSION} VERSION_GREATER_EQUAL 3.8.99)
+    find_package(Doxygen)
+endif (${CMAKE_VERSION} VERSION_GREATER_EQUAL 3.8.99)
 
 set(SOURCE_FILES
         include/msqlitecpp.h
@@ -46,8 +57,6 @@ set(SOURCE_FILES
         include/sqlitetable.h
         include/sqlitetransaction.h
         include/sqlitestatement.h
-        include/sqlitestatementformatters.h
-        include/sqlitefieldsop.h
         include/insertstatement.h
         include/selectstatement.h
         include/clauses.h
@@ -55,24 +64,24 @@ set(SOURCE_FILES
         include/updatestatement.h
         include/createstatement.h
         include/sqlformatters_helpers.h
-
-        src/utils/make_unique.h
-        src/sqlitetable.cpp
+        include/sqlitestatementformatters.h
+        include/sqlitefieldsop.h
         src/sqlitestorage.cpp
+        src/sqlitetable.cpp
         src/sqlitetransaction.cpp
         src/sqlitestatement.cpp
-        include/operators.h)
+        src/utils/make_unique.h
+        )
+
+include_directories(
+        ${MSQLITECPP_ROOT}/include
+        ${SQLITE_INCLUDE_DIRS}
+        ${MSQLITECPP_ROOT}
+)
 
 if (ENABLE_SQLITE_AMALGAMATION)
-    set (SOURCE_FILES ${SOURCE_FILES}
-            ${SQLITE_INCLUDE_DIRS}/sqlite3.c
-        )
-    set (LINK_SHARED STATIC)
-    add_definitions(-DEMBED_MSQLITECPP)
-else (ENABLE_SQLITE_AMALGAMATION)
-    set (SQLITE_LIB sqlite3)
-    add_definitions(-DBUILD_MSQLITECPP)
-    set (LINK_SHARED SHARED)
+    list(APPEND SOURCE_FILES ${SQLITE_SOURCE_PATH}/sqlite3.c)
+    include_directories(${SQLITE_INCLUDE_PATH})
 endif (ENABLE_SQLITE_AMALGAMATION)
 
 if (ENABLE_CODECOVERAGE)
