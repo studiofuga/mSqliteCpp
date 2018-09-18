@@ -1,3 +1,6 @@
+
+#include <sqlitestorage.h>
+
 #include "sqlitestorage.h"
 #include "sqlitetable.h"
 
@@ -31,6 +34,18 @@ bool SQLiteStorage::open()
     mBeginTransaction = utils::make_unique<SQLiteStatement>(shared_from_this(), "BEGIN TRANSACTION;");
     mCommitTransaction = utils::make_unique<SQLiteStatement>(shared_from_this(), "COMMIT TRANSACTION;");
     mAbortTransaction = utils::make_unique<SQLiteStatement>(shared_from_this(), "ROLLBACK TRANSACTION;");
+
+    for (auto &flag : mFlags) {
+        switch (flag) {
+            case Flags ::EnforceForeignKeys:
+                r = sqlite3_exec(mDb, "PRAGMA foreign_keys = ON;", nullptr, nullptr, nullptr);
+                if (r != SQLITE_OK)
+                    throw SQLiteException(mDb);
+                break;
+            default:
+                throw std::logic_error("Unhandled case for flag");
+        }
+    }
 
     return true;
 }
@@ -107,4 +122,9 @@ bool SQLiteStorage::abortTransaction()
 size_t SQLiteStorage::getLastRowId()
 {
     return sqlite3_last_insert_rowid(handle());
+}
+
+void SQLiteStorage::setFlag(SQLiteStorage::Flags flag)
+{
+    mFlags.insert(flag);
 }

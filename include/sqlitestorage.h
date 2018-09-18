@@ -11,6 +11,7 @@
 #include <thread>
 #include <mutex>
 #include <sstream>
+#include <set>
 
 namespace sqlite {
 class SQLiteTable;
@@ -62,6 +63,12 @@ public:
 };
 
 class EXPORT SQLiteStorage : public std::enable_shared_from_this<SQLiteStorage> {
+public:
+    enum class Flags {
+        EnforceForeignKeys
+    };
+
+private:
     mutable std::mutex mMutex;
     std::string dbPath;
 
@@ -71,10 +78,14 @@ class EXPORT SQLiteStorage : public std::enable_shared_from_this<SQLiteStorage> 
 
     std::unique_ptr<SQLiteStatement> mBeginTransaction, mCommitTransaction, mAbortTransaction;
 
+    std::set<Flags> mFlags;
 public:
+
     explicit SQLiteStorage(std::string path);
 
     ~SQLiteStorage() noexcept;
+
+    void setFlag(Flags);
 
     bool open();
 
