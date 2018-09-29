@@ -5,7 +5,9 @@
 #ifndef SQLITE_SELECTSTATEMENT_H
 #define SQLITE_SELECTSTATEMENT_H
 
+#if defined(WITH_BOOST)
 #include <boost/optional.hpp>
+#endif
 
 #include <functional>
 #include <tuple>
@@ -41,6 +43,7 @@ private:
         return statement.get<decltype(std::get<I>(fields).rawType())>(I);
     };
 
+#if defined(WITH_BOOST)
     template<std::size_t I>
     auto getValuesOpt()
     {
@@ -48,6 +51,7 @@ private:
             return boost::optional<decltype(std::get<I>(fields).rawType())>();
         return boost::make_optional(statement.get<decltype(std::get<I>(fields).rawType())>(I));
     };
+#endif
 
     template<typename F, std::size_t ...Is>
     bool execImpl(F func, std::index_sequence<Is...> const &i)
@@ -67,6 +71,7 @@ private:
         return true;
     }
 
+#if defined(WITH_BOOST)
     template <typename T>
     bool bindValue(int idx, const boost::optional<T> & t) {
         if (t) {
@@ -75,6 +80,7 @@ private:
         }
         return false;
     }
+#endif
 
     template <size_t I = 0, typename ...Vs, typename std::enable_if<I == sizeof...(Vs), int>::type = 0>
     void bindImpl(std::tuple<Vs...>, size_t = 0)

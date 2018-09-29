@@ -28,6 +28,7 @@ class InsertStatement {
         return true;
     }
 
+#if defined(WITH_BOOST)
     template <typename T>
     bool bindValue(int idx, const boost::optional<T> & t) {
         if (t) {
@@ -36,6 +37,7 @@ class InsertStatement {
         }
         return false;
     }
+#endif
 
     bool bindValue(int idx, std::nullptr_t t) {
         sqlite::bind(*statement, idx+1, nullptr);

@@ -29,6 +29,7 @@ class DeleteStatement {
         return true;
     }
 
+#if defined(WITH_BOOST)
     template <typename T>
     bool bindValue(int idx, const boost::optional<T> & t) {
         if (t) {
@@ -37,6 +38,7 @@ class DeleteStatement {
         }
         return false;
     }
+#endif
 
     template <size_t I = 0, typename ...Vs, typename std::enable_if<I == sizeof...(Vs), int>::type = 0>
     void bindImpl(std::tuple<Vs...>, size_t = 0)

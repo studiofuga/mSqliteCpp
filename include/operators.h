@@ -7,7 +7,9 @@
 
 #include "sqlitefielddef.h"
 
+#if defined(WITH_BOOST)
 #include <boost/optional.hpp>
+#endif
 
 #include <iostream>
 #include <string>
@@ -26,6 +28,7 @@ std::string make_oper(const FT &fld, std::string oper, size_t indx)
 
 }
 
+#if defined(WITH_BOOST)
 template<typename OP, typename T>
 std::string format(int indx, const OP &op, boost::optional<T> t)
 {
@@ -34,6 +37,7 @@ std::string format(int indx, const OP &op, boost::optional<T> t)
     }
     return std::string();
 }
+#endif
 
 template<typename FT>
 class UnaryOp {
@@ -50,6 +54,7 @@ public:
         return details::make_oper(fld, sep, indx);
     }
 
+#if defined(WITH_BOOST)
     template<typename T>
     std::string format(int indx, boost::optional<T> t)
     {
@@ -58,6 +63,7 @@ public:
         }
         return std::string();
     }
+#endif
 };
 
 template<typename ...OPS>
@@ -107,11 +113,13 @@ public:
         return opImpl<0>(idx);
     }
 
+#if defined(WITH_BOOST)
     template<typename ...T>
     std::string format(int indx, boost::optional<T>... t)
     {
         return formatImpl<0>(indx, std::make_tuple(t...));
     }
+#endif
 };
 
 // TODO avoid duplicating this class. The only changes is the " AND " string.
@@ -162,11 +170,13 @@ public:
         return opImpl<0>(idx);
     }
 
+#if defined(WITH_BOOST)
     template<typename ...T>
     std::string format(int indx, boost::optional<T>... t)
     {
         return formatImpl<0>(indx, std::make_tuple(t...));
     }
+#endif
 };
 
 template <typename FT>

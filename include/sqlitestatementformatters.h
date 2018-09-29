@@ -8,7 +8,10 @@
 #include "sqlitefielddef.h"
 #include <sstream>
 #include <tuple>
+
+#if defined(WITH_BOOST)
 #include <boost/optional.hpp>
+#endif
 
 namespace sqlite {
 namespace statements {
@@ -39,6 +42,7 @@ inline std::string toString(sqlite::FieldDef<Q> t)
     return t.name();
 }
 
+#if defined(WITH_BOOST)
 template <typename F, typename T>
 inline std::string toString(const F &field, boost::optional<T> v)
 {
@@ -54,6 +58,7 @@ inline std::string toString(boost::optional<T> v)
         return toString(v.value());
     return std::string{};
 }
+#endif
 
 template <typename T>
 std::string formatFieldName (const T&t, const std::string &sep)
@@ -67,6 +72,7 @@ std::string formatFieldName (const F&f, const T &t,const std::string &sep)
     return sep + toString(f);
 }
 
+#if defined(WITH_BOOST)
 template <typename T>
 std::string formatFieldName (const boost::optional<T> &t, const std::string &sep)
 {
@@ -82,6 +88,7 @@ std::string formatFieldName (const F& field, const boost::optional<T> &t, const 
         return sep + toString(field);
     return std::string{};
 }
+#endif
 
 template<size_t I, typename ...Ts>
 std::string
@@ -147,6 +154,7 @@ std::string formatFieldPlaceholder4 (const F &f, const T&t, const std::string &s
     return ss.str();
 }
 
+#if defined(WITH_BOOST)
 template <typename T>
 std::string formatFieldPlaceholder3 (const boost::optional<T> &t, const std::string &sep, size_t I = 0)
 {
@@ -168,7 +176,7 @@ std::string formatFieldPlaceholder4 (const F &f, const boost::optional<T> &t, co
     }
     return std::string{};
 }
-
+#endif
 
 template<size_t I, typename ...Ts>
 std::string
@@ -228,6 +236,7 @@ std::string formatFieldNameAndPlaceholder (const T&t, const std::string &sep, si
     return ss.str();
 }
 
+#if defined(WITH_BOOST)
 template <typename T>
 std::string formatFieldNameAndPlaceholder (const boost::optional<T> &t, const std::string &sep, size_t I = 0)
 {
@@ -248,6 +257,7 @@ std::string formatFieldNameAndPlaceholderOpt (const F &f, const boost::optional<
     }
     return std::string{};
 }
+#endif
 
 /// @brief Ends the recursion of unpackFieldsAndPlaceholders_impl()
 template<size_t I, typename ...Ts>
