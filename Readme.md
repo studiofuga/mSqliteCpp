@@ -19,6 +19,14 @@ Strong types are used in different context:
 - When running queries (insert, select), because there should be a strict relation between the fields selected and the
 type returned by the query / passed to the insert
 
+## PLEASE NOTE ##
+
+At the time of writing, due to a probable bug in the compiler, it is NOT possible to compile the library under
+Microsoft Visual Studio with versions 15.8 or later.
+
+We're waiting for a fix from Microsoft. For the moment, use any previous version of the compiler, for example, it is
+known that 15.6 and 15.5 work fine. 
+
 ## Usage
 Examples can be found in the `tests` directory. Below are a few examples:
 
@@ -60,14 +68,20 @@ Examples can be found in the `tests` directory. Below are a few examples:
 ## Building
 At the time of writing, the library depends only from the SQLite C Api library (libsqlite3).
 
-Before compiling, you must clone the googletest directory in `tests/googletest`, or disable testing adding
-`-DENABLE_TEST=OFF` while running cmake.
+To build the project, you need CMake.
 
-To clone the googletest, simply run the following command from the command line:
+The main project provides some compile time options. 
 
-```
-$ git clone https://github.com/google/googletest.git tests/googletest
-```
+- ENABLE_TEST: enable compiling the unit tests suite, using Google Tests. Default is On
+
+- ENABLE_PROFILER: enable compiling the profiler test program to measure the performances of the library.
+The default is On
+
+- ENABLE_SQLITE_AMALGAMATION: Compile sqlite3 statically using sqlite amalgamation. The default is Off, and CMake
+needs to find the sqlite3 files (header and libraries). If On, make sure to set SQLITE_INCLUDE_DIRS to point to the
+amalgamation files location, for example, -DSQLITE_INCLUDE_DIRS=3rdparty\sqlite-amalgamation-3250200.
+
+- ENABLE_CODECOVERAGE: compile the library with gcov support. Default is Off
 
 ## License
 The library is released under the BSD 2-Clause license. See the LICENSE file for details.
