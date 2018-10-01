@@ -97,7 +97,7 @@ TEST_F(NullsTest, insert)
     ASSERT_EQ(rValue, 0);
 }
 
-
+#if defined(WITH_BOOST)
 TEST_F(NullsTest, selectWithNulls)
 {
     auto createTable = makeCreateTableStatement2(db, "Insert1", fieldId, fieldText, fieldCount, fieldValue);
@@ -133,3 +133,4 @@ TEST_F(NullsTest, selectWithNulls)
     ASSERT_EQ(rId.value(), 1);
     ASSERT_EQ(rText.value(), "Sample");
 }
+#endif

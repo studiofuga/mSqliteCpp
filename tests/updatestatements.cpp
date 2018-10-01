@@ -106,6 +106,7 @@ TEST_F(UpdateStatements, update)
     ASSERT_TRUE(f);
 }
 
+#if defined(WITH_BOOST)
 TEST_F(UpdateStatements, updateWithOptional)
 {
     UpdateStatement<
@@ -119,6 +120,7 @@ TEST_F(UpdateStatements, updateWithOptional)
     updateStatement.where(where);
 
     int id = 1;
+
     boost::optional<int> id2{20}, value;
     boost::optional<std::string> name;
 
@@ -230,7 +232,7 @@ TEST_F(UpdateStatements, updateWithOptionalMore)
     ASSERT_EQ(rvalue_2, 6);
     ASSERT_EQ(rvalue_3, 1000);
 }
-
+#endif
 
 TEST_F(UpdateStatements, WhereReset)
 {

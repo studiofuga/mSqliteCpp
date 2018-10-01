@@ -14,6 +14,8 @@
 
 using namespace sqlite;
 
+#if defined(WITH_BOOST)
+
 TEST(WhereOptTests, formatOptionalOperators)
 {
     auto fldId = sqlite::makeFieldDef("id", sqlite::FieldType::Integer());
@@ -390,3 +392,4 @@ TEST_F(WhereOptTestsWithStatements, DeleteCase5)
     EXPECT_EQ(count, 1);
 }
 
+#endif

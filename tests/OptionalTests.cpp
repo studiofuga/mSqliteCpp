@@ -7,7 +7,9 @@
 #include "insertstatement.h"
 #include "selectstatement.h"
 
+#if defined(WITH_BOOST)
 #include <boost/optional.hpp>
+#endif
 
 #include <gtest/gtest.h>
 #include <clauses.h>
@@ -15,6 +17,7 @@
 
 using namespace sqlite;
 
+#if defined(WITH_BOOST)
 class OptionalStatements : public testing::Test {
 protected:
     std::shared_ptr<SQLiteStorage> db;
@@ -244,3 +247,5 @@ TEST_F(OptionalStatements, Issue6InsertMultipleOptionals)
     ASSERT_EQ(rcountvalue, 0);
     ASSERT_EQ(rvalue, 0);
 }
+
+#endif
