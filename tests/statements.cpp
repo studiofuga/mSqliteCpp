@@ -479,7 +479,7 @@ TEST_F(Statements, casts)
 
         stmt.bind(1, 1);
 
-        long lm = 0;
+        long long lm = 0;
         double dm = 0;
         ASSERT_NO_THROW(stmt.execute([&stmt, &lm, &dm]() {
             lm = stmt.getLongValue(0);
