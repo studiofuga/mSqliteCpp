@@ -59,6 +59,17 @@ class UpdateStatement {
         updateImpl<N + 1>(values, idx);
     };
 
+    template <size_t I = 0, typename ...Vs, typename std::enable_if<I == sizeof...(Vs), int>::type = 0>
+    void bindImpl(std::tuple<Vs...>, size_t = 0)
+    {
+    }
+
+    template <size_t I = 0, typename ...Vs, typename std::enable_if<I < sizeof...(Vs), int>::type = 0>
+    void bindImpl(std::tuple<Vs...> vs, size_t offs = 0) {
+        bindValue(I+offs, std::get<I>(vs));
+        bindImpl<I+1>(vs,offs);
+    };
+
 public:
     UpdateStatement()
     {}
@@ -103,6 +114,19 @@ public:
         w.setBindOffset(sizeof...(FIELDS));
         whereText = w.toText();
         sql.where(whereText);
+    }
+
+    template<typename OP, typename ...F>
+    void where(WhereOpt<OP> w, F... f)
+    {
+        w.setBindOffset(sizeof...(FIELDS));
+        whereText = w.format(f...);
+        sql.where(whereText);
+    }
+
+    template <typename ...Vs>
+    void bind(Vs... values) {
+        bindImpl<0>(std::make_tuple(values...), sizeof...(FIELDS));
     }
 
     template<typename ...T>

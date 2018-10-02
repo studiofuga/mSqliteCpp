@@ -124,6 +124,7 @@ template<typename OP>
 class WhereOpt {
     SQLiteStatement *statement;
     OP condition;
+    int bindOffset = 0;
 
 public:
     WhereOpt() = default;
@@ -131,9 +132,14 @@ public:
             : condition(std::move(cond)) {
     }
 
+    void setBindOffset(int n)
+    {
+        bindOffset = n;
+    }
+
     template <typename ...Vs>
     std::string format(Vs... v) {
-        auto condformat = condition.format(0, v...);
+        auto condformat = condition.format(bindOffset, v...);
         if (condformat.empty()) {
             condformat = "1";
         }

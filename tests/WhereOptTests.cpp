@@ -11,6 +11,8 @@
 #include <insertstatement.h>
 #include <selectstatement.h>
 #include <deletestatement.h>
+#include <updatestatement.h>
+#include <sqlitefieldsop.h>
 
 using namespace sqlite;
 
@@ -227,6 +229,105 @@ TEST_F(WhereOptTestsWithStatements, selectWhereCase4)
     s.where(w.format(field1, field2));
     s.prepare();
     s.bind(field1, field2);
+
+    int count = 0;
+    s.exec([&count](int) {
+        ++count;
+        return true;
+    });
+
+    EXPECT_EQ(count, 1);
+}
+
+TEST_F(WhereOptTestsWithStatements, updateWhereCase1)
+{
+    auto u = makeUpdateStatement(fldValue);
+    u.attach(db, TableName);
+
+    auto w = makeWhereOpt(operators::and_(operators::eq(fldId1), operators::eq(fldId2)));
+
+    boost::optional<int> field1;
+    boost::optional<int> field2;
+
+    u.where(w, field1, field2);
+    u.prepare();
+    u.bind(field1, field2);
+
+    u.update(1000);
+
+    auto s = makeSelectStatement(fldValue);
+    s.attach(db, TableName);
+    Where<decltype(fldValue)> sw;
+    sw.attach(s.getStatement(), op::eq(fldValue));
+    s.where(sw);
+    s.prepare();
+    sw.bind(1000);
+
+    int count = 0;
+    s.exec([&count](int) {
+        ++count;
+        return true;
+    });
+
+    EXPECT_EQ(count, 4);
+}
+
+TEST_F(WhereOptTestsWithStatements, updateWhereCase2)
+{
+    auto u = makeUpdateStatement(fldValue);
+    u.attach(db, TableName);
+
+    auto w = makeWhereOpt(operators::and_(operators::eq(fldId1), operators::eq(fldId2)));
+
+    boost::optional<int> field1 = 1;
+    boost::optional<int> field2;
+
+    u.where(w, field1, field2);
+    u.prepare();
+    u.bind(field1, field2);
+
+    u.update(2000);
+
+    auto s = makeSelectStatement(fldValue);
+    s.attach(db, TableName);
+    Where<decltype(fldValue)> sw;
+    sw.attach(s.getStatement(), op::eq(fldValue));
+    s.where(sw);
+    s.prepare();
+    sw.bind(2000);
+
+    int count = 0;
+    s.exec([&count](int) {
+        ++count;
+        return true;
+    });
+
+    EXPECT_EQ(count, 2);
+}
+
+TEST_F(WhereOptTestsWithStatements, updateWhereCase3)
+{
+    auto u = makeUpdateStatement(fldValue);
+    u.attach(db, TableName);
+
+    auto w = makeWhereOpt(operators::and_(operators::eq(fldId1), operators::eq(fldId2)));
+
+    boost::optional<int> field1 = 2;
+    boost::optional<int> field2 = 2;
+
+    u.where(w, field1, field2);
+    u.prepare();
+    u.bind(field1, field2);
+
+    u.update(3000);
+
+    auto s = makeSelectStatement(fldValue);
+    s.attach(db, TableName);
+    Where<decltype(fldValue)> sw;
+    sw.attach(s.getStatement(), op::eq(fldValue));
+    s.where(sw);
+    s.prepare();
+    sw.bind(3000);
 
     int count = 0;
     s.exec([&count](int) {
