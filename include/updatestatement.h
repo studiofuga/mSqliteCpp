@@ -5,12 +5,13 @@
 #ifndef SQLITE_UPDATESTATEMENT_H
 #define SQLITE_UPDATESTATEMENT_H
 
+#include "sqlitestorage.h"
+#include "sqlitestatement.h"
+#include "clauses.h"
+
 #include <tuple>
 #include <type_traits>
 #include <utility>
-
-#include "sqlitestorage.h"
-#include "sqlitestatement.h"
 
 namespace sqlite {
 
