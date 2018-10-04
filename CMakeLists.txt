@@ -18,10 +18,6 @@ set(CMAKE_CXX_STANDARD 14)
 
 set(CMAKE_MODULE_PATH ${MSQLITECPP_ROOT})
 
-set(CMAKE_ARCHIVE_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/lib)
-set(CMAKE_LIBRARY_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/bin)
-set(CMAKE_RUNTIME_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/bin)
-
 find_package(Boost)
 
 if (Boost_FOUND)
@@ -111,7 +107,7 @@ add_library(msqlitecpp ${LINK_SHARED} ${SOURCE_FILES})
 
 target_link_libraries(msqlitecpp ${SQLITE_LIB})
 
-install(TARGETS msqlitecpp DESTINATION usr/lib COMPONENT runtime)
+install(TARGETS msqlitecpp DESTINATION lib COMPONENT runtime)
 
 if (ENABLE_TEST)
     add_subdirectory(tests)
