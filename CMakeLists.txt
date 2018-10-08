@@ -107,7 +107,7 @@ add_library(msqlitecpp ${LINK_SHARED} ${SOURCE_FILES})
 
 target_link_libraries(msqlitecpp ${SQLITE_LIB})
 
-install(TARGETS msqlitecpp DESTINATION lib COMPONENT runtime)
+install(TARGETS msqlitecpp DESTINATION usr/lib COMPONENT runtime)
 
 if (ENABLE_TEST)
     add_subdirectory(tests)
