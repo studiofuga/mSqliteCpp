@@ -2,6 +2,14 @@
 ## Sources Setup
 
 set(SOURCE_FILES
+        src/sqlitestorage.cpp
+        src/sqlitetable.cpp
+        src/sqlitetransaction.cpp
+        src/sqlitestatement.cpp
+        src/utils/make_unique.h
+        )
+
+set(PUB_HEADERS
         include/msqlitecpp.h
         include/sqlitefielddef.h
         include/sqlitestorage.h
@@ -17,11 +25,6 @@ set(SOURCE_FILES
         include/sqlformatters_helpers.h
         include/sqlitestatementformatters.h
         include/sqlitefieldsop.h
-        src/sqlitestorage.cpp
-        src/sqlitetable.cpp
-        src/sqlitetransaction.cpp
-        src/sqlitestatement.cpp
-        src/utils/make_unique.h
         )
 
 if (ENABLE_SQLITE_AMALGAMATION)
@@ -31,12 +34,13 @@ endif (ENABLE_SQLITE_AMALGAMATION)
 
 ## Target setup
 
-add_library(msqlitecpp ${SOURCE_FILES})
+add_library(msqlitecpp ${SOURCE_FILES} ${PUB_HEADERS})
 
 set_target_properties(msqlitecpp PROPERTIES
         VERSION ${PROJECT_VERSION}
         SOVERSION ${PROJECT_VERSION_MAJOR}
         EXPORT_NAME MSqliteCpp
+        PUBLIC_HEADER "${PUB_HEADERS}"
         )
 
 target_include_directories(msqlitecpp
@@ -53,12 +57,13 @@ target_compile_features(msqlitecpp PUBLIC cxx_std_14)
 
 target_link_libraries(msqlitecpp
         PRIVATE
-            ${SQLITE_LIB})
+        ${SQLITE_LIB})
 
 install(TARGETS msqlitecpp
         EXPORT msqlitecpp-export
         LIBRARY DESTINATION ${CMAKE_INSTALL_LIBDIR}
         ARCHIVE DESTINATION ${CMAKE_INSTALL_LIBDIR}
+        PUBLIC_HEADER DESTINATION ${CMAKE_INSTALL_INCLUDEDIR}
         )
 
 install(EXPORT msqlitecpp-export
@@ -70,9 +75,6 @@ install(EXPORT msqlitecpp-export
             ${CMAKE_INSTALL_LIBDIR}/cmake/MSqliteCpp
         )
 
-install(DIRECTORY include/ DESTINATION ${CMAKE_INSTALL_INCLUDEDIR})
-
-#Install the config, configversion and custom find modules
 install(FILES
         ${CMAKE_SOURCE_DIR}/cmake/MSqliteCppConfig.cmake
         DESTINATION ${CMAKE_INSTALL_LIBDIR}/cmake/MSqliteCpp
