@@ -1,5 +1,5 @@
 cmake_minimum_required(VERSION 3.5)
-project(sqlite)
+project(msqlitecpp VERSION 0.9.1 DESCRIPTION "a Modern SQLite CPP library" LANGUAGES C CXX)
 
 include(cmake/options.cmake)
 include(cmake/dependencies.cmake)

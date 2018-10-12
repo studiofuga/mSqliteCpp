@@ -1,6 +1,4 @@
 
-set(CMAKE_CXX_STANDARD 14)
-
 if (ENABLE_SQLITE_AMALGAMATION)
     add_definitions(-DEMBED_MSQLITECPP)
     add_definitions(-DBUILD_MSQLITECPP)
