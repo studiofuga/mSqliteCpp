@@ -33,7 +33,7 @@ if (ENABLE_SQLITE_AMALGAMATION)
     include_directories(${SQLITE_INCLUDE_PATH})
 endif (ENABLE_SQLITE_AMALGAMATION)
 
-add_library(msqlitecpp ${LINK_SHARED} ${SOURCE_FILES})
+add_library(msqlitecpp ${SOURCE_FILES})
 
 target_link_libraries(msqlitecpp ${SQLITE_LIB})
 
