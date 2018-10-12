@@ -4,10 +4,13 @@ project(sqlite)
 include(cmake/options.cmake)
 include(cmake/dependencies.cmake)
 include(cmake/compileropts.cmake)
+include(cmake/install.cmake)
 
 include (main.cmake)
 
 if (ENABLE_TEST)
+    enable_testing()
+
     add_subdirectory(tests)
 endif(ENABLE_TEST)
 

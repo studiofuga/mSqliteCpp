@@ -14,7 +14,7 @@ if (NOT EXISTS ${CMAKE_SOURCE_DIR}/tests/googletest/CMakeLists.txt)
 endif (NOT EXISTS ${CMAKE_SOURCE_DIR}/tests/googletest/CMakeLists.txt)
 
 # This adds another subdirectory, which has 'project(gtest)'.
-add_subdirectory(googletest)
+add_subdirectory(googletest EXCLUDE_FROM_ALL)
 
 #enable_testing()
 
@@ -50,3 +50,4 @@ if (ENABLE_CODECOVERAGE)
             )
 endif (ENABLE_CODECOVERAGE)
 
+add_test(UnitTests runTests)
