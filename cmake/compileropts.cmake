@@ -11,3 +11,7 @@ if (ENABLE_CODECOVERAGE)
     set (CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} --coverage")
     set (CMAKE_C_FLAGS "${CMAKE_C_FLAGS} --coverage")
 endif (ENABLE_CODECOVERAGE)
+
+if (APPLE)
+    set(CMAKE_MACOSX_RPATH ON)
+endif (APPLE)
