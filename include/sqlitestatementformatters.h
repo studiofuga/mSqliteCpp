@@ -10,7 +10,7 @@
 #include <tuple>
 
 #if defined(WITH_BOOST)
-#include <boost/optional.hpp>
+#include "boost/optional.hpp"
 #endif
 
 namespace sqlite {
