@@ -10,21 +10,22 @@ set(SOURCE_FILES
         )
 
 set(PUB_HEADERS
+        include/clauses.h
+        include/createstatement.h
+        include/deletestatement.h
+        include/insertstatement.h
         include/msqlitecpp.h
+        include/operators.h
+        include/selectstatement.h
+        include/sqlformatters_helpers.h
         include/sqlitefielddef.h
+        include/sqlitefieldsop.h
+        include/sqlitestatement.h
+        include/sqlitestatementformatters.h
         include/sqlitestorage.h
         include/sqlitetable.h
         include/sqlitetransaction.h
-        include/sqlitestatement.h
-        include/insertstatement.h
-        include/selectstatement.h
-        include/clauses.h
-        include/deletestatement.h
         include/updatestatement.h
-        include/createstatement.h
-        include/sqlformatters_helpers.h
-        include/sqlitestatementformatters.h
-        include/sqlitefieldsop.h
         )
 
 if (ENABLE_SQLITE_AMALGAMATION)
