@@ -18,7 +18,7 @@ add_subdirectory(googletest EXCLUDE_FROM_ALL)
 
 #enable_testing()
 
-include_directories(${gtest_SOURCE_DIR}/include ${gtest_SOURCE_DIR})
+include_directories(${gtest_SOURCE_DIR}/include ${gtest_SOURCE_DIR} ${Boost_INCLUDE_DIRS})
 
 add_executable(runTests
         table.cpp

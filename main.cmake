@@ -29,7 +29,7 @@ set(PUB_HEADERS
 
 if (ENABLE_SQLITE_AMALGAMATION)
     list(APPEND SOURCE_FILES ${SQLITE_SOURCE_PATH}/sqlite3.c)
-    include_directories(${SQLITE_INCLUDE_PATH})
+    list(APPEND CMAKE_SOURCE_DIR ${SQLITE_INCLUDE_PATH})
 endif (ENABLE_SQLITE_AMALGAMATION)
 
 ## Target setup
@@ -48,6 +48,7 @@ target_include_directories(msqlitecpp
             $<INSTALL_INTERFACE:include>
             $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/include>
         PRIVATE
+            ${Boost_INCLUDE_DIRS}
             ${SQLITE_INCLUDE_DIRS}
             ${CMAKE_SOURCE_DIR}/src
         )
