@@ -54,7 +54,10 @@ target_include_directories(msqlitecpp
             ${CMAKE_SOURCE_DIR}/src
         )
 
-target_compile_options(msqlitecpp PRIVATE -Werror)
+if (NOT WIN32)
+    target_compile_options(msqlitecpp PRIVATE -Werror)
+endif()
+
 target_compile_features(msqlitecpp PUBLIC cxx_std_14)
 
 target_link_libraries(msqlitecpp
@@ -77,7 +80,7 @@ install(EXPORT msqlitecpp-export
             ${CMAKE_INSTALL_LIBDIR}/cmake/MSqliteCpp
         )
 
-install(FILES
-        ${CMAKE_SOURCE_DIR}/cmake/MSqliteCppConfig.cmake
-        DESTINATION ${CMAKE_INSTALL_LIBDIR}/cmake/MSqliteCpp
-        )
+#install(FILES
+#        ${CMAKE_SOURCE_DIR}/cmake/MSqliteCppConfig.cmake
+#        DESTINATION ${CMAKE_INSTALL_LIBDIR}/cmake/MSqliteCpp
+#        )
