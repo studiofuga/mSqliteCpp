@@ -35,19 +35,11 @@ file(REMOVE_RECURSE ${CURRENT_PACKAGES_DIR}/debug/include)
 
 # move the LIB files to the correct location
 
-file(INSTALL
-        ${CURRENT_PACKAGES_DIR}/lib/cmake/MSqliteCpp/MSqliteCppTargets-release.cmake
-        ${CURRENT_PACKAGES_DIR}/lib/cmake/MSqliteCpp/MSqliteCppTargets.cmake
+file(COPY
+        ${CURRENT_PACKAGES_DIR}/debug/share/msqlitecpp/msqlitecppTargets-debug.cmake
         DESTINATION
-        ${CURRENT_PACKAGES_DIR}/share/sqlitecpp)
-file(REMOVE_RECURSE ${CURRENT_PACKAGES_DIR}/lib/cmake)
-
-file(INSTALL
-        ${CURRENT_PACKAGES_DIR}/debug/lib/cmake/MSqliteCpp/MSqliteCppTargets-debug.cmake
-        DESTINATION
-        ${CURRENT_PACKAGES_DIR}/share/sqlitecpp)
-file(REMOVE_RECURSE ${CURRENT_PACKAGES_DIR}/debug/lib/cmake)
-
+        ${CURRENT_PACKAGES_DIR}/share/msqlitecpp)
+file(REMOVE_RECURSE ${CURRENT_PACKAGES_DIR}/debug/share)
 
 # Handle copyright
 

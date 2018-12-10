@@ -41,7 +41,7 @@ add_library(msqlitecpp ${SOURCE_FILES} ${PUB_HEADERS})
 set_target_properties(msqlitecpp PROPERTIES
         VERSION ${PROJECT_VERSION}
         SOVERSION ${PROJECT_VERSION_MAJOR}
-        EXPORT_NAME MSqliteCpp
+        EXPORT_NAME msqlitecpp
         PUBLIC_HEADER "${PUB_HEADERS}"
         )
 
@@ -75,14 +75,14 @@ install(TARGETS msqlitecpp
 
 install(EXPORT msqlitecpp-export
         FILE
-            MSqliteCppTargets.cmake
+            msqlitecppTargets.cmake
         NAMESPACE
-            MSqliteCpp::
+            msqlitecpp::
         DESTINATION
-            ${CMAKE_INSTALL_LIBDIR}/cmake/MSqliteCpp
+            ${INSTALL_EXPORTS_DIR}
         )
 
-#install(FILES
-#        ${CMAKE_SOURCE_DIR}/cmake/MSqliteCppConfig.cmake
-#        DESTINATION ${CMAKE_INSTALL_LIBDIR}/cmake/MSqliteCpp
-#        )
+install(FILES
+        ${CMAKE_SOURCE_DIR}/cmake/msqlitecppConfig.cmake
+        DESTINATION ${INSTALL_EXPORTS_DIR}
+        )
