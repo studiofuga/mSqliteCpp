@@ -1,37 +1,66 @@
-# Copyright (C) 2007-2009 LuaDist.
-# Created by Peter Kapec <kapecp@gmail.com>
-# Redistribution and use of this file is allowed according to the terms of the MIT license.
-# For details see the COPYRIGHT file distributed with LuaDist.
-#	Note:
-#		Searching headers and libraries is very simple and is NOT as powerful as scripts
-#		distributed with CMake, because LuaDist defines directories to search for.
-#		Everyone is encouraged to contact the author with improvements. Maybe this file
-#		becomes part of CMake distribution sometimes.
+#ckwg +4
+# Copyright 2010 by Kitware, Inc. All Rights Reserved. Please refer to
+# KITWARE_LICENSE.TXT for licensing information, or contact General Counsel,
+# Kitware, Inc., 28 Corporate Drive, Clifton Park, NY 12065.
 
-# - Find sqlite3
-# Find the native SQLITE3 headers and libraries.
+# Locate the system installed SQLite3
+# The following variables will be set:
 #
-# SQLITE3_INCLUDE_DIRS	- where to find sqlite3.h, etc.
-# SQLITE3_LIBRARIES	- List of libraries when using sqlite.
-# SQLITE3_FOUND	- True if sqlite found.
+# SQLite3_FOUND       - Set to true if SQLite3 can be found
+# SQLite3_INCLUDE_DIR - The path to the SQLite3 header files
+# SQLite3_LIBRARY     - The full path to the SQLite3 library
 
-# Look for the header file.
-FIND_PATH(SQLITE3_INCLUDE_DIR NAMES sqlite3.h)
+if( SQLite3_DIR )
+    if( SQLite3_FIND_VERSION )
+        find_package( SQLite3 ${SQLite3_FIND_VERSION} NO_MODULE)
+    else()
+        find_package( SQLite3 NO_MODULE)
+    endif()
+elseif( NOT SQLite3_FOUND )
+    message(STATUS "Searching for sqlite3.h")
+    find_path( SQLite3_INCLUDE_DIR sqlite3.h )
+    message(STATUS "Searching for sqlite3.h - ${SQLite3_INCLUDE_DIR}")
 
-# Look for the library.
-FIND_LIBRARY(SQLITE3_LIBRARY NAMES sqlite)
+    message(STATUS "Searching for libsqlite3")
+    find_library( SQLite3_LIBRARY sqlite3 )
+    message(STATUS "Searching for libsqlite3 - ${SQLite3_LIBRARY}")
 
-# Handle the QUIETLY and REQUIRED arguments and set SQLITE3_FOUND to TRUE if all listed variables are TRUE.
-INCLUDE(FindPackageHandleStandardArgs)
-FIND_PACKAGE_HANDLE_STANDARD_ARGS(sqlite3 DEFAULT_MSG SQLITE3_LIBRARY SQLITE3_INCLUDE_DIR)
+    include( FindPackageHandleStandardArgs )
+    FIND_PACKAGE_HANDLE_STANDARD_ARGS( SQLite3 SQLite3_INCLUDE_DIR SQLite3_LIBRARY )
+    if( SQLITE3_FOUND )
+        # Determine the SQLite version found
+        file( READ ${SQLite3_INCLUDE_DIR}/sqlite3.h SQLite3_INCLUDE_FILE )
+        string( REGEX REPLACE
+                ".*# *define *SQLITE_VERSION *\\\"([0-9\\.]+)\\\".*" "\\1"
+                SQLite3_VERSION "${SQLite3_INCLUDE_FILE}" )
+        string( REGEX REPLACE
+                "([0-9]+)\\.[0-9]+\\.[0-9]+" "\\1"
+                SQLite3_VERSION_MAJOR "${SQLite3_VERSION}" )
+        string( REGEX REPLACE
+                "[0-9]+\\.([0-9]+)\\.[0-9]+" "\\1"
+                SQLite3_VERSION_MINOR "${SQLite3_VERSION}" )
+        string( REGEX REPLACE
+                "[0-9]+\\.[0-9]+\\.([0-9])+" "\\1"
+                SQLite3_VERSION_PATCH "${SQLite3_VERSION}" )
 
-# Copy the results to the output variables.
-IF(SQLITE3_FOUND)
-    SET(SQLITE3_LIBRARIES ${SQLITE3_LIBRARY})
-    SET(SQLITE3_INCLUDE_DIRS ${SQLITE3_INCLUDE_DIR})
-ELSE(SQLITE3_FOUND)
-    SET(SQLITE3_LIBRARIES)
-    SET(SQLITE3_INCLUDE_DIRS)
-ENDIF(SQLITE3_FOUND)
-
-MARK_AS_ADVANCED(SQLITE3_INCLUDE_DIRS SQLITE3_LIBRARIES)
+        # Determine version compatibility
+        if( SQLite3_FIND_VERSION )
+            if( SQLite3_FIND_VERSION_EXACT )
+                if( SQLite3_FIND_VERSION VERSION_EQUAL SQLite3_VERSION )
+                    message( STATUS "SQLite3 version: ${SQLite3_VERSION}" )
+                    set( SQLite3_FOUND TRUE )
+                endif()
+            else()
+                if( (SQLite3_FIND_VERSION VERSION_LESS  SQLite3_VERSION) OR
+                (SQLite3_FIND_VERSION VERSION_EQUAL SQLite3_VERSION) )
+                    message( STATUS "SQLite3 version: ${SQLite3_VERSION}" )
+                    set( SQLite3_FOUND TRUE )
+                endif()
+            endif()
+        else()
+            message( STATUS "SQLite3 version: ${SQLite3_VERSION}" )
+            set( SQLite3_FOUND TRUE )
+        endif()
+        unset( SQLITE3_FOUND )
+    endif()
+endif()
