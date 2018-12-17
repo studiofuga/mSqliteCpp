@@ -16,9 +16,7 @@ endif (NOT EXISTS ${CMAKE_SOURCE_DIR}/tests/googletest/CMakeLists.txt)
 # This adds another subdirectory, which has 'project(gtest)'.
 add_subdirectory(googletest EXCLUDE_FROM_ALL)
 
-#enable_testing()
-
-include_directories(${gtest_SOURCE_DIR}/include ${gtest_SOURCE_DIR} ${Boost_INCLUDE_DIRS})
+enable_testing()
 
 add_executable(runTests
         table.cpp
@@ -33,7 +31,21 @@ add_executable(runTests
         StrongTypeTests.cpp
         WhereOptTests.cpp TestForeignKeys.cpp)
 
-target_link_libraries(runTests msqlitecpp gtest gtest_main)
+target_include_directories( runTests
+        PRIVATE
+            ${Boost_INCLUDE_DIRS}
+            ${SQLITE_INCLUDE_DIRS}
+            ${gtest_SOURCE_DIR}/include
+            ${gtest_SOURCE_DIR}
+)
+
+target_compile_features(runTests PUBLIC cxx_std_14)
+
+target_link_libraries(runTests
+        msqlitecpp
+        gtest gtest_main
+        ${SQLITE_LIB}
+        )
 
 add_custom_target(check
         COMMAND runTests --gtest_output=xml:gtestresults.xml
