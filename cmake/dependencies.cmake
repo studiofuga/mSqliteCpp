@@ -6,18 +6,7 @@ if (Boost_FOUND)
     add_definitions(-DWITH_BOOST)
 endif(Boost_FOUND)
 
-if (ENABLE_SQLITE_AMALGAMATION)
-    find_path(SQLITE_INCLUDE_PATH
-            NAME sqlite3.h
-            PATHS ${SQLITE_INCLUDE_DIRS} ${CMAKE_SOURCE_DIR}/${SQLITE_INCLUDE_DIRS}
-            )
-    find_path(SQLITE_SOURCE_PATH
-            NAME sqlite3.c
-            PATHS ${SQLITE_INCLUDE_DIRS} ${CMAKE_SOURCE_DIR}/${SQLITE_INCLUDE_DIRS}
-            )
-else(ENABLE_SQLITE_AMALGAMATION)
-    find_package(sqlite3 REQUIRED)
-endif (ENABLE_SQLITE_AMALGAMATION)
+find_package(sqlite3 REQUIRED)
 
 if (${CMAKE_VERSION} VERSION_GREATER_EQUAL 3.8.99)
     find_package(Doxygen)

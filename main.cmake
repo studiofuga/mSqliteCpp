@@ -28,12 +28,6 @@ set(PUB_HEADERS
         include/updatestatement.h
         )
 
-if (ENABLE_SQLITE_AMALGAMATION)
-    list(APPEND SOURCE_FILES ${SQLITE_SOURCE_PATH}/sqlite3.c)
-    list(APPEND CMAKE_SOURCE_DIR ${SQLITE_INCLUDE_PATH})
-    list(APPEND PUB_HEADERS ${SQLITE_SOURCE_PATH}/sqlite3.h)
-endif (ENABLE_SQLITE_AMALGAMATION)
-
 ## Target setup
 
 add_library(msqlitecpp ${SOURCE_FILES} ${PUB_HEADERS})
@@ -61,9 +55,11 @@ endif()
 
 target_compile_features(msqlitecpp PUBLIC cxx_std_14)
 
+target_compile_definitions(msqlitecpp PRIVATE BUILD_MSQLITECPP)
+
 target_link_libraries(msqlitecpp
         PRIVATE
-        ${SQLITE_LIB})
+        ${SQLite3_LIBRARIES})
 
 install(TARGETS msqlitecpp
         EXPORT msqlitecpp-export

@@ -77,10 +77,6 @@ The main project provides some compile time options.
 - ENABLE_PROFILER: enable compiling the profiler test program to measure the performances of the library.
 The default is On
 
-- ENABLE_SQLITE_AMALGAMATION: Compile sqlite3 statically using sqlite amalgamation. The default is Off, and CMake
-needs to find the sqlite3 files (header and libraries). If On, make sure to set SQLITE_INCLUDE_DIRS to point to the
-amalgamation files location, for example, -DSQLITE_INCLUDE_DIRS=3rdparty\sqlite-amalgamation-3250200.
-
 - ENABLE_CODECOVERAGE: compile the library with gcov support. Default is Off
 
 ## License

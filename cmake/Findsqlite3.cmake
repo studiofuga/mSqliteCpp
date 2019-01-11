@@ -1,66 +1,66 @@
-#ckwg +4
-# Copyright 2010 by Kitware, Inc. All Rights Reserved. Please refer to
-# KITWARE_LICENSE.TXT for licensing information, or contact General Counsel,
-# Kitware, Inc., 28 Corporate Drive, Clifton Park, NY 12065.
+# Distributed under the OSI-approved BSD 3-Clause License.  See accompanying
+# file Copyright.txt or https://cmake.org/licensing for details.
 
-# Locate the system installed SQLite3
-# The following variables will be set:
-#
-# SQLite3_FOUND       - Set to true if SQLite3 can be found
-# SQLite3_INCLUDE_DIR - The path to the SQLite3 header files
-# SQLite3_LIBRARY     - The full path to the SQLite3 library
+#[=======================================================================[.rst:
+FindSQLite3
+-----------
 
-if( SQLite3_DIR )
-    if( SQLite3_FIND_VERSION )
-        find_package( SQLite3 ${SQLite3_FIND_VERSION} NO_MODULE)
-    else()
-        find_package( SQLite3 NO_MODULE)
-    endif()
-elseif( NOT SQLite3_FOUND )
-    message(STATUS "Searching for sqlite3.h")
-    find_path( SQLite3_INCLUDE_DIR sqlite3.h )
-    message(STATUS "Searching for sqlite3.h - ${SQLite3_INCLUDE_DIR}")
+Find the SQLite libraries, v3
 
-    message(STATUS "Searching for libsqlite3")
-    find_library( SQLite3_LIBRARY sqlite3 )
-    message(STATUS "Searching for libsqlite3 - ${SQLite3_LIBRARY}")
+IMPORTED targets
+^^^^^^^^^^^^^^^^
 
-    include( FindPackageHandleStandardArgs )
-    FIND_PACKAGE_HANDLE_STANDARD_ARGS( SQLite3 SQLite3_INCLUDE_DIR SQLite3_LIBRARY )
-    if( SQLITE3_FOUND )
-        # Determine the SQLite version found
-        file( READ ${SQLite3_INCLUDE_DIR}/sqlite3.h SQLite3_INCLUDE_FILE )
-        string( REGEX REPLACE
-                ".*# *define *SQLITE_VERSION *\\\"([0-9\\.]+)\\\".*" "\\1"
-                SQLite3_VERSION "${SQLite3_INCLUDE_FILE}" )
-        string( REGEX REPLACE
-                "([0-9]+)\\.[0-9]+\\.[0-9]+" "\\1"
-                SQLite3_VERSION_MAJOR "${SQLite3_VERSION}" )
-        string( REGEX REPLACE
-                "[0-9]+\\.([0-9]+)\\.[0-9]+" "\\1"
-                SQLite3_VERSION_MINOR "${SQLite3_VERSION}" )
-        string( REGEX REPLACE
-                "[0-9]+\\.[0-9]+\\.([0-9])+" "\\1"
-                SQLite3_VERSION_PATCH "${SQLite3_VERSION}" )
+This module defines the following :prop_tgt:`IMPORTED` target:
 
-        # Determine version compatibility
-        if( SQLite3_FIND_VERSION )
-            if( SQLite3_FIND_VERSION_EXACT )
-                if( SQLite3_FIND_VERSION VERSION_EQUAL SQLite3_VERSION )
-                    message( STATUS "SQLite3 version: ${SQLite3_VERSION}" )
-                    set( SQLite3_FOUND TRUE )
-                endif()
-            else()
-                if( (SQLite3_FIND_VERSION VERSION_LESS  SQLite3_VERSION) OR
-                (SQLite3_FIND_VERSION VERSION_EQUAL SQLite3_VERSION) )
-                    message( STATUS "SQLite3 version: ${SQLite3_VERSION}" )
-                    set( SQLite3_FOUND TRUE )
-                endif()
-            endif()
-        else()
-            message( STATUS "SQLite3 version: ${SQLite3_VERSION}" )
-            set( SQLite3_FOUND TRUE )
-        endif()
-        unset( SQLITE3_FOUND )
+``SQLite::SQLite3``
+
+Result variables
+^^^^^^^^^^^^^^^^
+
+This module will set the following variables if found:
+
+``SQLite3_INCLUDE_DIRS``
+  where to find sqlite3.h, etc.
+``SQLite3_LIBRARIES``
+  the libraries to link against to use SQLite3.
+``SQLite3_VERSION``
+  version of the SQLite3 library found
+``SQLite3_FOUND``
+  TRUE if found
+
+#]=======================================================================]
+
+# Look for the necessary header
+find_path(SQLite3_INCLUDE_DIR NAMES sqlite3.h)
+mark_as_advanced(SQLite3_INCLUDE_DIR)
+
+# Look for the necessary library
+find_library(SQLite3_LIBRARY NAMES sqlite3 sqlite)
+mark_as_advanced(SQLite3_LIBRARY)
+
+# Extract version information from the header file
+if(SQLite3_INCLUDE_DIR)
+    file(STRINGS ${SQLite3_INCLUDE_DIR}/sqlite3.h _ver_line
+            REGEX "^#define SQLITE_VERSION  *\"[0-9]+\\.[0-9]+\\.[0-9]+\""
+            LIMIT_COUNT 1)
+    string(REGEX MATCH "[0-9]+\\.[0-9]+\\.[0-9]+"
+            SQLite3_VERSION "${_ver_line}")
+    unset(_ver_line)
+endif()
+
+include(FindPackageHandleStandardArgs)
+find_package_handle_standard_args(SQLite3
+        REQUIRED_VARS SQLite3_INCLUDE_DIR SQLite3_LIBRARY
+        VERSION_VAR SQLite3_VERSION)
+
+# Create the imported target
+if(SQLite3_FOUND)
+    set(SQLite3_INCLUDE_DIRS ${SQLite3_INCLUDE_DIR})
+    set(SQLite3_LIBRARIES ${SQLite3_LIBRARY})
+    if(NOT TARGET SQLite::SQLite3)
+        add_library(SQLite::SQLite3 UNKNOWN IMPORTED)
+        set_target_properties(SQLite::SQLite3 PROPERTIES
+                IMPORTED_LOCATION             "${SQLite3_LIBRARY}"
+                INTERFACE_INCLUDE_DIRECTORIES "${SQLite3_INCLUDE_DIR}")
     endif()
 endif()
