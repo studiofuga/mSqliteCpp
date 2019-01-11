@@ -53,6 +53,11 @@ if (NOT WIN32)
     target_compile_options(msqlitecpp PRIVATE -Werror)
 endif()
 
+# Workaround the C1001 bug with microsoft compilers
+if (WIN32)
+    target_compile_options(msqlitecpp PUBLIC /permissive-)
+endif()
+
 target_compile_features(msqlitecpp PUBLIC cxx_std_14)
 
 target_compile_definitions(msqlitecpp PRIVATE BUILD_MSQLITECPP)
