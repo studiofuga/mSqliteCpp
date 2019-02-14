@@ -35,7 +35,8 @@ class InsertStatement {
             sqlite::bind(*statement, idx+1, t.value());
             return true;
         }
-        return false;
+        sqlite::bind(*statement, idx+1, nullptr);
+        return true;
     }
 #endif
 
