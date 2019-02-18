@@ -249,3 +249,55 @@ TEST_F(OptionalStatements, Issue6InsertMultipleOptionals)
 }
 
 #endif
+
+TEST_F(OptionalStatements, ReplaceOnConflict)
+{
+    auto createTable = makeCreateTableStatement2(db, "TryInsert", fieldId, fieldText, fieldCount, fieldValue);
+    ASSERT_NO_THROW(createTable.execute());
+
+    auto index = makeCreateUniqueIndexStatement(db, "UniqueIndexTryInsert", "TryInsert", fieldId);
+    index.execute();
+
+    auto insertStatementNormal = makeInsertStatement(fieldId, fieldText, fieldCount, fieldValue);
+
+    ASSERT_NO_THROW(insertStatementNormal.attach(db, "TryInsert"));
+    ASSERT_NO_THROW(insertStatementNormal.insert(1, "some text", 0, 1));
+    ASSERT_THROW(insertStatementNormal.insert(1, "some text", 0, 3), sqlite::SQLiteException);
+
+    auto insertStatementReplace = makeInsertStatement(fieldId, fieldText, fieldCount, fieldValue);
+    insertStatementReplace.replaceOnConflict();
+
+    ASSERT_NO_THROW(insertStatementReplace.attach(db, "TryInsert"));
+    ASSERT_NO_THROW(insertStatementReplace.insert(1, "some text", 0, 3));
+
+    auto select = makeSelectStatement(fieldValue);
+    select.attach(db, "TryInsert");
+    Where<decltype(fieldId)> w;
+    w.attach(select.getStatement(), op::eq(fieldId));
+    select.where(w);
+    select.prepare();
+
+    w.bind(1);
+    int r = 0;
+    select.exec([&r](int v){
+        r = v;
+        return true;
+    });
+
+    EXPECT_EQ(r, 3);
+
+    auto insertStatementIgnore = makeInsertStatement(fieldId, fieldText, fieldCount, fieldValue);
+    insertStatementIgnore.ignoreOnConflict();
+
+    ASSERT_NO_THROW(insertStatementIgnore.attach(db, "TryInsert"));
+    ASSERT_NO_THROW(insertStatementIgnore.insert(1, "some text", 0, 3000));
+
+    w.bind(1);
+    r = 0;
+    select.exec([&r](int v){
+        r = v;
+        return true;
+    });
+
+    EXPECT_EQ(r, 3);
+}

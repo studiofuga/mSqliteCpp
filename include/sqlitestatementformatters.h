@@ -667,6 +667,11 @@ public:
         mAction = "INSERT OR REPLACE ";
     }
 
+    void doIgnoreOnConflict()
+    {
+        mAction = "INSERT OR IGNORE ";
+    }
+
     std::string string() const override
     {
         std::ostringstream ss;

@@ -20,7 +20,10 @@ class InsertStatement {
     std::shared_ptr<SQLiteStorage> db;
     std::shared_ptr<SQLiteStatement> statement;
     std::string tablename;
-    bool do_replace = false;
+    enum class Action {
+        NoAction, Replace, Ignore
+    };
+    Action conflictAction = Action::NoAction;
 
     template <typename T>
     bool bindValue(int idx, const T& t) {
@@ -67,15 +70,17 @@ public:
     void replaceOnConflict()
     {
         if (statement) {
-            throw std::logic_error("Cannot call InsertStatement::doReplace() after InsertStatement::Attach()");
+            throw std::logic_error("Cannot call InsertStatement::replaceOnConflict() after InsertStatement::Attach()");
         }
-        do_replace = true;
+        conflictAction = Action::Replace;
     }
 
-    [[deprecated("use replaceOnConflict() instead")]]
-    void doReplace()
+    void ignoreOnConflict()
     {
-        replaceOnConflict();
+        if (statement) {
+            throw std::logic_error("Cannot call InsertStatement::ignoreOnConflict() after InsertStatement::Attach()");
+        }
+        conflictAction = Action::Ignore;
     }
 
     void attach(std::shared_ptr<SQLiteStorage> dbm, std::string table)
@@ -87,8 +92,10 @@ public:
 
     void prepare() {
         auto insertStatement = statements::Insert(tablename, fields);
-        if (do_replace) {
+        if (conflictAction == Action::Replace) {
             insertStatement.doReplace();
+        } else if(conflictAction == Action::Ignore) {
+            insertStatement.doIgnoreOnConflict();
         }
         statement = std::make_shared<SQLiteStatement>(db, insertStatement);
     }

@@ -82,7 +82,7 @@ void SQLiteStatement::prepare(std::string sql)
     auto db = p->mDb.lock();
     auto r = sqlite3_prepare_v2(db->handle(), sql.c_str(), -1, &p->stmt, nullptr);
     if (r != SQLITE_OK)
-        throw SQLiteException(db->handle());
+        throw SQLiteException(db->handle(), sql);
 }
 
 void SQLiteStatement::bind(size_t idx, std::string value)
