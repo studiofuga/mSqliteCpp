@@ -82,8 +82,7 @@ Temporary Items
 .idea/**/libraries
 
 # CMake
-cmake-build-debug/
-cmake-build-release/
+cmake-build-*/
 
 # Mongo Explorer plugin:
 .idea/**/mongoSettings.xml
@@ -120,3 +119,7 @@ fabric.properties
 ###
 
 tests/googletest
+
+# Debian
+
+debian/.debhelper
