@@ -384,6 +384,100 @@ TEST_F(Statements, selectStatements1)
     ASSERT_EQ(count, 3);
 }
 
+TEST_F(Statements, selectStatementsMultipleBind)
+{
+    auto fldId = sqlite::makeFieldDef("id", sqlite::FieldType::Integer()).notNull();
+    auto fldName = sqlite::makeFieldDef("name", sqlite::FieldType::Text()).notNull();
+    auto fldValue = sqlite::makeFieldDef("value", sqlite::FieldType::Real()).notNull();
+
+    {
+        SQLiteStatement stmt(db,
+                             "CREATE TABLE sample (id INTEGER PRIMARY KEY, name TEXT NOT NULL, value DOUBLE NOT NULL)");
+        ASSERT_NO_THROW(stmt.execute());
+    }
+
+    auto insertStatement = sqlite::makeInsertStatement(fldId, fldName, fldValue);
+    ASSERT_NO_THROW(insertStatement.attach(db, "sample"));
+    ASSERT_NO_THROW(insertStatement.insert(1, std::string{"first"}, 10.0));
+    ASSERT_NO_THROW(insertStatement.insert(2, std::string{"sec"}, 20.0));
+    ASSERT_NO_THROW(insertStatement.insert(3, std::string{"third"}, 30.0));
+
+    SelectStatement<
+            decltype(fldId), decltype(fldValue)>
+            selectStatement(fldId, fldValue);
+
+    ASSERT_NO_THROW(selectStatement.attach(db, "sample"));
+
+    Where<decltype(fldId)> where(selectStatement.getStatement(), "id IN (?,?)");
+    ASSERT_NO_THROW(selectStatement.where(where));
+    ASSERT_NO_THROW(selectStatement.prepare());
+
+    ASSERT_NO_THROW(where.bind(1,2));
+
+    std::vector<std::tuple<int,double>> r;
+    EXPECT_NO_THROW(selectStatement.exec([&r](int rn, double rv) {
+        r.push_back(std::make_tuple(rn,rv));
+        return true;
+    }));
+
+    EXPECT_EQ(r.size(), 2);
+    EXPECT_EQ(std::get<0>(r[0]), 1);
+    EXPECT_EQ(std::get<0>(r[1]), 2);
+}
+
+TEST_F(Statements, selectStatementsMultipleBindDynamic)
+{
+    auto fldId = sqlite::makeFieldDef("id", sqlite::FieldType::Integer()).notNull();
+    auto fldName = sqlite::makeFieldDef("name", sqlite::FieldType::Text()).notNull();
+    auto fldValue = sqlite::makeFieldDef("value", sqlite::FieldType::Real()).notNull();
+
+    {
+        SQLiteStatement stmt(db,
+                             "CREATE TABLE sample (id INTEGER PRIMARY KEY, name TEXT NOT NULL, value DOUBLE NOT NULL)");
+        ASSERT_NO_THROW(stmt.execute());
+    }
+
+    auto insertStatement = sqlite::makeInsertStatement(fldId, fldName, fldValue);
+    ASSERT_NO_THROW(insertStatement.attach(db, "sample"));
+    ASSERT_NO_THROW(insertStatement.insert(1, std::string{"first"}, 10.0));
+    ASSERT_NO_THROW(insertStatement.insert(2, std::string{"sec"}, 20.0));
+    ASSERT_NO_THROW(insertStatement.insert(3, std::string{"third"}, 30.0));
+
+    SelectStatement<
+            decltype(fldId), decltype(fldValue)>
+            selectStatement(fldId, fldValue);
+
+    ASSERT_NO_THROW(selectStatement.attach(db, "sample"));
+
+    std::vector<int> whereValues {1,2,3};
+
+    std::ostringstream ss;
+    ss << "id IN (?";
+    for (int i = 0; i < whereValues.size()-1; ++i) {
+        ss << ",?";
+    }
+    ss << ")";
+
+    Where<decltype(fldId)> where(selectStatement.getStatement(), ss.str());
+    ASSERT_NO_THROW(selectStatement.where(where));
+    ASSERT_NO_THROW(selectStatement.prepare());
+
+    for (size_t i = 0; i < whereValues.size(); ++i) {
+        where.bindN(i+1, whereValues[i]);
+    }
+
+    std::vector<std::tuple<int,double>> r;
+    EXPECT_NO_THROW(selectStatement.exec([&r](int rn, double rv) {
+        r.push_back(std::make_tuple(rn,rv));
+        return true;
+    }));
+
+    EXPECT_EQ(r.size(), 3);
+    EXPECT_EQ(std::get<0>(r[0]), 1);
+    EXPECT_EQ(std::get<0>(r[1]), 2);
+    EXPECT_EQ(std::get<0>(r[2]), 3);
+}
+
 TEST_F(Statements, selectStatementsWhere)
 {
     std::string table = "sample";
@@ -649,6 +743,7 @@ TEST(SelectStatementsWithDef, selectWithDefaultValues)
     EXPECT_EQ(name, "(null)");
     EXPECT_EQ(value, -1.5);
 }
+
 
 TEST_F(SelectStatements, join)
 {

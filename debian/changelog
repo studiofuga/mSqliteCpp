@@ -1,3 +1,9 @@
+msqlitecpp (0.9.5) UNRELEASED; urgency=medium
+
+  * Added bindN function to Select Statement to allow dynamic queries
+
+ -- Federico Fuga <fuga@studiofuga.com>  Tue, 09 Apr 2019 12:42:15 +0200
+
 msqlitecpp (0.9.4) unstable; urgency=medium
 
   * Initial Release.

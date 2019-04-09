@@ -59,6 +59,11 @@ public:
     {
         bindImpl<0>(std::make_tuple(t...));
     }
+
+    template<typename V>
+    void bindN(size_t index, V v) {
+        statement->bind(index, v);
+    }
 };
 
 
