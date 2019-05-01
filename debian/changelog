@@ -1,8 +1,15 @@
-msqlitecpp (0.9.5) UNRELEASED; urgency=medium
+msqlitecpp (0.9.6) bionic; urgency=medium
 
-  * Added bindN function to Select Statement to allow dynamic queries
+  * Added "Order By" Clause on Select
+  * New Version 0.9.6
 
- -- Federico Fuga <fuga@studiofuga.com>  Tue, 09 Apr 2019 12:42:15 +0200
+ -- Federico Fuga <fuga@studiofuga.com>  Wed, 01 May 2019 14:29:12 +0200
+
+msqlitecpp (0.9.5) bionic; urgency=medium
+
+  * Added bindN function to Select Statement to allow dynamic queries 
+
+ -- Federico Fuga <fuga@studiofuga.com>  Wed, 01 May 2019 14:28:34 +0200
 
 msqlitecpp (0.9.4) unstable; urgency=medium
 

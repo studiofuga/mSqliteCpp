@@ -6,12 +6,14 @@
 #define SQLITE_SQLITESTATEMENTFORMATTERS_H
 
 #include "sqlitefielddef.h"
-#include <sstream>
-#include <tuple>
+#include "sqlconstants.h"
 
 #if defined(WITH_BOOST)
 #include "boost/optional.hpp"
 #endif
+
+#include <sstream>
+#include <tuple>
 
 namespace sqlite {
 namespace statements {
@@ -403,6 +405,7 @@ class Select : public StatementFormatter {
     std::string mSelectOp;
     std::string mWhere;
     std::string mGroupBy;
+    std::string mOrderBy;
 public:
     Select() = default;
 
@@ -435,6 +438,36 @@ public:
         return *this;
     }
 
+    template<typename ...FLDS>
+    Select &orderBy(FLDS... flds)
+    {
+        mOrderBy = " ORDER BY " + unpackFieldNames(flds...);
+        return *this;
+    }
+
+    Select &orderBy()
+    {
+        mOrderBy = "";
+        return *this;
+    }
+
+    Select &orderBy(Ordering ordering)
+    {
+        if (mOrderBy.empty()) {
+            throw std::runtime_error("Called OrderBy(Ordering) on empty Order By Clause");
+        }
+        switch (ordering) {
+            case Ordering::ASC:
+                mOrderBy += " ASC";
+                break;
+            case Ordering::DESC:
+                mOrderBy += " DESC";
+                break;
+        }
+        return *this;
+    }
+
+
     Select &where(std::string condition)
     {
         if (condition.empty()) {
@@ -448,7 +481,7 @@ public:
     std::string string() const override
     {
         std::ostringstream ss;
-        ss << mSelectOp << mSelectBase << mWhere << mGroupBy << "";
+        ss << mSelectOp << mSelectBase << mWhere << mGroupBy << mOrderBy << "";
         return ss.str();
     }
 

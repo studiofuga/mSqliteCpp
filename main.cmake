@@ -26,7 +26,7 @@ set(PUB_HEADERS
         include/sqlitetable.h
         include/sqlitetransaction.h
         include/updatestatement.h
-        )
+        include/sqlconstants.h)
 
 ## Target setup
 

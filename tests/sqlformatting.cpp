@@ -108,6 +108,51 @@ TEST(SqlFormatting, select)
     }
 }
 
+TEST(SqlFormatting, selectOrdering)
+{
+    auto db = std::make_shared<sqlite::SQLiteStorage>(":memory:");
+    db->open();
+
+    auto fldId = sqlite::makeFieldDef("id", sqlite::FieldType::Integer());
+    auto fldName = sqlite::makeFieldDef("name", sqlite::FieldType::Text());
+    auto fldValue = sqlite::makeFieldDef("value", sqlite::FieldType::Real());
+
+    sqlite::SQLiteTable table(db, "tbl");
+    table.create(std::make_tuple(fldId, fldName, fldValue));
+
+    {
+        sqlite::statements::Select select("tbl", fldId, fldName, fldValue);
+        select.orderBy(fldId);
+        EXPECT_EQ(select.string(), "SELECT id,name,value FROM tbl ORDER BY id");
+        EXPECT_NO_THROW(sqlite::SQLiteStatement(db, select));
+    }
+
+    {
+        sqlite::statements::Select select("tbl", fldId, fldName, fldValue);
+        select.orderBy(fldId, fldName);
+        EXPECT_EQ(select.string(), "SELECT id,name,value FROM tbl ORDER BY id,name");
+        EXPECT_NO_THROW(sqlite::SQLiteStatement(db, select));
+    }
+
+    {
+        sqlite::statements::Select select("tbl", fldId, fldName, fldValue);
+        select.orderBy(fldId, fldName).orderBy(sqlite::Ordering::ASC);
+        EXPECT_EQ(select.string(), "SELECT id,name,value FROM tbl ORDER BY id,name ASC");
+        EXPECT_NO_THROW(sqlite::SQLiteStatement(db, select));
+    }
+
+    {
+        sqlite::statements::Select select("tbl", fldId, fldName, fldValue);
+        select.orderBy(fldId, fldName).orderBy(sqlite::Ordering::DESC);
+        EXPECT_EQ(select.string(), "SELECT id,name,value FROM tbl ORDER BY id,name DESC");
+        EXPECT_NO_THROW(sqlite::SQLiteStatement(db, select));
+
+        select.orderBy();
+        EXPECT_EQ(select.string(), "SELECT id,name,value FROM tbl");
+        EXPECT_NO_THROW(sqlite::SQLiteStatement(db, select));
+    }
+}
+
 TEST(SqlFormatting, insert)
 {
     auto fldId = sqlite::makeFieldDef("id", sqlite::FieldType::Integer());

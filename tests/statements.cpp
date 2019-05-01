@@ -384,6 +384,103 @@ TEST_F(Statements, selectStatements1)
     ASSERT_EQ(count, 3);
 }
 
+TEST_F(Statements, selectStatementsSorting)
+{
+    auto fldId = sqlite::makeFieldDef("id", sqlite::FieldType::Integer()).notNull();
+    auto fldNum = sqlite::makeFieldDef("num", sqlite::FieldType::Integer()).notNull();
+    {
+        SQLiteStatement stmt(db,
+                             "CREATE TABLE sample (id INTEGER, num INTEGER)");
+        ASSERT_NO_THROW(stmt.execute());
+    }
+
+    auto insertStatement = sqlite::makeInsertStatement(fldId, fldNum);
+    ASSERT_NO_THROW(insertStatement.attach(db, "sample"));
+    ASSERT_NO_THROW(insertStatement.insert(3, 4));
+    ASSERT_NO_THROW(insertStatement.insert(1, 1));
+    ASSERT_NO_THROW(insertStatement.insert(2, 2));
+
+    SelectStatement<decltype(fldId)> selectStatement(fldId);
+
+    ASSERT_NO_THROW(selectStatement.attach(db, "sample"));
+    ASSERT_NO_THROW(selectStatement.orderBy(fldId).orderBy(Ordering::ASC));
+    ASSERT_NO_THROW(selectStatement.prepare());
+
+    std::vector<int> in;
+    ASSERT_NO_THROW(selectStatement.exec([&in](int rn) {
+        in.push_back(rn);
+        return true;
+    }));
+
+    ASSERT_EQ(in.size(), 3);
+    EXPECT_EQ(in.at(0), 1);
+    EXPECT_EQ(in.at(1), 2);
+    EXPECT_EQ(in.at(2), 3);
+
+    ASSERT_NO_THROW(selectStatement.orderBy(fldId).orderBy(Ordering::DESC));
+    ASSERT_NO_THROW(selectStatement.prepare());
+
+    in.clear();
+    ASSERT_NO_THROW(selectStatement.exec([&in](int rn) {
+        in.push_back(rn);
+        return true;
+    }));
+
+    ASSERT_EQ(in.size(), 3);
+    EXPECT_EQ(in.at(0), 3);
+    EXPECT_EQ(in.at(1), 2);
+    EXPECT_EQ(in.at(2), 1);
+
+    ASSERT_NO_THROW(selectStatement.orderBy(fldId));
+    ASSERT_NO_THROW(selectStatement.prepare());
+
+    in.clear();
+    ASSERT_NO_THROW(selectStatement.exec([&in](int rn) {
+        in.push_back(rn);
+        return true;
+    }));
+
+    ASSERT_EQ(in.size(), 3);
+    EXPECT_EQ(in.at(0), 1);
+    EXPECT_EQ(in.at(1), 2);
+    EXPECT_EQ(in.at(2), 3);
+
+    ASSERT_NO_THROW(selectStatement.orderBy());
+    ASSERT_NO_THROW(selectStatement.prepare());
+
+    in.clear();
+    ASSERT_NO_THROW(selectStatement.exec([&in](int rn) {
+        in.push_back(rn);
+        return true;
+    }));
+
+    ASSERT_EQ(in.size(), 3);
+    EXPECT_EQ(in.at(0), 3);
+    EXPECT_EQ(in.at(1), 1);
+    EXPECT_EQ(in.at(2), 2);
+
+    // Multiple sorting
+    ASSERT_NO_THROW(insertStatement.insert(2, 0));
+
+    SelectStatement<decltype(fldId), decltype(fldNum)> selectStatement2(fldId, fldNum);
+
+    ASSERT_NO_THROW(selectStatement2.attach(db, "sample"));
+    ASSERT_NO_THROW(selectStatement2.orderBy(fldId, fldNum).orderBy(Ordering::ASC));
+    ASSERT_NO_THROW(selectStatement2.prepare());
+
+    in.clear();
+    ASSERT_NO_THROW(selectStatement2.exec([&in](int rn, int num) {
+        in.push_back(num);
+        return true;
+    }));
+
+    ASSERT_EQ(in.size(), 4);
+    EXPECT_EQ(in.at(0), 1);
+    EXPECT_EQ(in.at(1), 0);
+    EXPECT_EQ(in.at(2), 2);
+    EXPECT_EQ(in.at(3), 4);
+}
+
 TEST_F(Statements, selectStatementsMultipleBind)
 {
     auto fldId = sqlite::makeFieldDef("id", sqlite::FieldType::Integer()).notNull();

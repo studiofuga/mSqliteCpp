@@ -134,6 +134,25 @@ public:
         sql.where("");
     }
 
+    template<typename ...FLDS>
+    SelectStatement<Fs...> &orderBy(FLDS... flds)
+    {
+        sql.orderBy(flds...);
+        return *this;
+    }
+
+    SelectStatement<Fs...> &orderBy()
+    {
+        sql.orderBy();
+        return *this;
+    }
+
+    SelectStatement<Fs...> &orderBy(Ordering ordering)
+    {
+        sql.orderBy(ordering);
+        return *this;
+    }
+
     SQLiteStatement *getStatement()
     {
         return &statement;
