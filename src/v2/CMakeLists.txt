@@ -12,7 +12,7 @@ set(PUB_HEADERS
         ../../include/msqlitecpp/v2/exceptions.h
         ../../include/msqlitecpp/v2/storage.h
         ../../include/msqlitecpp/v2/statement.h
-        ../../include/msqlitecpp/v2/fields.h)
+        ../../include/msqlitecpp/v2/fields.h ../../include/msqlitecpp/v2/createstatement.h)
 
 ## Target setup
 
