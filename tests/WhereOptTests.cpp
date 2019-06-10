@@ -3,16 +3,16 @@
  * @date 10/07/18
  */
 
-#include "clauses.h"
-#include "operators.h"
+#include "msqlitecpp/clauses.h"
+#include "msqlitecpp/operators.h"
 
 #include <gtest/gtest.h>
-#include <createstatement.h>
-#include <insertstatement.h>
-#include <selectstatement.h>
-#include <deletestatement.h>
-#include <updatestatement.h>
-#include <sqlitefieldsop.h>
+#include <msqlitecpp/createstatement.h>
+#include <msqlitecpp/insertstatement.h>
+#include <msqlitecpp/selectstatement.h>
+#include <msqlitecpp/deletestatement.h>
+#include <msqlitecpp/updatestatement.h>
+#include <msqlitecpp/sqlitefieldsop.h>
 
 using namespace sqlite;
 

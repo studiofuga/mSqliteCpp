@@ -4,9 +4,9 @@
 
 #include <gtest/gtest.h>
 
-#include "sqlitetransaction.h"
-#include "sqlitetable.h"
-#include "sqlitestorage.h"
+#include "msqlitecpp/sqlitetransaction.h"
+#include "msqlitecpp/sqlitetable.h"
+#include "msqlitecpp/sqlitestorage.h"
 
 using namespace sqlite;
 

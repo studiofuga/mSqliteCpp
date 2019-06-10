@@ -5,8 +5,8 @@
 #ifndef SQLITE_CLAUSES_H
 #define SQLITE_CLAUSES_H
 
-#include "sqlitestatement.h"
-#include "operators.h"
+#include "msqlitecpp/sqlitestatement.h"
+#include "msqlitecpp/operators.h"
 
 #include <string>
 

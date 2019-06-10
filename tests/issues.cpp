@@ -4,12 +4,12 @@
 
 #include <gtest/gtest.h>
 
-#include <sqlitestorage.h>
-#include <sqlitetable.h>
-#include <deletestatement.h>
-#include <insertstatement.h>
-#include <selectstatement.h>
-#include <createstatement.h>
+#include <msqlitecpp/sqlitestorage.h>
+#include <msqlitecpp/sqlitetable.h>
+#include <msqlitecpp/deletestatement.h>
+#include <msqlitecpp/insertstatement.h>
+#include <msqlitecpp/selectstatement.h>
+#include <msqlitecpp/createstatement.h>
 
 using namespace sqlite;
 

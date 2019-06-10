@@ -2,16 +2,16 @@
 // Created by Federico Fuga on 19/12/17.
 //
 
-#include "insertstatement.h"
-#include "deletestatement.h"
-#include "sqlitestorage.h"
-#include "sqlitestatement.h"
-#include "selectstatement.h"
-#include "createstatement.h"
+#include "msqlitecpp/insertstatement.h"
+#include "msqlitecpp/deletestatement.h"
+#include "msqlitecpp/sqlitestorage.h"
+#include "msqlitecpp/sqlitestatement.h"
+#include "msqlitecpp/selectstatement.h"
+#include "msqlitecpp/createstatement.h"
 
-#include "sqlitestatementformatters.h"
-#include "sqlitefieldsop.h"
-#include "clauses.h"
+#include "msqlitecpp/sqlitestatementformatters.h"
+#include "msqlitecpp/sqlitefieldsop.h"
+#include "msqlitecpp/clauses.h"
 
 #include "gtest/gtest.h"
 

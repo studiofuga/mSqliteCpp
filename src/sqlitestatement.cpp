@@ -2,7 +2,7 @@
 // Created by Federico Fuga on 16/12/17.
 //
 
-#include "sqlitestatement.h"
+#include "msqlitecpp/sqlitestatement.h"
 
 using namespace sqlite;
 

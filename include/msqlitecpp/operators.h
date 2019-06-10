@@ -5,7 +5,7 @@
 #ifndef SQLITE_OPERATORS_H
 #define SQLITE_OPERATORS_H
 
-#include "sqlitefielddef.h"
+#include "msqlitecpp/sqlitefielddef.h"
 
 #if defined(WITH_BOOST)
 #include <boost/optional.hpp>

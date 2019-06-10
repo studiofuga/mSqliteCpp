@@ -11,8 +11,8 @@
 #include <utility>
 
 #include <iostream>
-#include "sqlitestorage.h"
-#include "sqlitestatement.h"
+#include "msqlitecpp/sqlitestorage.h"
+#include "msqlitecpp/sqlitestatement.h"
 
 namespace sqlite {
 

@@ -1,7 +1,7 @@
 #ifndef SQLITETABLE_H
 #define SQLITETABLE_H
 
-#include "msqlitecpp.h"
+#include "msqlitecpp/msqlitecpp.h"
 
 #include <string>
 #include <memory>
@@ -10,8 +10,8 @@
 
 #include <stdexcept>
 
-#include "sqlitestorage.h"
-#include "sqlitefielddef.h"
+#include "msqlitecpp/sqlitestorage.h"
+#include "msqlitecpp/sqlitefielddef.h"
 #include <iostream>
 
 namespace sqlite {

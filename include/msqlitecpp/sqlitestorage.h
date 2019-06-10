@@ -1,7 +1,7 @@
 #ifndef SQLITERESULTSTORAGE_H
 #define SQLITERESULTSTORAGE_H
 
-#include "msqlitecpp.h"
+#include "msqlitecpp/msqlitecpp.h"
 #include "sqlite3.h"
 
 #include <string>

@@ -3,10 +3,10 @@
 //
 
 #include <gtest/gtest.h>
-#include <sqlitestatement.h>
+#include <msqlitecpp/sqlitestatement.h>
 
-#include "sqlitefielddef.h"
-#include "clauses.h"
+#include "msqlitecpp/sqlitefielddef.h"
+#include "msqlitecpp/clauses.h"
 
 using namespace sqlite;
 

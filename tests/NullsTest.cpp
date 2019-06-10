@@ -3,9 +3,9 @@
  * @date 15/06/18
  */
 
-#include "insertstatement.h"
-#include "createstatement.h"
-#include "selectstatement.h"
+#include "msqlitecpp/insertstatement.h"
+#include "msqlitecpp/createstatement.h"
+#include "msqlitecpp/selectstatement.h"
 
 #include <gtest/gtest.h>
 

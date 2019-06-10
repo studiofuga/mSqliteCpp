@@ -5,9 +5,9 @@
 #ifndef SQLITE_UPDATESTATEMENT_H
 #define SQLITE_UPDATESTATEMENT_H
 
-#include "sqlitestorage.h"
-#include "sqlitestatement.h"
-#include "clauses.h"
+#include "msqlitecpp/sqlitestorage.h"
+#include "msqlitecpp/sqlitestatement.h"
+#include "msqlitecpp/clauses.h"
 
 #include <tuple>
 #include <type_traits>

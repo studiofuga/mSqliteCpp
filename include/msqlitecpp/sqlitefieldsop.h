@@ -5,8 +5,8 @@
 #ifndef SQLITE_SQLITEFIELDSOP_H
 #define SQLITE_SQLITEFIELDSOP_H
 
-#include "sqlitefielddef.h"
-#include "sqlformatters_helpers.h"
+#include "msqlitecpp/sqlitefielddef.h"
+#include "msqlitecpp/sqlformatters_helpers.h"
 
 namespace sqlite {
 namespace op {

@@ -6,9 +6,9 @@
 #ifndef SQLITE_INSERTSTATEMENT_H
 #define SQLITE_INSERTSTATEMENT_H
 
-#include "sqlitestorage.h"
-#include "sqlitestatement.h"
-#include "sqlitestatementformatters.h"
+#include "msqlitecpp/sqlitestorage.h"
+#include "msqlitecpp/sqlitestatement.h"
+#include "msqlitecpp/sqlitestatementformatters.h"
 
 #include <cstddef>
 

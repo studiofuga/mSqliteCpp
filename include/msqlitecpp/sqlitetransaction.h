@@ -5,7 +5,7 @@
 #ifndef SQLITE_SQLITETRANSACTION_H
 #define SQLITE_SQLITETRANSACTION_H
 
-#include "msqlitecpp.h"
+#include "msqlitecpp/msqlitecpp.h"
 
 #include <memory>
 

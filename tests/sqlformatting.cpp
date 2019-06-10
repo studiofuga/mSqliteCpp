@@ -3,12 +3,12 @@
 //
 
 #include <gtest/gtest.h>
-#include <sqlitetable.h>
+#include <msqlitecpp/sqlitetable.h>
 
-#include "sqlitefielddef.h"
-#include "sqlitefieldsop.h"
-#include "sqlitestatementformatters.h"
-#include "sqlitestatement.h"
+#include "msqlitecpp/sqlitefielddef.h"
+#include "msqlitecpp/sqlitefieldsop.h"
+#include "msqlitecpp/sqlitestatementformatters.h"
+#include "msqlitecpp/sqlitestatement.h"
 
 TEST(SqlFormatting, fieldOperators)
 {

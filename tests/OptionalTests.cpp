@@ -3,17 +3,17 @@
  * @date 15/06/18
  */
 
-#include "createstatement.h"
-#include "insertstatement.h"
-#include "selectstatement.h"
+#include "msqlitecpp/createstatement.h"
+#include "msqlitecpp/insertstatement.h"
+#include "msqlitecpp/selectstatement.h"
 
 #if defined(WITH_BOOST)
 #include <boost/optional.hpp>
 #endif
 
 #include <gtest/gtest.h>
-#include <clauses.h>
-#include <sqlitefieldsop.h>
+#include <msqlitecpp/clauses.h>
+#include <msqlitecpp/sqlitefieldsop.h>
 
 using namespace sqlite;
 

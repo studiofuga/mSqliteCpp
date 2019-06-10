@@ -5,9 +5,9 @@
 #ifndef SQLITE_SQLITESTATEMENT_H
 #define SQLITE_SQLITESTATEMENT_H
 
-#include "sqlitefielddef.h"
-#include "sqlitestatementformatters.h"
-#include "sqlitestorage.h"
+#include "msqlitecpp/sqlitefielddef.h"
+#include "msqlitecpp/sqlitestatementformatters.h"
+#include "msqlitecpp/sqlitestorage.h"
 
 #include <sqlite3.h>
 

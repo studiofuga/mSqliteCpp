@@ -5,8 +5,8 @@
 #ifndef SQLITE_SQLITESTATEMENTFORMATTERS_H
 #define SQLITE_SQLITESTATEMENTFORMATTERS_H
 
-#include "sqlitefielddef.h"
-#include "sqlconstants.h"
+#include "msqlitecpp/sqlitefielddef.h"
+#include "msqlitecpp/sqlconstants.h"
 
 #if defined(WITH_BOOST)
 #include "boost/optional.hpp"

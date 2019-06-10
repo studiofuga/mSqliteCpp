@@ -6,7 +6,7 @@
 #ifndef SQLITE_SQLFORMATTERS_HELPERS_H
 #define SQLITE_SQLFORMATTERS_HELPERS_H
 
-#include "sqlitefielddef.h"
+#include "msqlitecpp/sqlitefielddef.h"
 
 #include <string>
 

@@ -2,9 +2,9 @@
 // Created by Federico Fuga on 28/11/17.
 //
 
-#include "sqlitetransaction.h"
+#include "msqlitecpp/sqlitetransaction.h"
 
-#include "sqlitestorage.h"
+#include "msqlitecpp/sqlitestorage.h"
 
 using namespace sqlite;
 

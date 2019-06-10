@@ -2,12 +2,12 @@
 // Created by Federico Fuga on 07/04/18.
 //
 
-#include <clauses.h>
-#include <sqlitefieldsop.h>
-#include <createstatement.h>
-#include <selectstatement.h>
-#include "updatestatement.h"
-#include "operators.h"
+#include <msqlitecpp/clauses.h>
+#include <msqlitecpp/sqlitefieldsop.h>
+#include <msqlitecpp/createstatement.h>
+#include <msqlitecpp/selectstatement.h>
+#include "msqlitecpp/updatestatement.h"
+#include "msqlitecpp/operators.h"
 
 #include <gtest/gtest.h>
 

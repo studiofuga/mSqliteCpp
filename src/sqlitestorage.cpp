@@ -1,10 +1,10 @@
 
-#include <sqlitestorage.h>
+#include "msqlitecpp/sqlitestorage.h"
 
-#include "sqlitestorage.h"
-#include "sqlitetable.h"
+#include "msqlitecpp/sqlitestorage.h"
+#include "msqlitecpp/sqlitetable.h"
 
-#include "sqlitestatement.h"
+#include "msqlitecpp/sqlitestatement.h"
 
 #include "utils/make_unique.h"
 

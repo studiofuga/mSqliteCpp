@@ -1,7 +1,7 @@
 #ifndef SQLITEFIELDDEF_H
 #define SQLITEFIELDDEF_H
 
-#include "msqlitecpp.h"
+#include "msqlitecpp/msqlitecpp.h"
 
 #include <string>
 #include <vector>

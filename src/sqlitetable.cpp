@@ -1,11 +1,11 @@
-#include "sqlitetable.h"
+#include "msqlitecpp/sqlitetable.h"
 
-#include "sqlitestorage.h"
+#include "msqlitecpp/sqlitestorage.h"
 #include <sqlite3.h>
 
 #include <sstream>
 #include <iostream>
-#include "sqlitestatement.h"
+#include "msqlitecpp/sqlitestatement.h"
 
 using namespace sqlite;
 

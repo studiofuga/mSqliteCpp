@@ -2,7 +2,7 @@
 // Created by Federico Fuga on 18/06/18.
 //
 
-#include "sqlitestatement.h"
+#include "msqlitecpp/sqlitestatement.h"
 
 template <typename T, typename TAG>
 class StrongType {
@@ -28,9 +28,9 @@ inline void bind (SQLiteStatement &statement, size_t s, const StrongType<T,TAG> 
 }
 }
 
-#include "insertstatement.h"
-#include "createstatement.h"
-#include "selectstatement.h"
+#include "msqlitecpp/insertstatement.h"
+#include "msqlitecpp/createstatement.h"
+#include "msqlitecpp/selectstatement.h"
 
 #include <gtest/gtest.h>
 

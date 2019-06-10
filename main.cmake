@@ -10,23 +10,23 @@ set(SOURCE_FILES
         )
 
 set(PUB_HEADERS
-        include/clauses.h
-        include/createstatement.h
-        include/deletestatement.h
-        include/insertstatement.h
-        include/msqlitecpp.h
-        include/operators.h
-        include/selectstatement.h
-        include/sqlformatters_helpers.h
-        include/sqlitefielddef.h
-        include/sqlitefieldsop.h
-        include/sqlitestatement.h
-        include/sqlitestatementformatters.h
-        include/sqlitestorage.h
-        include/sqlitetable.h
-        include/sqlitetransaction.h
-        include/updatestatement.h
-        include/sqlconstants.h)
+        include/msqlitecpp/clauses.h
+        include/msqlitecpp/createstatement.h
+        include/msqlitecpp/deletestatement.h
+        include/msqlitecpp/insertstatement.h
+        include/msqlitecpp/msqlitecpp.h
+        include/msqlitecpp/operators.h
+        include/msqlitecpp/selectstatement.h
+        include/msqlitecpp/sqlformatters_helpers.h
+        include/msqlitecpp/sqlitefielddef.h
+        include/msqlitecpp/sqlitefieldsop.h
+        include/msqlitecpp/sqlitestatement.h
+        include/msqlitecpp/sqlitestatementformatters.h
+        include/msqlitecpp/sqlitestorage.h
+        include/msqlitecpp/sqlitetable.h
+        include/msqlitecpp/sqlitetransaction.h
+        include/msqlitecpp/updatestatement.h
+        include/msqlitecpp/sqlconstants.h)
 
 ## Target setup
 

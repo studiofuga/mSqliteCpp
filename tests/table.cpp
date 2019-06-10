@@ -3,10 +3,10 @@
 //
 
 #include <gtest/gtest.h>
-#include <sqlitestatement.h>
+#include <msqlitecpp/sqlitestatement.h>
 
-#include "sqlitestorage.h"
-#include "sqlitetable.h"
+#include "msqlitecpp/sqlitestorage.h"
+#include "msqlitecpp/sqlitetable.h"
 
 using namespace sqlite;
 
