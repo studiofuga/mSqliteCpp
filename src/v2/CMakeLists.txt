@@ -3,6 +3,7 @@
 
 set(SOURCE_FILES
         storage.cpp
+        statement.cpp
         ../utils/make_unique.h
         )
 
@@ -10,6 +11,7 @@ set(PUB_HEADERS
         ../../include/msqlitecpp/v2/msqlitecpp.h
         ../../include/msqlitecpp/v2/exceptions.h
         ../../include/msqlitecpp/v2/storage.h
+        ../../include/msqlitecpp/v2/statement.h
         )
 
 ## Target setup

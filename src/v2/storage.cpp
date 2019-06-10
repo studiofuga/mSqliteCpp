@@ -5,6 +5,7 @@
 
 #include "msqlitecpp/v2/storage.h"
 #include "msqlitecpp/v2/exceptions.h"
+#include "msqlitecpp/v2/statement.h"
 
 #include <sqlite3.h>
 #include <set>
@@ -33,7 +34,7 @@ Storage::~Storage() noexcept
     }
 }
 
-Storage Storage::makeInMemory()
+Storage Storage::inMemory()
 {
     return Storage(":memory:");
 }
@@ -79,6 +80,11 @@ sqlite3 *Storage::handle()
 void Storage::setFlag(Storage::Flags flag)
 {
     p->mFlags.insert(flag);
+}
+
+bool Storage::execute(Statement &s)
+{
+    return s.execute(*this);
 }
 
 }

@@ -5,6 +5,7 @@
 
 add_executable(runTestsV2
         storage.cpp
+        statements.cpp
         )
 
 target_include_directories(runTestsV2

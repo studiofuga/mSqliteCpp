@@ -16,6 +16,8 @@ struct sqlite3;
 namespace msqlitecpp {
 namespace v2 {
 
+class Statement;
+
 class EXPORT_MSQLITEV2 Storage {
 public:
     enum class Flags {
@@ -28,7 +30,7 @@ private:
 public:
     explicit Storage(std::string path);
 
-    static Storage makeInMemory();
+    static Storage inMemory();
 
     ~Storage() noexcept;
 
@@ -40,6 +42,7 @@ public:
 
     sqlite3 *handle();
 
+    bool execute(Statement &s);
 };
 
 }

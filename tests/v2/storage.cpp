@@ -11,7 +11,7 @@ using namespace msqlitecpp::v2;
 
 TEST(Storage, createInMemory)
 {
-    auto storage = Storage::makeInMemory();
+    auto storage = Storage::inMemory();
 
     ASSERT_NO_THROW(storage.open());
     ASSERT_NO_THROW(storage.close());
