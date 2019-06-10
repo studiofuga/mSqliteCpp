@@ -2,31 +2,31 @@
 ## Sources Setup
 
 set(SOURCE_FILES
-        v1/sqlitestorage.cpp
-        v1/sqlitetable.cpp
-        v1/sqlitetransaction.cpp
-        v1/sqlitestatement.cpp
-        utils/make_unique.h
+        sqlitestorage.cpp
+        sqlitetable.cpp
+        sqlitetransaction.cpp
+        sqlitestatement.cpp
+        ../utils/make_unique.h
         )
 
 set(PUB_HEADERS
-        ../include/msqlitecpp/v1/clauses.h
-        ../include/msqlitecpp/v1/createstatement.h
-        ../include/msqlitecpp/v1/deletestatement.h
-        ../include/msqlitecpp/v1/insertstatement.h
-        ../include/msqlitecpp/v1/msqlitecpp.h
-        ../include/msqlitecpp/v1/operators.h
-        ../include/msqlitecpp/v1/selectstatement.h
-        ../include/msqlitecpp/v1/sqlformatters_helpers.h
-        ../include/msqlitecpp/v1/sqlitefielddef.h
-        ../include/msqlitecpp/v1/sqlitefieldsop.h
-        ../include/msqlitecpp/v1/sqlitestatement.h
-        ../include/msqlitecpp/v1/sqlitestatementformatters.h
-        ../include/msqlitecpp/v1/sqlitestorage.h
-        ../include/msqlitecpp/v1/sqlitetable.h
-        ../include/msqlitecpp/v1/sqlitetransaction.h
-        ../include/msqlitecpp/v1/updatestatement.h
-        ../include/msqlitecpp/v1/sqlconstants.h)
+        ../../include/msqlitecpp/v1/clauses.h
+        ../../include/msqlitecpp/v1/createstatement.h
+        ../../include/msqlitecpp/v1/deletestatement.h
+        ../../include/msqlitecpp/v1/insertstatement.h
+        ../../include/msqlitecpp/v1/msqlitecpp.h
+        ../../include/msqlitecpp/v1/operators.h
+        ../../include/msqlitecpp/v1/selectstatement.h
+        ../../include/msqlitecpp/v1/sqlformatters_helpers.h
+        ../../include/msqlitecpp/v1/sqlitefielddef.h
+        ../../include/msqlitecpp/v1/sqlitefieldsop.h
+        ../../include/msqlitecpp/v1/sqlitestatement.h
+        ../../include/msqlitecpp/v1/sqlitestatementformatters.h
+        ../../include/msqlitecpp/v1/sqlitestorage.h
+        ../../include/msqlitecpp/v1/sqlitetable.h
+        ../../include/msqlitecpp/v1/sqlitetransaction.h
+        ../../include/msqlitecpp/v1/updatestatement.h
+        ../../include/msqlitecpp/v1/sqlconstants.h)
 
 ## Target setup
 
@@ -42,7 +42,7 @@ set_target_properties(msqlitecpp PROPERTIES
 target_include_directories(msqlitecpp
         PUBLIC
         $<INSTALL_INTERFACE:include>
-        $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/../include>
+        $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/../../include>
         PRIVATE
         ${Boost_INCLUDE_DIRS}
         ${SQLITE_INCLUDE_DIRS}

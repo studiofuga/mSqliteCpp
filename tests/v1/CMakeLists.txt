@@ -2,35 +2,20 @@
 # Testing
 ##############
 
-# Fix problems linking on Windows
-set(gtest_force_shared_crt ON CACHE BOOL "" FORCE)
-
-if (NOT EXISTS ${CMAKE_SOURCE_DIR}/tests/googletest/CMakeLists.txt)
-    set(GTEST_URL https://github.com/google/googletest.git)
-    execute_process(
-            COMMAND git clone ${GTEST_URL}
-            WORKING_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}
-            )
-endif (NOT EXISTS ${CMAKE_SOURCE_DIR}/tests/googletest/CMakeLists.txt)
-
-# This adds another subdirectory, which has 'project(gtest)'.
-add_subdirectory(googletest EXCLUDE_FROM_ALL)
-
-enable_testing()
 
 add_executable(runTests
-        v1/table.cpp
-        v1/transactions.cpp
-        v1/issues.cpp
-        v1/statements.cpp
-        v1/sqlformatting.cpp
-        v1/clauses.cpp
-        v1/updatestatements.cpp
-        v1/OptionalTests.cpp
-        v1/NullsTest.cpp
-        v1/StrongTypeTests.cpp
-        v1/WhereOptTests.cpp
-        v1/TestForeignKeys.cpp)
+        table.cpp
+        transactions.cpp
+        issues.cpp
+        statements.cpp
+        sqlformatting.cpp
+        clauses.cpp
+        updatestatements.cpp
+        OptionalTests.cpp
+        NullsTest.cpp
+        StrongTypeTests.cpp
+        WhereOptTests.cpp
+        TestForeignKeys.cpp)
 
 target_include_directories( runTests
         PRIVATE
