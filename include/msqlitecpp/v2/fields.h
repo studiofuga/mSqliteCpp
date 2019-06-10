@@ -6,6 +6,8 @@
 #ifndef MSQLITECPP_FIELDS_H
 #define MSQLITECPP_FIELDS_H
 
+//#include "msqlitecpp/v2/helpers/formatters.h"
+
 #include <string>
 #include <sstream>
 
@@ -164,6 +166,17 @@ inline std::string Column<ColumnTypes::Text>::sqlType() const
 template<>
 inline std::string Column<ColumnTypes::Real>::sqlType() const
 { return "REAL"; }
+
+/*
+namespace details {
+template<typename Q>
+inline std::string toString(msqlitecpp::v2::Column<Q> t)
+{
+    return t.name();
+}
+
+}
+*/
 
 
 }

@@ -4,7 +4,7 @@
  */
 
 #include "msqlitecpp/v2/storage.h"
-#include "msqlitecpp/v2/statement.h"
+#include "msqlitecpp/v2/createstatement.h"
 #include "msqlitecpp/v2/fields.h"
 #include "msqlitecpp/v2/insertstatement.h"
 
@@ -18,13 +18,13 @@ TEST(InsertStatement, simple)
 
     ASSERT_NO_THROW(db.open());
 
-    auto statement = Statement(db, "CREATE TABLE t (i INTEGER, t TEXT, r REAL);");
-
-    ASSERT_NO_THROW(statement.execute());
-
     Column<ColumnTypes::Integer> colI("i");
     Column<ColumnTypes::Text> colT("t");
     Column<ColumnTypes::Real> colR("r");
+
+    auto statement = makeCreateStatement(db, "t", colI, colT, colR);
+
+    ASSERT_NO_THROW(statement.execute());
 
     auto insertStatement = makeInsertStatement(db, "t", colI, colT, colR);
 

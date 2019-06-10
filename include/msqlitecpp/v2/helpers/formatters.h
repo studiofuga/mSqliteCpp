@@ -6,6 +6,8 @@
 #ifndef MSQLITECPP_FORMATTERS_H
 #define MSQLITECPP_FORMATTERS_H
 
+#include "msqlitecpp/v2/fields.h"
+
 #include <string>
 #include <tuple>
 #include <sstream>
