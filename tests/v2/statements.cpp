@@ -22,6 +22,12 @@ TEST(Statements, executeString)
 
     ASSERT_TRUE(statement.execute(db));
 
+    auto str2 = "CREATE TABLE t2 (i INTEGER, t TEXT, r REAL, b BLOB);";
+
+    ASSERT_NO_THROW(statement.set(str2));
+
+    ASSERT_TRUE(statement.execute(db));
+
     ASSERT_NO_THROW(db.close());
 }
 

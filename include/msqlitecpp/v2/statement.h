@@ -45,6 +45,10 @@ public:
 
     virtual ~Statement();
 
+    void set(char const *sql);
+
+    void set(std::string const &sql);
+
     void bind(size_t idx, std::string value);
 
     void bind(size_t idx, unsigned long long value);
@@ -89,6 +93,8 @@ public:
     bool execute(std::function<bool()> function);
 
     bool execute();
+
+    std::string toString() const;
 };
 
 

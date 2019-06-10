@@ -173,6 +173,8 @@ Statement::QueryResult Statement::executeStep()
 
 bool Statement::execute(std::function<bool()> function)
 {
+    p->prepareIfNecessary();
+
     QueryResult result;
     try {
         while ((result = executeStep(function)) == Statement::QueryResult::Ongoing) {}
@@ -194,6 +196,25 @@ bool Statement::execute(Storage &db)
 {
     p->prepare(db.handle());
     return execute();
+}
+
+void Statement::set(char const *sql)
+{
+    set(std::string(sql));
+}
+
+std::string Statement::toString() const
+{
+    return p->sqlStatement;
+}
+
+void Statement::set(std::string const &sql)
+{
+    p->sqlStatement = sql;
+    if (p->stmt != nullptr) {
+        sqlite3_finalize(p->stmt);
+    }
+    p->stmt = nullptr;
 }
 
 }
