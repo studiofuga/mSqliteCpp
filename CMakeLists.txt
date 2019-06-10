@@ -11,6 +11,7 @@ include(cmake/compileropts.cmake)
 include(cmake/install.cmake)
 
 add_subdirectory(src/v1)
+add_subdirectory(src/v2)
 
 if (ENABLE_TEST)
     # Fix problems linking on Windows
@@ -30,6 +31,7 @@ if (ENABLE_TEST)
     enable_testing()
 
     add_subdirectory(tests/v1)
+    add_subdirectory(tests/v2)
 endif(ENABLE_TEST)
 
 if (ENABLE_PROFILER)
