@@ -1,5 +1,5 @@
 cmake_minimum_required(VERSION 3.8)
-project(msqlitecpp VERSION 0.9.6 LANGUAGES C CXX)
+project(msqlitecpp VERSION 1.0.1 LANGUAGES C CXX)
 
 set(msqlitecpp_DESCRIPTION "a Modern SQLite CPP library")
 
@@ -10,7 +10,7 @@ include(cmake/dependencies.cmake)
 include(cmake/compileropts.cmake)
 include(cmake/install.cmake)
 
-include (main.cmake)
+add_subdirectory(src)
 
 if (ENABLE_TEST)
     enable_testing()

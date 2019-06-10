@@ -2,7 +2,7 @@
 // Created by Federico Fuga on 26/01/18.
 //
 
-#include "msqlitecpp/sqlitetable.h"
+#include "msqlitecpp/v1/sqlitetable.h"
 
 #include <iostream>
 #include <chrono>

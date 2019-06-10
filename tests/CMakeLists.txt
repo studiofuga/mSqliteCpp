@@ -19,17 +19,18 @@ add_subdirectory(googletest EXCLUDE_FROM_ALL)
 enable_testing()
 
 add_executable(runTests
-        table.cpp
-        transactions.cpp
-        issues.cpp
-        statements.cpp
-        sqlformatting.cpp
-        clauses.cpp
-        updatestatements.cpp
-        OptionalTests.cpp
-        NullsTest.cpp
-        StrongTypeTests.cpp
-        WhereOptTests.cpp TestForeignKeys.cpp)
+        v1/table.cpp
+        v1/transactions.cpp
+        v1/issues.cpp
+        v1/statements.cpp
+        v1/sqlformatting.cpp
+        v1/clauses.cpp
+        v1/updatestatements.cpp
+        v1/OptionalTests.cpp
+        v1/NullsTest.cpp
+        v1/StrongTypeTests.cpp
+        v1/WhereOptTests.cpp
+        v1/TestForeignKeys.cpp)
 
 target_include_directories( runTests
         PRIVATE
