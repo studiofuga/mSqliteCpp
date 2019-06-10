@@ -11,11 +11,11 @@ Package: msqlitecpp-dev
 Section: libdevel
 Architecture: any
 Multi-Arch: same
-Depends: msqlitecpp0 (= ${binary:Version}), ${misc:Depends}
+Depends: msqlitecpp1 (= ${binary:Version}), ${misc:Depends}
 Description: A modern SQLite C++ interface
  This is the dev package of msqlitecpp, a library that allows access to msqlite api using C++11.
 
-Package: msqlitecpp0
+Package: msqlitecpp1
 Architecture: any
 Multi-Arch: same
 Depends: ${shlibs:Depends}, ${misc:Depends}
