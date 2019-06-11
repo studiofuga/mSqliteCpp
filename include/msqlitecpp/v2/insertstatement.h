@@ -53,7 +53,7 @@ private:
 };
 
 template<typename ...FIELDS>
-static InsertStatement<FIELDS...> makeInsertStatement(Storage &db, std::string const &tablename, FIELDS... fields)
+InsertStatement<FIELDS...> makeInsertStatement(Storage &db, std::string const &tablename, FIELDS... fields)
 {
     return InsertStatement<FIELDS...>(db, tablename, fields...);
 }

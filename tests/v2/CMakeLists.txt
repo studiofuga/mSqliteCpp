@@ -6,7 +6,7 @@
 add_executable(runTestsV2
         storage.cpp
         statements.cpp
-        insertstatements.cpp fields.cpp createstatement.cpp)
+        insertstatements.cpp fields.cpp createstatement.cpp selectstatements.cpp)
 
 target_include_directories(runTestsV2
         PRIVATE

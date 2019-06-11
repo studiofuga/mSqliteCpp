@@ -8,6 +8,7 @@
 
 #include "msqlitecpp/v2/msqlitecpp.h"
 #include "msqlitecpp/v2/storage.h"
+#include "msqlitecpp/v2/fields.h"
 
 #include "msqlitecpp/utils/spimpl.h"
 
@@ -93,6 +94,29 @@ public:
     bool execute(std::function<bool()> function);
 
     bool execute();
+
+    long long getLongValue(int idx);
+
+    unsigned long long getULongValue(int idx);
+
+    int getIntValue(int idx);
+
+    double getDoubleValue(int idx);
+
+    std::string getStringValue(int idx);
+
+    template<typename T>
+    T get(int idx)
+    {
+        static_assert(sizeof(T) == 0, "Generic version of get is undefined");
+    }
+
+    bool isNull(int idx);
+
+    ColumnTypes::Type columnType(int idx);
+
+    int columnCount();
+
 
     std::string toString() const;
 };

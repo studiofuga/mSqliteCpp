@@ -5,6 +5,7 @@
 
 #include "msqlitecpp/v2/statement.h"
 #include "msqlitecpp/v2/exceptions.h"
+#include "msqlitecpp/v2/fields.h"
 
 #include <sqlite3.h>
 
@@ -216,6 +217,60 @@ void Statement::set(std::string const &sql)
     }
     p->stmt = nullptr;
 }
+
+long long Statement::getLongValue(int idx)
+{
+    return sqlite3_column_int64(p->stmt, idx);
+}
+
+unsigned long long Statement::getULongValue(int idx)
+{
+    return sqlite3_column_int64(p->stmt, idx);
+}
+
+int Statement::getIntValue(int idx)
+{
+    return sqlite3_column_int(p->stmt, idx);
+}
+
+double Statement::getDoubleValue(int idx)
+{
+    return sqlite3_column_double(p->stmt, idx);
+}
+
+std::string Statement::getStringValue(int idx)
+{
+    auto sptr = sqlite3_column_text(p->stmt, idx);
+    auto len = sqlite3_column_bytes(p->stmt, idx);
+    return std::string(sptr, sptr + len);
+}
+
+
+ColumnTypes::Type Statement::columnType(int idx)
+{
+    switch (sqlite3_column_type(p->stmt, idx)) {
+        case SQLITE_TEXT:
+            return ColumnTypes::Type::Text;
+        case SQLITE_INTEGER:
+            return ColumnTypes::Type::Integer;
+        case SQLITE_FLOAT:
+            return ColumnTypes::Type::Real;
+        case SQLITE_BLOB:
+            return ColumnTypes::Type::Blob;
+    }
+    throw std::runtime_error("Unhandled sqlite3 type");
+}
+
+bool Statement::isNull(int idx)
+{
+    return sqlite3_column_type(p->stmt, idx) == SQLITE_NULL;
+}
+
+int Statement::columnCount()
+{
+    return sqlite3_column_count(p->stmt);
+}
+
 
 }
 }

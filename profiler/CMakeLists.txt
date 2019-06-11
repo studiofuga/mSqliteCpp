@@ -1,7 +1,7 @@
 
 add_executable(runProfiler
         profiler.cpp
-        ../include/msqlitecpp/v2/insertstatement.h ../include/msqlitecpp/v2/helpers/formatters.h)
+        ../include/msqlitecpp/v2/insertstatement.h ../include/msqlitecpp/v2/helpers/formatters.h ../include/msqlitecpp/v2/selectstatement.h)
 
 if(UNIX AND NOT APPLE)
     set(EXTRA_LIB pthread)
