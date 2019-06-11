@@ -406,7 +406,36 @@ std::string unpackFieldDefinitions(Ts... def)
 }
 
 
+/// Operators
+
+struct WhereStatement {
+    std::string t;
+
+    WhereStatement(std::string lh, std::string op, std::string rh)
+    {
+        t = lh + " " + op + " :" + rh;
+    }
+
+    WhereStatement(WhereStatement &&lh, std::string op, WhereStatement &&rh)
+    {
+        t = lh.t + " " + op + " " + rh.t;
+    }
+};
+
 }
 }
+
+template<typename T>
+inline msqlitecpp::v2::WhereStatement operator==(msqlitecpp::v2::Column<T> &c, std::string name)
+{
+    return msqlitecpp::v2::WhereStatement(c.name(), "=", name);
+}
+
+inline msqlitecpp::v2::WhereStatement
+operator&&(msqlitecpp::v2::WhereStatement &&w1, msqlitecpp::v2::WhereStatement &&w2)
+{
+    return msqlitecpp::v2::WhereStatement(std::move(w1), "AND", std::move(w2));
+}
+
 
 #endif //MSQLITECPP_FORMATTERS_H

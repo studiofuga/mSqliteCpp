@@ -20,7 +20,10 @@ namespace v2 {
 template<typename ...FIELDS>
 class SelectStatement {
     Statement statement;
+    std::string tableName;
     std::tuple<FIELDS...> fields;
+
+    std::string whereClause;
 
     template<std::size_t I>
     auto getValues()
@@ -40,10 +43,10 @@ class SelectStatement {
 
 
 public:
-    SelectStatement(Storage &db, std::string const &tablename, FIELDS... fieldlist)
-            : statement(db), fields(std::make_tuple(fieldlist...))
+    SelectStatement(Storage &db, std::string const &tn, FIELDS... fieldlist)
+            : statement(db), tableName(tn), fields(std::make_tuple(fieldlist...))
     {
-        statement.set(format(tablename, fields));
+        formatStatement();
     }
 
     std::string toString() const
@@ -59,13 +62,40 @@ public:
         });
     }
 
+    void where()
+    {
+        whereClause.clear();
+        formatStatement();
+    }
+
+    void where(WhereStatement const &s)
+    {
+        whereClause = s.t;
+        formatStatement();
+    }
+
+    template<typename ...VALUES_TYPES>
+    void bind(VALUES_TYPES ... values)
+    {
+        statement.bind(std::make_tuple(values...));
+    }
+
 private:
-    std::string format(std::string const &tablename, std::tuple<FIELDS...> const &fields)
+    void formatStatement()
+    {
+        statement.set(format());
+    }
+
+    std::string format()
     {
         std::ostringstream ss;
 
         ss << "SELECT " << unpackFieldNames(fields)
-           << " FROM " << tablename;
+           << " FROM " << tableName;
+
+        if (!whereClause.empty()) {
+            ss << " WHERE " << whereClause;
+        }
 
         return ss.str();
     }
