@@ -4,8 +4,8 @@ _A modern SQLite C++ interface_
 ## Introduction
 Why this library?
 
-C++ is a strong typed language and the obvious advantage of this is the ability to catch many non-obvious problems at
-compile time.
+C++ is a strong typed language and the very important advantage of this is the ability to catch many non-obvious 
+problems at compile time.
 
 The SQLite C API library somehow try to enforce the strong typing of the database engine by using different functions
 for different types, but all the C++ libraries I've seen till now don't make any effort to force strong types at user
@@ -19,13 +19,25 @@ Strong types are used in different context:
 - When running queries (insert, select), because there should be a strict relation between the fields selected and the
 type returned by the query / passed to the insert
 
-## PLEASE NOTE ##
+## V1 vs V2
 
-At the time of writing, due to a probable bug in the compiler, it is NOT possible to compile the library under
-Microsoft Visual Studio with versions 15.8 or later.
+There are two versions of the API.
 
-We're waiting for a fix from Microsoft. For the moment, use any previous version of the compiler, for example, it is
-known that 15.6 and 15.5 work fine. 
+V1 is my first attempt to implement the intended behaviour. It is a complete but pretty messed set of classes, 
+where I was trying to understand how was the best way to achieve my objective of creating a useful and 
+flexible library of classes. It uses metaprogramming and classic C++ approach.
+
+It implements CREATE TABLE/INDEX, INSERT INTO, SELECT, DELETE and UPDATE sql clauses but the use is sometimes difficult
+and there are may different approach for the same function. Though it is used in some production project, I wouldn't 
+suggest to use it.
+
+V2 is the NEW API. It is a pretty new approach to the problem, I'm using metaprogramming and still classic c++ to 
+encapsulate the sqlite functions. I'm keeping the good parts of the old API, removing the redundant and verbose
+functions, and it will be official API. This documentation will cover only the V2 Api. V1 will be removed and 
+abandoned one day.
+
+Both apis can be installed side by side. For the moment, two libraries will be built, perhaps I'll unify them one day,
+or perhaps no, we'll see. Headers are well separed in proper subdirectories. You can use both safely. 
 
 ## Usage
 Examples can be found in the `tests` directory. Below are a few examples:
@@ -33,36 +45,47 @@ Examples can be found in the `tests` directory. Below are a few examples:
 ### Creating a table
 
 ```
-    auto db = std::make_shared<SQLiteStorage>(":memory:");
-    db->open();
-    auto fldId = makeFieldDef("id", FieldType::Integer()).primaryKey().autoincrement();
-    auto fldName = makeFieldDef("name", FieldType::Text());
-    auto fldCount = makeFieldDef("count", FieldType::Integer());
-    auto tableDefinition = std::make_tuple(
-            fldId,
-            fldName,
-            fldCount
-    );
+    char const *SelectStatements::tableName = "t";
 
-    auto table = SQLiteTable::create(db, "tableName", tableDefinition));
+    Column<ColumnTypes::Integer> int1{"field1"};
+    Column<ColumnTypes::Integer> int2{"field2"};
+    Column<ColumnTypes::Text> text{"textfield"};
+
+    auto db = Storage::inMemory();
+    makeCreateStatement(db, tableName, int1, int2, text).execute();
 ```
 
-### Querying a table
+### Inserting values
 
 ```
-    std::vector<Record> r;
-    SQLiteTable::query(std::make_tuple(fldName, fldCount), [&r](std::string name, int value) {
-        r.push_back(Record{name, value});
+    auto insertStatement = makeInsertStatement(db, tableName, int1, int2, text);
+    
+    insertStatement.insert(1, 1, "1-1");
+    insertStatement.insert(1, 2, "1-2");
+    insertStatement.insert(2, 1, "2-1");    
+```
+
+### Executing queries with Select
+
+```
+    auto statement = makeSelectStatement(db, tableName, int1, int2, text);
+    size_t count = 0;
+    statement.execute([&count](int i1, int i2, std::string t) {
+        ++count;
+        return true;
     });
 ```
 
 ### Querying a table, filtering with WHERE clause
 
 ```
-    auto tb = std::make_tuple(fldName, fldCount);
-    auto where = std::make_tuple(fldCount.assign(100));
-    int cnt = 0;
-    table.query(tb, where, [&r](std::string name, int value) { ++cnt; }));
+    auto whereClause = (int1 == "x" && int2 == "y");
+
+    select.where(whereClause);
+    select.bind(1,1);
+    statement.execute([&count](int i1, int i2, std::string t) { 
+        //...
+    });
 ```
 
 ## Building
@@ -80,4 +103,4 @@ The default is On
 - ENABLE_CODECOVERAGE: compile the library with gcov support. Default is Off
 
 ## License
-The library is released under the BSD 2-Clause license. See the LICENSE file for details.
+The library is released under the BSD 3-Clause license. See the LICENSE file for details.
