@@ -27,7 +27,6 @@ public:
     SelectStatements()
             : db(Storage::inMemory())
     {
-        db.open();
         makeCreateStatement(db, tableName, int1, int2, text).execute();
 
         auto insertStatement = makeInsertStatement(db, tableName, int1, int2, text);

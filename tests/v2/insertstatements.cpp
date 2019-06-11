@@ -16,8 +16,6 @@ TEST(InsertStatement, simple)
 {
     auto db = Storage::inMemory();
 
-    ASSERT_NO_THROW(db.open());
-
     Column<ColumnTypes::Integer> colI("i");
     Column<ColumnTypes::Text> colT("t");
     Column<ColumnTypes::Real> colR("r");

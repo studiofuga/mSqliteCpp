@@ -21,10 +21,12 @@ struct Storage::Impl {
     std::set<Flags> mFlags;
 };
 
-Storage::Storage(std::string path)
+Storage::Storage(std::string path, OpenMode openMode)
         : p(spimpl::make_impl<Impl>())
 {
-
+    if (openMode == OpenMode::ImmediateOpen) {
+        open();
+    }
 }
 
 Storage::~Storage() noexcept
@@ -34,13 +36,18 @@ Storage::~Storage() noexcept
     }
 }
 
-Storage Storage::inMemory()
+Storage Storage::inMemory(OpenMode openMode)
 {
-    return Storage(":memory:");
+    return Storage(":memory:", openMode);
 }
 
-bool Storage::open()
+void Storage::open()
 {
+    if (p->mDb != nullptr) {
+        // already open, return.
+        return;
+    }
+
     auto r = sqlite3_open_v2(p->dbPath.c_str(), &p->mDb,
                              SQLITE_OPEN_FULLMUTEX | SQLITE_OPEN_READWRITE | SQLITE_OPEN_CREATE,
                              nullptr);
@@ -48,6 +55,19 @@ bool Storage::open()
         throw Exception(p->mDb);
     }
     sqlite3_busy_timeout(p->mDb, 1000);
+
+    updateFlags();
+}
+
+void Storage::close()
+{
+    sqlite3_close(p->mDb);
+    p->mDb = nullptr;
+}
+
+void Storage::updateFlags()
+{
+    int r;
 
     for (auto &flag : p->mFlags) {
         switch (flag) {
@@ -61,15 +81,6 @@ bool Storage::open()
                 throw std::logic_error("Unhandled case for flag");
         }
     }
-
-    return true;
-}
-
-bool Storage::close()
-{
-    sqlite3_close(p->mDb);
-    p->mDb = nullptr;
-    return true;
 }
 
 sqlite3 *Storage::handle()
@@ -80,6 +91,14 @@ sqlite3 *Storage::handle()
 void Storage::setFlag(Storage::Flags flag)
 {
     p->mFlags.insert(flag);
+    if (isOpen()) {
+        updateFlags();
+    }
+}
+
+bool Storage::isOpen()
+{
+    return p->mDb != nullptr;
 }
 
 bool Storage::execute(Statement &s)

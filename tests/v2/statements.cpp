@@ -16,8 +16,6 @@ TEST(Statements, executeString)
 
     auto db = Storage::inMemory();
 
-    ASSERT_NO_THROW(db.open());
-
     auto statement = Statement(str);
 
     ASSERT_TRUE(statement.execute(db));

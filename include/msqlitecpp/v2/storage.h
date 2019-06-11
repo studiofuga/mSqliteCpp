@@ -24,21 +24,29 @@ public:
         EnforceForeignKeys
     };
 
+    enum class OpenMode {
+        ImmediateOpen, DelayedOpen
+    };
+
 private:
     struct Impl;
     spimpl::impl_ptr<Impl> p;
-public:
-    explicit Storage(std::string path);
 
-    static Storage inMemory();
+    void updateFlags();
+public:
+    explicit Storage(std::string path, OpenMode openMode = OpenMode::ImmediateOpen);
+
+    static Storage inMemory(OpenMode openMode = OpenMode::ImmediateOpen);
 
     ~Storage() noexcept;
 
     void setFlag(Flags);
 
-    bool open();
+    void open();
 
-    bool close();
+    void close();
+
+    bool isOpen();
 
     sqlite3 *handle();
 
