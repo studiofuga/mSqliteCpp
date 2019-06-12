@@ -17,11 +17,11 @@
 
 using namespace sqlite;
 
-class StatementsV1 : public testing::Test {
+class V1Statements : public testing::Test {
 protected:
     std::shared_ptr<SQLiteStorage> db;
 public:
-    StatementsV1()
+    V1Statements()
             : fldId("id", sqlite::NotNull),
               fldName("name", sqlite::NotNull),
               fldValue("v", sqlite::NotNull)
@@ -35,7 +35,7 @@ public:
     sqlite::FieldDef<sqlite::FieldType::Real> fldValue;
 };
 
-TEST_F(StatementsV1, CreateTable)
+TEST_F(V1Statements, CreateTable)
 {
     CreateTableStatement<decltype(fldId), decltype(fldName), decltype(fldValue)> create(db, "sample", fldId, fldName,
                                                                                         fldValue);
@@ -55,7 +55,7 @@ TEST_F(StatementsV1, CreateTable)
 
 }
 
-TEST_F(StatementsV1, CreateTableWithConstraint)
+TEST_F(V1Statements, CreateTableWithConstraint)
 {
     CreateTableStatement<decltype(fldId), decltype(fldName), decltype(fldValue)> c1(db, "withunique", fldId, fldName,
                                                                                     fldValue);
@@ -73,7 +73,7 @@ TEST_F(StatementsV1, CreateTableWithConstraint)
 
 }
 
-TEST_F(StatementsV1, MakeCreateTableStatementOpt1)
+TEST_F(V1Statements, MakeCreateTableStatementOpt1)
 {
     auto createTable = makeCreateTableStatement(fldId, fldName, fldValue);
     createTable.attach(db, "make1");
@@ -81,13 +81,13 @@ TEST_F(StatementsV1, MakeCreateTableStatementOpt1)
     ASSERT_NO_THROW(createTable.execute());
 }
 
-TEST_F(StatementsV1, MakeCreateTableStatementOpt2)
+TEST_F(V1Statements, MakeCreateTableStatementOpt2)
 {
     auto createTable = makeCreateTableStatement2(db, "make2", fldId, fldName, fldValue);
     ASSERT_NO_THROW(createTable.execute());
 }
 
-TEST_F(StatementsV1, FixCreateTableInvertedAttachConstraint)
+TEST_F(V1Statements, FixCreateTableInvertedAttachConstraint)
 {
     CreateTableStatement<decltype(fldId), decltype(fldName), decltype(fldValue)> create(fldId, fldName,
                                                                                         fldValue);
@@ -117,7 +117,7 @@ TEST_F(StatementsV1, FixCreateTableInvertedAttachConstraint)
 }
 
 
-TEST_F(StatementsV1, FixCreateTableMultipleConstraint)
+TEST_F(V1Statements, FixCreateTableMultipleConstraint)
 {
     CreateTableStatement<decltype(fldId), decltype(fldName), decltype(fldValue)> create(fldId, fldName,
                                                                                         fldValue);
@@ -135,7 +135,7 @@ TEST_F(StatementsV1, FixCreateTableMultipleConstraint)
     );
 }
 
-TEST_F(StatementsV1, createIndex)
+TEST_F(V1Statements, createIndex)
 {
     CreateTableStatement<decltype(fldId), decltype(fldName), decltype(fldValue)> create(fldId, fldName,
                                                                                         fldValue);
@@ -162,7 +162,7 @@ TEST_F(StatementsV1, createIndex)
     ASSERT_NO_THROW(uq.execute());
 }
 
-TEST_F(StatementsV1, create)
+TEST_F(V1Statements, create)
 {
     {
         SQLiteStatement stmt(db, "CREATE TABLE sample (id INTEGER, name TEXT, v DOUBLE)");
@@ -203,7 +203,7 @@ TEST_F(StatementsV1, create)
     }
 }
 
-TEST_F(StatementsV1, typedCreate)
+TEST_F(V1Statements, typedCreate)
 {
     auto fldId = sqlite::makeFieldDef("id", sqlite::FieldType::Integer()).notNull();
     auto fldName = sqlite::makeFieldDef("name", sqlite::FieldType::Text()).notNull();
@@ -227,7 +227,7 @@ TEST_F(StatementsV1, typedCreate)
     ASSERT_NO_THROW(insertOrReplaceStatement.insert(1, std::string{"First Again"}, 1.0));
 }
 
-TEST_F(StatementsV1, statementExecuteFail)
+TEST_F(V1Statements, statementExecuteFail)
 {
     SQLiteStatement stmt(db,
                          "CREATE TABLE sample (id INTEGER PRIMARY KEY, name TEXT)");
@@ -254,7 +254,7 @@ TEST_F(StatementsV1, statementExecuteFail)
 
 }
 
-TEST_F(StatementsV1, insertFromQuery)
+TEST_F(V1Statements, insertFromQuery)
 {
     SQLiteStatement stmt(db,
                          "CREATE TABLE sample (id INTEGER PRIMARY KEY, name TEXT)");
@@ -278,7 +278,7 @@ TEST_F(StatementsV1, insertFromQuery)
     ASSERT_NO_THROW(stmt.execute());
 }
 
-TEST_F(StatementsV1, selectStatementsV11)
+TEST_F(V1Statements, V1selectStatements1)
 {
     auto fldId = sqlite::makeFieldDef("id", sqlite::FieldType::Integer()).notNull();
     auto fldName = sqlite::makeFieldDef("name", sqlite::FieldType::Text()).notNull();
@@ -384,7 +384,7 @@ TEST_F(StatementsV1, selectStatementsV11)
     ASSERT_EQ(count, 3);
 }
 
-TEST_F(StatementsV1, selectStatementsV1Sorting)
+TEST_F(V1Statements, V1selectStatementsSorting)
 {
     auto fldId = sqlite::makeFieldDef("id", sqlite::FieldType::Integer()).notNull();
     auto fldNum = sqlite::makeFieldDef("num", sqlite::FieldType::Integer()).notNull();
@@ -481,7 +481,7 @@ TEST_F(StatementsV1, selectStatementsV1Sorting)
     EXPECT_EQ(in.at(3), 4);
 }
 
-TEST_F(StatementsV1, selectStatementsV1MultipleBind)
+TEST_F(V1Statements, V1selectStatementsMultipleBind)
 {
     auto fldId = sqlite::makeFieldDef("id", sqlite::FieldType::Integer()).notNull();
     auto fldName = sqlite::makeFieldDef("name", sqlite::FieldType::Text()).notNull();
@@ -522,7 +522,7 @@ TEST_F(StatementsV1, selectStatementsV1MultipleBind)
     EXPECT_EQ(std::get<0>(r[1]), 2);
 }
 
-TEST_F(StatementsV1, selectStatementsV1MultipleBindDynamic)
+TEST_F(V1Statements, V1selectStatementsMultipleBindDynamic)
 {
     auto fldId = sqlite::makeFieldDef("id", sqlite::FieldType::Integer()).notNull();
     auto fldName = sqlite::makeFieldDef("name", sqlite::FieldType::Text()).notNull();
@@ -575,7 +575,7 @@ TEST_F(StatementsV1, selectStatementsV1MultipleBindDynamic)
     EXPECT_EQ(std::get<0>(r[2]), 3);
 }
 
-TEST_F(StatementsV1, selectStatementsV1Where)
+TEST_F(V1Statements, V1selectStatementsWhere)
 {
     std::string table = "sample";
 
@@ -644,7 +644,7 @@ TEST_F(StatementsV1, selectStatementsV1Where)
     ASSERT_EQ(count, 2);
 }
 
-TEST_F(StatementsV1, casts)
+TEST_F(V1Statements, casts)
 {
     {
         SQLiteStatement stmt(db, "CREATE TABLE sample (id INTEGER, vint INTEGER, name TEXT, vreal DOUBLE)");
@@ -684,7 +684,7 @@ TEST_F(StatementsV1, casts)
 
 }
 
-TEST_F(StatementsV1, move)
+TEST_F(V1Statements, move)
 {
     {
         SQLiteStatement stmt(db, "CREATE TABLE sample (id INTEGER, name TEXT, v DOUBLE)");
@@ -696,7 +696,7 @@ TEST_F(StatementsV1, move)
     s = std::move(SQLiteStatement(db, "INSERT INTO sample VALUES (?,?,?)"));
 }
 
-TEST_F(StatementsV1, createWithStatementsV1)
+TEST_F(V1Statements, V1createWithStatements)
 {
     auto fldId = sqlite::makeFieldDef("id", sqlite::FieldType::Integer());
     auto fldName = sqlite::makeFieldDef("name", sqlite::FieldType::Text());
@@ -745,7 +745,7 @@ TEST_F(StatementsV1, createWithStatementsV1)
     }
 }
 
-TEST_F(StatementsV1, failAndRepeat)
+TEST_F(V1Statements, failAndRepeat)
 {
     // Check that a failing statement is correctly reset after
     SQLiteStatement create(db, "CREATE TABLE sample (id INTEGER PRIMARY KEY, name TEXT)");
@@ -766,7 +766,7 @@ TEST_F(StatementsV1, failAndRepeat)
 
 }
 
-class SelectStatementsV1 : public testing::Test {
+class V1SelectStatements : public testing::Test {
 protected:
     std::shared_ptr<SQLiteStorage> db;
 public:
@@ -774,7 +774,7 @@ public:
     const FieldDef<FieldType::Text> fldName = sqlite::makeFieldDef("n", sqlite::FieldType::Text());
     const FieldDef<FieldType::Real> fldValue = sqlite::makeFieldDef("v", sqlite::FieldType::Real());
 
-    SelectStatementsV1()
+    V1SelectStatements()
     {
         db = std::make_shared<SQLiteStorage>(":memory:");
         db->open();
@@ -792,7 +792,7 @@ public:
     }
 };
 
-TEST_F(SelectStatementsV1, execute)
+TEST_F(V1SelectStatements, execute)
 {
     SQLiteStatement select(db, sqlite::statements::Select("ex", fldId));
     int count = 0;
@@ -804,7 +804,7 @@ TEST_F(SelectStatementsV1, execute)
     ASSERT_EQ(count, 3);
 }
 
-TEST(SelectStatementsV1WithDef, selectWithDefaultValues)
+TEST(V1SelectStatementsWithDef, selectWithDefaultValues)
 {
     FieldDef<FieldType::Integer> fldIdDef {"id", -1};
     FieldDef<FieldType::Text> fldNameDef {"n", "(null)"};
@@ -842,7 +842,7 @@ TEST(SelectStatementsV1WithDef, selectWithDefaultValues)
 }
 
 
-TEST_F(SelectStatementsV1, join)
+TEST_F(V1SelectStatements, join)
 {
     FieldDef<FieldType::Integer> jfldId = sqlite::makeFieldDef("jid", sqlite::FieldType::Integer());
     FieldDef<FieldType::Text> jfldName = sqlite::makeFieldDef("name", sqlite::FieldType::Text());
@@ -880,7 +880,7 @@ TEST_F(SelectStatementsV1, join)
     }
 }
 
-class DeleteStatementsV1 : public testing::Test {
+class V1DeleteStatements : public testing::Test {
 protected:
     std::shared_ptr<SQLiteStorage> db;
 public:
@@ -921,7 +921,7 @@ protected:
     }
 };
 
-TEST_F(DeleteStatementsV1, exec)
+TEST_F(V1DeleteStatements, exec)
 {
     // first check that everything is properly prepared.
     ASSERT_EQ(count(), 3);
@@ -943,7 +943,7 @@ TEST_F(DeleteStatementsV1, exec)
     ASSERT_EQ(count(), 0);
 }
 
-TEST_F(DeleteStatementsV1, whereReset)
+TEST_F(V1DeleteStatements, whereReset)
 {
     // first check that everything is properly prepared.
     ASSERT_EQ(count(), 3);

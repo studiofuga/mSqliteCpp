@@ -10,10 +10,10 @@
 
 using namespace sqlite;
 
-class TransactionTestV1 : public ::testing::Test {
+class V1TransactionTest : public ::testing::Test {
     std::shared_ptr<SQLiteStorage> mDb;
 public:
-    TransactionTestV1()
+    V1TransactionTest()
     {
         mDb = std::make_shared<SQLiteStorage>(":memory:");
 
@@ -26,7 +26,7 @@ public:
     auto db() const { return mDb; }
 };
 
-TEST_F (TransactionTestV1, commit)
+TEST_F (V1TransactionTest, commit)
 {
     SQLiteTable table(db(), "test");
 
@@ -50,7 +50,7 @@ TEST_F (TransactionTestV1, commit)
     ASSERT_EQ(r, 2);
 }
 
-TEST_F (TransactionTestV1, abort)
+TEST_F (V1TransactionTest, abort)
 {
     SQLiteTable table(db(), "test2");
 
@@ -85,7 +85,7 @@ TEST_F (TransactionTestV1, abort)
     ASSERT_EQ(r, 0);
 }
 
-TEST_F (TransactionTestV1, nestedTransactions)
+TEST_F (V1TransactionTest, nestedTransactions)
 {
     SQLiteTable table(db(), "test3");
 

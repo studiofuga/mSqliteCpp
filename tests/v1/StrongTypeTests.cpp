@@ -37,11 +37,11 @@ inline void bind (SQLiteStatement &statement, size_t s, const StrongType<T,TAG> 
 using namespace sqlite;
 
 
-class StrongTypeTestV1 : public testing::Test {
+class V1StrongTypeTest : public testing::Test {
 protected:
     std::shared_ptr<SQLiteStorage> db;
 public:
-    StrongTypeTestV1()
+    V1StrongTypeTest()
     {
         db = std::make_shared<SQLiteStorage>(":memory:");
         db->open();
@@ -56,7 +56,7 @@ public:
     FieldDef<FieldType::Real> fieldValue {"value"};
 };
 
-TEST_F(StrongTypeTestV1, insertStrongTypes)
+TEST_F(V1StrongTypeTest, insertStrongTypes)
 {
     struct MyIntTag{};
     struct MyStringTag{};

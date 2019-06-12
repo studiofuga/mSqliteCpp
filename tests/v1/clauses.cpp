@@ -10,14 +10,14 @@
 
 using namespace sqlite;
 
-class ClausesV1 : public ::testing::Test {
+class V1Clauses : public ::testing::Test {
     std::shared_ptr<SQLiteStorage> db;
 public:
     const FieldDef<FieldType::Integer> fId;
     const FieldDef<FieldType::Text> fName;
     const FieldDef<FieldType::Real> fValue;
 
-    ClausesV1()
+    V1Clauses()
             : fId("id"), fName("name"), fValue("value") {
 
     }
@@ -35,7 +35,7 @@ protected:
 
 };
 
-TEST_F(ClausesV1, Where)
+TEST_F(V1Clauses, Where)
 {
     /*
     Where<decltype(fId)> where(fId);

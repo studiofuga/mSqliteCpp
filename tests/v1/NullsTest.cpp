@@ -11,11 +11,11 @@
 
 using namespace sqlite;
 
-class NullTestV1 : public testing::Test {
+class V1NullTest : public testing::Test {
 protected:
     std::shared_ptr<SQLiteStorage> db;
 public:
-    NullTestV1()
+    V1NullTest()
     {
         db = std::make_shared<SQLiteStorage>(":memory:");
         db->open();
@@ -28,7 +28,7 @@ public:
 };
 
 
-TEST_F(NullTestV1, insert)
+TEST_F(V1NullTest, insert)
 {
     auto createTable = makeCreateTableStatement2(db, "Insert1", fieldId, fieldText, fieldCount, fieldValue);
     ASSERT_NO_THROW(createTable.execute());
@@ -99,7 +99,7 @@ TEST_F(NullTestV1, insert)
 
 #if defined(WITH_BOOST)
 
-TEST_F(NullTestV1, selectWithNulls)
+TEST_F(V1NullTest, selectWithNulls)
 {
     auto createTable = makeCreateTableStatement2(db, "Insert1", fieldId, fieldText, fieldCount, fieldValue);
     ASSERT_NO_THROW(createTable.execute());

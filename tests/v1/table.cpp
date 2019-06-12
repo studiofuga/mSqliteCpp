@@ -10,7 +10,7 @@
 
 using namespace sqlite;
 
-class TableV1 : public ::testing::Test {
+class V1Table : public ::testing::Test {
 protected:
     std::shared_ptr<SQLiteStorage> db;
 public:
@@ -20,7 +20,7 @@ public:
     }
 };
 
-TEST_F(TableV1, creation)
+TEST_F(V1Table, creation)
 {
     ASSERT_FALSE(db->tableExists("do-not-exists"));
 
@@ -37,7 +37,7 @@ TEST_F(TableV1, creation)
     ASSERT_TRUE(db->tableExists("sample"));
 }
 
-TEST_F(TableV1, creationWithoutTuple)
+TEST_F(V1Table, creationWithoutTuple)
 {
     SQLiteTable table;
     ASSERT_NO_THROW(table = SQLiteTable::make(db, "sample",
@@ -46,7 +46,7 @@ TEST_F(TableV1, creationWithoutTuple)
     ));
 }
 
-TEST_F(TableV1, query)
+TEST_F(V1Table, query)
 {
     ASSERT_FALSE(db->tableExists("do-not-exists"));
 
@@ -120,7 +120,7 @@ public:
     }
 };
 
-TEST_F(TableV1, subclassing)
+TEST_F(V1Table, subclassing)
 {
     MyTable myTable(db);
 
@@ -132,7 +132,7 @@ TEST_F(TableV1, subclassing)
     ASSERT_EQ(r.size(), 2);
 }
 
-TEST_F(TableV1, DynamicCreate)
+TEST_F(V1Table, DynamicCreate)
 {
     std::vector<FieldDef<FieldType::Integer>> dynFields {
             makeFieldDef("c1", FieldType::Integer()),
@@ -153,7 +153,7 @@ TEST_F(TableV1, DynamicCreate)
     ASSERT_NO_THROW(table.query(std::make_tuple(dynFields[0], dynFields[1]), [](int, int) { }));
 }
 
-TEST_F(TableV1, IndexCreate)
+TEST_F(V1Table, IndexCreate)
 {
     auto fldName = makeFieldDef("name", FieldType::Text());
     auto fldX = makeFieldDef("x", FieldType::Real());
@@ -173,7 +173,7 @@ TEST_F(TableV1, IndexCreate)
     ASSERT_NO_THROW(table.createIndex ("coords", std::make_tuple(fldX, fldY)));
 }
 
-TEST_F(TableV1, InsertWithStatement)
+TEST_F(V1Table, InsertWithStatement)
 {
     auto fldId = makeFieldDef("id", FieldType::Integer()).primaryKey().autoincrement();
     auto fldName = makeFieldDef("name", FieldType::Text());
@@ -201,7 +201,7 @@ TEST_F(TableV1, InsertWithStatement)
     ASSERT_EQ(r, 3);
 }
 
-TEST_F(TableV1, InsertOrUpdate)
+TEST_F(V1Table, InsertOrUpdate)
 {
     auto key = makeFieldDef("Key", FieldType::Text()).primaryKey();
     auto value = makeFieldDef("Value", FieldType::Text());

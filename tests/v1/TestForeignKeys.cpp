@@ -18,7 +18,7 @@
 
 using namespace sqlite;
 
-TEST(ForeignKeysV1, Enforce)
+TEST(V1ForeignKeys, Enforce)
 {
     auto db = std::make_shared<SQLiteStorage>(":memory:");
     db->setFlag(sqlite::SQLiteStorage::Flags::EnforceForeignKeys);

@@ -18,7 +18,7 @@ using namespace sqlite;
 
 #if defined(WITH_BOOST)
 
-TEST(WhereOptTestsV1, formatOptionalOperators)
+TEST(V1WhereOptTests, formatOptionalOperators)
 {
     auto fldId = sqlite::makeFieldDef("id", sqlite::FieldType::Integer());
 
@@ -44,7 +44,7 @@ TEST(WhereOptTestsV1, formatOptionalOperators)
     EXPECT_EQ(operators::format(0, operators::ge(fldId),fieldNotSet), "");
 }
 
-TEST(WhereOptTestsV1, formatOptionalUnaryOperator)
+TEST(V1WhereOptTests, formatOptionalUnaryOperator)
 {
     auto fldId = sqlite::makeFieldDef("id", sqlite::FieldType::Integer());
 
@@ -61,7 +61,7 @@ TEST(WhereOptTestsV1, formatOptionalUnaryOperator)
     EXPECT_EQ(operators::format(0, oper2,  fieldNotSet), "");
 }
 
-TEST(WhereOptTestsV1, formatOptionalRelationalOperators)
+TEST(V1WhereOptTests, formatOptionalRelationalOperators)
 {
     auto fldId = sqlite::makeFieldDef("id", sqlite::FieldType::Integer());
     auto fldId2 = sqlite::makeFieldDef("id2", sqlite::FieldType::Integer());
@@ -82,7 +82,7 @@ TEST(WhereOptTestsV1, formatOptionalRelationalOperators)
     EXPECT_EQ(opOr.format(0, fieldNotSet, fieldNotSet), "");
 }
 
-TEST(WhereOptTestsV1, formatWhereCase1)
+TEST(V1WhereOptTests, formatWhereCase1)
 {
     auto fldId = sqlite::makeFieldDef("id", sqlite::FieldType::Integer());
 
@@ -95,7 +95,7 @@ TEST(WhereOptTestsV1, formatWhereCase1)
     EXPECT_EQ(w.format(fieldNotSet), "1");
 }
 
-TEST(WhereOptTestsV1, formatWhereCase2)
+TEST(V1WhereOptTests, formatWhereCase2)
 {
     auto fldId = sqlite::makeFieldDef("id", sqlite::FieldType::Integer());
     auto fldId2 = sqlite::makeFieldDef("id2", sqlite::FieldType::Integer());
@@ -111,7 +111,7 @@ TEST(WhereOptTestsV1, formatWhereCase2)
     EXPECT_EQ(w.format(fieldNotSet, fieldNotSet), "1");
 }
 
-class WhereOptTestsV1WithStatements : public ::testing::Test {
+class V1WhereOptTestsWithStatements : public ::testing::Test {
 public:
     std::string TableName{"SampleTable"};
 
@@ -139,7 +139,7 @@ protected:
     }
 };
 
-TEST_F(WhereOptTestsV1WithStatements, selectWhereCase1)
+TEST_F(V1WhereOptTestsWithStatements, selectWhereCase1)
 {
     auto s = makeSelectStatement(fldId1, fldId2, fldValue);
     s.attach(db, TableName);
@@ -164,7 +164,7 @@ TEST_F(WhereOptTestsV1WithStatements, selectWhereCase1)
     EXPECT_EQ(count, 4);
 }
 
-TEST_F(WhereOptTestsV1WithStatements, selectWhereCase2)
+TEST_F(V1WhereOptTestsWithStatements, selectWhereCase2)
 {
     auto s = makeSelectStatement(fldValue);
     s.attach(db, TableName);
@@ -189,7 +189,7 @@ TEST_F(WhereOptTestsV1WithStatements, selectWhereCase2)
     EXPECT_EQ(count, 2);
 }
 
-TEST_F(WhereOptTestsV1WithStatements, selectWhereCase3)
+TEST_F(V1WhereOptTestsWithStatements, selectWhereCase3)
 {
     auto s = makeSelectStatement(fldValue);
     s.attach(db, TableName);
@@ -214,7 +214,7 @@ TEST_F(WhereOptTestsV1WithStatements, selectWhereCase3)
     EXPECT_EQ(count, 1);
 }
 
-TEST_F(WhereOptTestsV1WithStatements, selectWhereCase4)
+TEST_F(V1WhereOptTestsWithStatements, selectWhereCase4)
 {
     auto s = makeSelectStatement(fldValue);
     s.attach(db, TableName);
@@ -239,7 +239,7 @@ TEST_F(WhereOptTestsV1WithStatements, selectWhereCase4)
     EXPECT_EQ(count, 1);
 }
 
-TEST_F(WhereOptTestsV1WithStatements, updateWhereCase1)
+TEST_F(V1WhereOptTestsWithStatements, updateWhereCase1)
 {
     auto u = makeUpdateStatement(fldValue);
     u.attach(db, TableName);
@@ -272,7 +272,7 @@ TEST_F(WhereOptTestsV1WithStatements, updateWhereCase1)
     EXPECT_EQ(count, 4);
 }
 
-TEST_F(WhereOptTestsV1WithStatements, updateWhereCase2)
+TEST_F(V1WhereOptTestsWithStatements, updateWhereCase2)
 {
     auto u = makeUpdateStatement(fldValue);
     u.attach(db, TableName);
@@ -305,7 +305,7 @@ TEST_F(WhereOptTestsV1WithStatements, updateWhereCase2)
     EXPECT_EQ(count, 2);
 }
 
-TEST_F(WhereOptTestsV1WithStatements, updateWhereCase3)
+TEST_F(V1WhereOptTestsWithStatements, updateWhereCase3)
 {
     auto u = makeUpdateStatement(fldValue);
     u.attach(db, TableName);
@@ -338,7 +338,7 @@ TEST_F(WhereOptTestsV1WithStatements, updateWhereCase3)
     EXPECT_EQ(count, 1);
 }
 
-TEST_F(WhereOptTestsV1WithStatements, DeleteCase1)
+TEST_F(V1WhereOptTestsWithStatements, DeleteCase1)
 {
     auto s = makeSelectStatement(fldId1);
     s.attach(db, TableName);
@@ -369,7 +369,7 @@ TEST_F(WhereOptTestsV1WithStatements, DeleteCase1)
     EXPECT_EQ(count, 0);
 }
 
-TEST_F(WhereOptTestsV1WithStatements, DeleteCase2)
+TEST_F(V1WhereOptTestsWithStatements, DeleteCase2)
 {
     auto s = makeSelectStatement(fldId1);
     s.attach(db, TableName);
@@ -400,7 +400,7 @@ TEST_F(WhereOptTestsV1WithStatements, DeleteCase2)
     EXPECT_EQ(count, 2);
 }
 
-TEST_F(WhereOptTestsV1WithStatements, DeleteCase3)
+TEST_F(V1WhereOptTestsWithStatements, DeleteCase3)
 {
     auto s = makeSelectStatement(fldId1);
     s.attach(db, TableName);
@@ -431,7 +431,7 @@ TEST_F(WhereOptTestsV1WithStatements, DeleteCase3)
     EXPECT_EQ(count, 2);
 }
 
-TEST_F(WhereOptTestsV1WithStatements, DeleteCase4)
+TEST_F(V1WhereOptTestsWithStatements, DeleteCase4)
 {
     auto s = makeSelectStatement(fldId1);
     s.attach(db, TableName);
@@ -462,7 +462,7 @@ TEST_F(WhereOptTestsV1WithStatements, DeleteCase4)
     EXPECT_EQ(count, 3);
 }
 
-TEST_F(WhereOptTestsV1WithStatements, DeleteCase5)
+TEST_F(V1WhereOptTestsWithStatements, DeleteCase5)
 {
     auto s = makeSelectStatement(fldId1);
     s.attach(db, TableName);
