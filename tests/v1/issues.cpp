@@ -13,7 +13,7 @@
 
 using namespace sqlite;
 
-TEST(issues, lockAfterClose)
+TEST(issuesV1, lockAfterClose)
 {
     auto dbname = "lockissue.db";
     {
@@ -49,9 +49,9 @@ TEST(issues, lockAfterClose)
     }
 }
 
-TEST(issues, insertOptionalUnboundValues)
+TEST(issuesV1, insertOptionalUnboundValues)
 {
-    //auto db1 = std::make_shared<SQLiteStorage>("issuestest.db");
+    //auto db1 = std::make_shared<SQLiteStorage>("issuesV1test.db");
     auto db1 = std::make_shared<SQLiteStorage>(":memory:");
     ASSERT_NO_THROW(db1->open());
 

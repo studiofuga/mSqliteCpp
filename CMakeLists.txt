@@ -10,28 +10,10 @@ include(cmake/dependencies.cmake)
 include(cmake/compileropts.cmake)
 include(cmake/install.cmake)
 
-add_subdirectory(src/v1)
-add_subdirectory(src/v2)
+add_subdirectory(src)
 
 if (ENABLE_TEST)
-    # Fix problems linking on Windows
-    set(gtest_force_shared_crt ON CACHE BOOL "" FORCE)
-
-    if (NOT EXISTS ${CMAKE_SOURCE_DIR}/tests/googletest/CMakeLists.txt)
-        set(GTEST_URL https://github.com/google/googletest.git)
-        execute_process(
-                COMMAND git clone ${GTEST_URL}
-                WORKING_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}
-        )
-    endif (NOT EXISTS ${CMAKE_SOURCE_DIR}/tests/googletest/CMakeLists.txt)
-
-    # This adds another subdirectory, which has 'project(gtest)'.
-    add_subdirectory(tests/googletest EXCLUDE_FROM_ALL)
-
-    enable_testing()
-
-    add_subdirectory(tests/v1)
-    add_subdirectory(tests/v2)
+    add_subdirectory(tests)
 endif(ENABLE_TEST)
 
 if (ENABLE_PROFILER)

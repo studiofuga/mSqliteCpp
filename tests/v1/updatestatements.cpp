@@ -13,7 +13,7 @@
 
 using namespace sqlite;
 
-class UpdateStatements : public testing::Test {
+class UpdateStatementsV1 : public testing::Test {
 protected:
     std::shared_ptr<SQLiteStorage> db;
 public:
@@ -59,7 +59,7 @@ protected:
     }
 };
 
-TEST_F(UpdateStatements, update)
+TEST_F(UpdateStatementsV1, update)
 {
     UpdateStatement<decltype(fldValue)> statement(fldValue);
 
@@ -107,7 +107,8 @@ TEST_F(UpdateStatements, update)
 }
 
 #if defined(WITH_BOOST)
-TEST_F(UpdateStatements, updateWithOptional)
+
+TEST_F(UpdateStatementsV1, updateWithOptional)
 {
     UpdateStatement<
             decltype(fldId2), decltype(fldName), decltype(fldValue)
@@ -172,7 +173,7 @@ TEST_F(UpdateStatements, updateWithOptional)
     ASSERT_TRUE(ok);
 }
 
-TEST_F(UpdateStatements, updateWithOptionalMore)
+TEST_F(UpdateStatementsV1, updateWithOptionalMore)
 {
     UpdateStatement<
             decltype(fldName), decltype(fldValue)
@@ -234,7 +235,7 @@ TEST_F(UpdateStatements, updateWithOptionalMore)
 }
 #endif
 
-TEST_F(UpdateStatements, WhereReset)
+TEST_F(UpdateStatementsV1, WhereReset)
 {
     UpdateStatement<
             decltype(fldValue)

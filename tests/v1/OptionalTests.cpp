@@ -18,11 +18,12 @@
 using namespace sqlite;
 
 #if defined(WITH_BOOST)
-class OptionalStatements : public testing::Test {
+
+class OptionalStatementsV1 : public testing::Test {
 protected:
     std::shared_ptr<SQLiteStorage> db;
 public:
-    OptionalStatements()
+    OptionalStatementsV1()
     {
         //db = std::make_shared<SQLiteStorage>("OptionalStatement.db");
         db = std::make_shared<SQLiteStorage>(":memory:");
@@ -35,7 +36,7 @@ public:
     FieldDef<FieldType::Real> fieldValue {"value"};
 };
 
-TEST_F(OptionalStatements, FieldsFormat)
+TEST_F(OptionalStatementsV1, FieldsFormat)
 {
     boost::optional<FieldDef<FieldType::Text>> text;
     boost::optional<FieldDef<FieldType::Integer>> count;
@@ -50,7 +51,7 @@ TEST_F(OptionalStatements, FieldsFormat)
     ASSERT_EQ(statements::details::toString(text), "text");
 }
 
-TEST_F(OptionalStatements, Unpack)
+TEST_F(OptionalStatementsV1, Unpack)
 {
     boost::optional<FieldDef<FieldType::Text>> text;
     boost::optional<FieldDef<FieldType::Integer>> count;
@@ -89,7 +90,7 @@ TEST_F(OptionalStatements, Unpack)
     ASSERT_EQ(fieldplaceholders, "value = ?1");
 }
 
-TEST_F(OptionalStatements, InsertFormatter)
+TEST_F(OptionalStatementsV1, InsertFormatter)
 {
     boost::optional<FieldDef<FieldType::Text>> text;
     boost::optional<FieldDef<FieldType::Integer>> count;
@@ -109,7 +110,7 @@ TEST_F(OptionalStatements, InsertFormatter)
     ASSERT_EQ(exp, insert.string());
 }
 
-TEST_F(OptionalStatements, Insert)
+TEST_F(OptionalStatementsV1, Insert)
 {
     auto createTable = makeCreateTableStatement2(db, "Insert1", fieldId, fieldText, fieldCount, fieldValue);
     ASSERT_NO_THROW(createTable.execute());
@@ -188,7 +189,7 @@ TEST_F(OptionalStatements, Insert)
 
 }
 
-TEST_F(OptionalStatements, Issue6InsertMultipleOptionals)
+TEST_F(OptionalStatementsV1, Issue6InsertMultipleOptionals)
 {
     auto createTable = makeCreateTableStatement2(db, "Insert1", fieldId, fieldText, fieldCount, fieldValue);
     ASSERT_NO_THROW(createTable.execute());
@@ -250,7 +251,7 @@ TEST_F(OptionalStatements, Issue6InsertMultipleOptionals)
 
 #endif
 
-TEST_F(OptionalStatements, ReplaceOnConflict)
+TEST_F(OptionalStatementsV1, ReplaceOnConflict)
 {
     auto createTable = makeCreateTableStatement2(db, "TryInsert", fieldId, fieldText, fieldCount, fieldValue);
     ASSERT_NO_THROW(createTable.execute());

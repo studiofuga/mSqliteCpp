@@ -10,7 +10,7 @@
 
 #include <gtest/gtest.h>
 
-TEST(SqlFormatting, fieldOperators)
+TEST(SqlFormattingV1, fieldOperators)
 {
     auto fldId = sqlite::makeFieldDef("id", sqlite::FieldType::Integer());
 
@@ -22,7 +22,7 @@ TEST(SqlFormatting, fieldOperators)
     ASSERT_EQ(sqlite::op::max(fldId).name(), "MAX(id)");
 }
 
-TEST(SqlFormatting, relOperators)
+TEST(SqlFormattingV1, relOperators)
 {
     auto fldId = sqlite::makeFieldDef("id", sqlite::FieldType::Integer());
     auto fldValue = sqlite::makeFieldDef("value", sqlite::FieldType::Integer());
@@ -42,7 +42,7 @@ TEST(SqlFormatting, relOperators)
               "(id = ? OR id = ? OR id = ?)");
 }
 
-TEST(SqlFormatting, internalUnpack)
+TEST(SqlFormattingV1, internalUnpack)
 {
     auto fldId = sqlite::makeFieldDef("id", sqlite::FieldType::Integer());
     auto fldName = sqlite::makeFieldDef("name", sqlite::FieldType::Text());
@@ -65,7 +65,7 @@ TEST(SqlFormatting, internalUnpack)
     ASSERT_EQ(fieldplaceholders, "id = ?1");
 }
 
-TEST(SqlFormatting, select)
+TEST(SqlFormattingV1, select)
 {
     auto db = std::make_shared<sqlite::SQLiteStorage>(":memory:");
     db->open();
@@ -108,7 +108,7 @@ TEST(SqlFormatting, select)
     }
 }
 
-TEST(SqlFormatting, selectOrdering)
+TEST(SqlFormattingV1, selectOrdering)
 {
     auto db = std::make_shared<sqlite::SQLiteStorage>(":memory:");
     db->open();
@@ -153,7 +153,7 @@ TEST(SqlFormatting, selectOrdering)
     }
 }
 
-TEST(SqlFormatting, insert)
+TEST(SqlFormattingV1, insert)
 {
     auto fldId = sqlite::makeFieldDef("id", sqlite::FieldType::Integer());
     auto fldName = sqlite::makeFieldDef("name", sqlite::FieldType::Text());
@@ -164,7 +164,7 @@ TEST(SqlFormatting, insert)
     ASSERT_EQ(i.string(), "INSERT INTO Table(id,name,value) VALUES(?1,?2,?3)");
 }
 
-TEST(SqlFormatting, deleteStatement)
+TEST(SqlFormattingV1, deleteStatement)
 {
     sqlite::statements::Delete d("MyTable");
     ASSERT_EQ(d.string(), "DELETE FROM MyTable");
@@ -173,7 +173,7 @@ TEST(SqlFormatting, deleteStatement)
     ASSERT_EQ(d.string(), "DELETE FROM MyTable WHERE id = ?");
 }
 
-TEST(SqlFormatting, updateStatement)
+TEST(SqlFormattingV1, updateStatement)
 {
     auto fldName = sqlite::makeFieldDef("name", sqlite::FieldType::Text());
     auto fldValue = sqlite::makeFieldDef("value", sqlite::FieldType::Real());
@@ -188,7 +188,7 @@ TEST(SqlFormatting, updateStatement)
     ASSERT_EQ(u.string(), "UPDATE OR ROLLBACK MyTable SET name = ?1,value = ?2 WHERE id = ?");
 }
 
-TEST(SqlFormatting, ForeignKey)
+TEST(SqlFormattingV1, ForeignKey)
 {
     auto fldId = sqlite::makeFieldDef("id", sqlite::FieldType::Integer()).primaryKey();
     sqlite::statements::CreateTable::TableConstraint::ForeignKey constraint("u", std::make_tuple(fldId), "x", std::make_tuple("y"));
@@ -207,7 +207,7 @@ TEST(SqlFormatting, ForeignKey)
     ASSERT_EQ(c2.toString(), "CONSTRAINT w FOREIGN KEY(id,name) REFERENCES x(y,z)");
 }
 
-TEST(SqlFormatting, UniqueAndPrimaryKey)
+TEST(SqlFormattingV1, UniqueAndPrimaryKey)
 {
     auto fldId = sqlite::makeFieldDef("id", sqlite::FieldType::Integer()).primaryKey();
     auto fldName = sqlite::makeFieldDef("name", sqlite::FieldType::Text());
@@ -225,7 +225,7 @@ TEST(SqlFormatting, UniqueAndPrimaryKey)
     ASSERT_EQ(p2.toString(), "CONSTRAINT pk PRIMARY KEY (id,name)");
 }
 
-TEST(SqlFormatting, createTableStatement)
+TEST(SqlFormattingV1, createTableStatement)
 {
     auto fldId = sqlite::makeFieldDef("id", sqlite::FieldType::Integer()).primaryKey();
     auto fldName = sqlite::makeFieldDef("name", sqlite::FieldType::Text());
@@ -240,7 +240,7 @@ TEST(SqlFormatting, createTableStatement)
                           " CONSTRAINT u FOREIGN KEY(id) REFERENCES x(y))");
 }
 
-TEST(SqlFormatting, createIndex)
+TEST(SqlFormattingV1, createIndex)
 {
     auto fldId = sqlite::makeFieldDef("id", sqlite::FieldType::Integer()).primaryKey();
     auto fldName = sqlite::makeFieldDef("name", sqlite::FieldType::Text());
