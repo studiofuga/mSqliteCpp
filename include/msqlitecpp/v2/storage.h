@@ -36,6 +36,12 @@ private:
 public:
     explicit Storage(std::string path, OpenMode openMode = OpenMode::ImmediateOpen);
 
+    Storage (Storage const &) = delete;
+    Storage (Storage &&) = default;
+
+    Storage & operator = (Storage const &) = delete;
+    Storage & operator = (Storage &&) = default;
+
     static Storage inMemory(OpenMode openMode = OpenMode::ImmediateOpen);
 
     ~Storage() noexcept;
