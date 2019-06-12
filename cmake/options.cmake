@@ -7,5 +7,5 @@ OPTION(ENABLE_CODECOVERAGE "Enable Code Coverage tests" OFF)
 OPTION(DISABLE_LEGACY_CODE "Disable Legacy (v1) API" OFF)
 
 if (DISABLE_LEGACY_CODE)
-    set(DISABLE_V1 on CACHE)
+    set(DISABLE_V1 on)
 endif ()
