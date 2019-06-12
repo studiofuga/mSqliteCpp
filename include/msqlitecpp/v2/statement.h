@@ -17,6 +17,11 @@
 namespace msqlitecpp {
 namespace v2 {
 
+/**
+ * @brief An SQL Statement
+ *
+ * The class is moveable but not copyable because of the raw pointer to the sqlite3_stmt structure.
+ */
 class EXPORT_MSQLITEV2 Statement {
 private:
     struct Impl;
@@ -41,6 +46,12 @@ public:
     explicit Statement(Storage &);
 
     explicit Statement(Storage &, char const *sql);
+
+    Statement(Statement const &) = delete;
+    Statement(Statement &&) = default;
+
+    Statement &operator =(Statement const &) = delete;
+    Statement &operator =(Statement &&) = default;
 
     bool execute(Storage &handle);
 

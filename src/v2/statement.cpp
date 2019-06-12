@@ -81,6 +81,7 @@ Statement::~Statement()
 {
     if (p != nullptr && p->stmt != nullptr) {
         sqlite3_finalize(p->stmt);
+        p->stmt = nullptr;
     }
 }
 

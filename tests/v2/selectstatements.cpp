@@ -40,7 +40,7 @@ public:
     }
 
     template<typename ...T>
-    int count(SelectStatement<T...> statement)
+    int count(SelectStatement<T...> &statement)
     {
         size_t count = 0;
         statement.execute([&count](int i1, int i2, std::string t) {
