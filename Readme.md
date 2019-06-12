@@ -102,5 +102,7 @@ The default is On
 
 - ENABLE_CODECOVERAGE: compile the library with gcov support. Default is Off
 
+- DISABLE_LEGACY_CODE: Compile only the V2 API, default is Off (for the moment)
+
 ## License
 The library is released under the BSD 3-Clause license. See the LICENSE file for details.
