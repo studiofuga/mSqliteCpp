@@ -1,5 +1,5 @@
-#ifndef MSQLITECPP_H
-#define MSQLITECPP_H
+#ifndef V2_MSQLITECPP_H
+#define V2_MSQLITECPP_H
 
 #ifdef _WIN32
 #ifdef BUILD_MSQLITECPP
@@ -15,4 +15,4 @@
 #define EXPORT_MSQLITEV2
 #endif
 
-#endif // MSQLITECPP_H
+#endif // V2_MSQLITECPP_H

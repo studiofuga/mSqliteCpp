@@ -1,3 +1,9 @@
+msqlitecpp (1.99.1ubuntu1) bionic; urgency=medium
+
+  * utils/ missing include files added
+
+ -- Federico Fuga <fuga@studiofuga.com>  Wed, 19 Jun 2019 15:40:49 +0200
+
 msqlitecpp (1.99.1) bionic; urgency=medium
 
   * New Development version with legacy compatibility code 
