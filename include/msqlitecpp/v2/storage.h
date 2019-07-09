@@ -10,6 +10,7 @@
 #include "msqlitecpp/v2/msqlitecpp.h"
 
 #include <memory>
+#include <string>
 
 struct sqlite3;
 

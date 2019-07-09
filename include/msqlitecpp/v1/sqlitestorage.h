@@ -2,7 +2,8 @@
 #define SQLITERESULTSTORAGE_H
 
 #include "msqlitecpp/v1/msqlitecpp.h"
-#include "sqlite3.h"
+
+#include <sqlite3.h>
 
 #include <string>
 #include <memory>
