@@ -1,6 +1,6 @@
 # Manage dependencies, find paths, etc
 
-find_package(Boost)
+find_package(Boost REQUIRED filesystem)
 
 if (Boost_FOUND)
     add_definitions(-DWITH_BOOST)

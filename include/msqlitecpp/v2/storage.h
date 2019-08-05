@@ -25,6 +25,10 @@ public:
         EnforceForeignKeys
     };
 
+    enum class CreateFlag {
+        Create, DoNotCreate
+    };
+
     enum class OpenMode {
         ImmediateOpen, DelayedOpen
     };
@@ -35,7 +39,7 @@ private:
 
     void updateFlags();
 public:
-    explicit Storage(std::string path, OpenMode openMode = OpenMode::ImmediateOpen);
+    explicit Storage(std::string path, OpenMode openMode = OpenMode::ImmediateOpen, CreateFlag createFlag = CreateFlag::Create);
 
     Storage (Storage const &) = delete;
     Storage (Storage &&) = default;
@@ -43,7 +47,7 @@ public:
     Storage & operator = (Storage const &) = delete;
     Storage & operator = (Storage &&) = default;
 
-    static Storage inMemory(OpenMode openMode = OpenMode::ImmediateOpen);
+    static Storage inMemory(OpenMode openMode = OpenMode::ImmediateOpen, CreateFlag createFlag = CreateFlag::Create);
 
     ~Storage() noexcept;
 

@@ -19,11 +19,14 @@ struct Storage::Impl {
     sqlite3 *mDb = nullptr;
 
     std::set<Flags> mFlags;
+    CreateFlag mCreateFlag;
 };
 
-Storage::Storage(std::string path, OpenMode openMode)
+Storage::Storage(std::string path, OpenMode openMode, CreateFlag createFlag)
         : p(spimpl::make_impl<Impl>())
 {
+    p->dbPath = path;
+    p->mCreateFlag = createFlag;
     if (openMode == OpenMode::ImmediateOpen) {
         open();
     }
@@ -36,9 +39,9 @@ Storage::~Storage() noexcept
     }
 }
 
-Storage Storage::inMemory(OpenMode openMode)
+Storage Storage::inMemory(OpenMode openMode, CreateFlag createFlag)
 {
-    return Storage(":memory:", openMode);
+    return Storage(":memory:", openMode, createFlag);
 }
 
 void Storage::open()
@@ -48,8 +51,13 @@ void Storage::open()
         return;
     }
 
+    auto openFlags = SQLITE_OPEN_FULLMUTEX | SQLITE_OPEN_READWRITE ;
+    if (p->mCreateFlag == CreateFlag::Create) {
+        openFlags |= SQLITE_OPEN_CREATE;
+    }
+
     auto r = sqlite3_open_v2(p->dbPath.c_str(), &p->mDb,
-                             SQLITE_OPEN_FULLMUTEX | SQLITE_OPEN_READWRITE | SQLITE_OPEN_CREATE,
+                             openFlags,
                              nullptr);
     if (r != SQLITE_OK) {
         throw Exception(p->mDb);

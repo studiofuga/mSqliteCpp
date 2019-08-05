@@ -58,6 +58,7 @@ target_compile_features(runTests PUBLIC cxx_std_14)
 
 target_link_libraries(runTests
         msqlitecpp
+        Boost::filesystem
         gtest gtest_main
         ${SQLITE_LIB}
         )
