@@ -1,3 +1,9 @@
+msqlitecpp (1.99.3) bionic; urgency=medium
+
+  * Fix a few bugs on opening files.
+
+ -- Federico Fuga <fuga@studiofuga.com>  Fri, 18 Oct 2019 17:01:29 +0200
+
 msqlitecpp (1.99.1ubuntu1) bionic; urgency=medium
 
   * utils/ missing include files added

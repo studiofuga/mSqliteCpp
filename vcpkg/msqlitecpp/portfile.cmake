@@ -11,11 +11,11 @@
 #
 
 include(vcpkg_common_functions)
-set(SOURCE_PATH ${CURRENT_BUILDTREES_DIR}/src/mSqliteCpp-1.99.1)
+set(SOURCE_PATH ${CURRENT_BUILDTREES_DIR}/src/mSqliteCpp-1.99.3)
 vcpkg_download_distfile(ARCHIVE
-    URLS "https://github.com/studiofuga/mSqliteCpp/archive/v1.99.1.tar.gz"
-    FILENAME "mSqliteCpp-1.99.1.tar.gz"
-    SHA512 0651c052a372cd492043d96ac1b33a563cecd8addacb9dac334e7730c6aca27d0aa3438651ea4ec3e7df41a5383c4dfa53f25f58fcee72a56419ef0fb1a6b32c
+		URLS "https://github.com/studiofuga/mSqliteCpp/archive/v1.99.3.tar.gz"
+		FILENAME "mSqliteCpp-1.99.3.tar.gz"
+		SHA512 0
 )
 vcpkg_extract_source_archive(${ARCHIVE})
 
