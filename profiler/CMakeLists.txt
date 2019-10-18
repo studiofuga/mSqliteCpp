@@ -15,6 +15,10 @@ if (NOT DISABLE_V1)
 	target_compile_features(runProfiler PUBLIC cxx_std_14)
 
     # Extra linking for the project.
-    target_link_libraries(runProfiler msqlitecpp ${EXTRA_LIB})
+    target_link_libraries(runProfiler
+            msqlitecpp
+            ${SQLITE_LIB}
+            ${EXTRA_LIB}
+            )
 
 endif ()
