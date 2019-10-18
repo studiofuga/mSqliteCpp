@@ -11,18 +11,18 @@
 #
 
 include(vcpkg_common_functions)
-set(SOURCE_PATH ${CURRENT_BUILDTREES_DIR}/src/mSqliteCpp-0.9.3)
+set(SOURCE_PATH ${CURRENT_BUILDTREES_DIR}/src/mSqliteCpp-1.99.1)
 vcpkg_download_distfile(ARCHIVE
-    URLS "https://github.com/studiofuga/mSqliteCpp/archive/v0.9.3.tar.gz"
-    FILENAME "mSqliteCpp-0.9.3.tar.gz"
-    SHA512 c9309caf301a1973816ab51411dd141085b4e9ac4221de7403d6fd96cac9e9c5a849da8fa72989f71af5fc52ad31c538e35a4d28c64a7d5072dc658dbffc252e
+    URLS "https://github.com/studiofuga/mSqliteCpp/archive/v1.99.1.tar.gz"
+    FILENAME "mSqliteCpp-1.99.1.tar.gz"
+    SHA512 0651c052a372cd492043d96ac1b33a563cecd8addacb9dac334e7730c6aca27d0aa3438651ea4ec3e7df41a5383c4dfa53f25f58fcee72a56419ef0fb1a6b32c
 )
 vcpkg_extract_source_archive(${ARCHIVE})
 
 vcpkg_apply_patches(
 	SOURCE_PATH ${SOURCE_PATH}
     PATCHES
-        ${CMAKE_CURRENT_LIST_DIR}/0000-FixC1001.patch
+        ${CMAKE_CURRENT_LIST_DIR}/0001-Windows-Fixes.patch
 )
 
 vcpkg_configure_cmake(
