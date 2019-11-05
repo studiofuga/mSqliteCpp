@@ -1,6 +1,11 @@
 
 ## Sources Setup
 
+configure_file(../include/msqlitecpp/version.h.in
+        ../include/msqlitecpp/version.h
+        @ONLY
+        )
+
 set(SOURCE_FILES
         v2/storage.cpp
         v2/statement.cpp
@@ -14,6 +19,7 @@ set(PUB_HEADERS
         ../include/msqlitecpp/v2/statement.h
         ../include/msqlitecpp/v2/fields.h
         ../include/msqlitecpp/v2/createstatement.h
+        ${CMAKE_BINARY_DIR}/include/msqlitecpp/version.h
         )
 
 
@@ -42,7 +48,7 @@ if (NOT DISABLE_V1)
             ../include/msqlitecpp/v1/sqlitetable.h
             ../include/msqlitecpp/v1/sqlitetransaction.h
             ../include/msqlitecpp/v1/updatestatement.h
-            ../include/msqlitecpp/v1/sqlconstants.h)
+            ../include/msqlitecpp/v1/sqlconstants.h version.cpp)
 endif ()
 ## Target setup
 
@@ -59,10 +65,12 @@ target_include_directories(msqlitecpp
         PUBLIC
         $<INSTALL_INTERFACE:include>
         $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/../include>
+        $<BUILD_INTERFACE:${CMAKE_CURRENT_BINARY_DIR}/../include>
         PRIVATE
         ${Boost_INCLUDE_DIRS}
         ${SQLITE_INCLUDE_DIRS}
         ${CMAKE_SOURCE_DIR}/src
+        ${CMAKE_BINARY_DIR}/include
         )
 
 if (NOT WIN32)

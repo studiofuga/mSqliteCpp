@@ -19,6 +19,7 @@ enable_testing()
 ##############
 
 set(SOURCES
+        version_test.cpp
         v2/storage.cpp
         v2/statements.cpp
         v2/insertstatements.cpp

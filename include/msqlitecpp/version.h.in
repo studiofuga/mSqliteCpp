@@ -1,0 +1,27 @@
+/** @file version.h
+ * @author Federico Fuga <fuga@studiofuga.com>
+ * @date 05/11/2019
+ */
+
+#ifndef MSQLITECPP_VERSION_H
+#define MSQLITECPP_VERSION_H
+
+#include <cstdint>
+#include <string>
+
+#define MSQLITECPP_VERSION "@PROJECT_VERSION@"
+
+#define MSQLITECPP_VERSION_MAJOR @PROJECT_VERSION_MAJOR@
+#define MSQLITECPP_VERSION_MINOR @PROJECT_VERSION_MINOR@
+#define MSQLITECPP_VERSION_PATCH @PROJECT_VERSION_PATCH@
+#define MSQLITECPP_VERSION_TWEAK @PROJECT_VERSION_TWEAK@
+
+namespace msqlitecpp {
+
+uint32_t version();
+std::string version_string();
+
+}
+
+#endif
+
