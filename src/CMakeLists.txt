@@ -118,7 +118,31 @@ install(EXPORT msqlitecpp-export
         ${INSTALL_EXPORTS_DIR}
         )
 
+set(INCLUDE_INSTALL_DIR include/)
+set(LIB_INSTALL_DIR lib/)
+set(SYSCONFIG_INSTALL_DIR etc/msqlitecpp/)
+
+# Configuration
+set(version_config "${generated_dir}/${PROJECT_NAME}ConfigVersion.cmake")
+set(project_config "${generated_dir}/${PROJECT_NAME}Config.cmake")
+set(TARGETS_EXPORT_NAME "${PROJECT_NAME}Targets")
+set(namespace "${PROJECT_NAME}::")
+
+include(CMakePackageConfigHelpers)
+
+configure_package_config_file(
+        ${CMAKE_SOURCE_DIR}/cmake/msqlitecppConfig.cmake.in
+        ${CMAKE_CURRENT_BINARY_DIR}/msqlitecppConfig.cmake
+        INSTALL_DESTINATION ${INSTALL_EXPORTS_DIR}
+        PATH_VARS INCLUDE_INSTALL_DIR SYSCONFIG_INSTALL_DIR)
+
+write_basic_package_version_file(
+        ${CMAKE_BINARY_DIR}/msqlitecppConfigVersion.cmake
+        VERSION ${PROJECT_VERSION}
+        COMPATIBILITY SameMajorVersion)
+
 install(FILES
-        ${CMAKE_SOURCE_DIR}/cmake/msqlitecppConfig.cmake
+        ${CMAKE_CURRENT_BINARY_DIR}/msqlitecppConfig.cmake
+        ${CMAKE_BINARY_DIR}/msqlitecppConfigVersion.cmake
         DESTINATION ${INSTALL_EXPORTS_DIR}
         )
