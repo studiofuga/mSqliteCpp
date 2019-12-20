@@ -9,7 +9,7 @@ if (NOT DISABLE_V1)
 	target_include_directories(runProfiler
         PRIVATE
         ${Boost_INCLUDE_DIRS}
-        ${SQLITE_INCLUDE_DIRS}
+        ${sqlite3_INCLUDE_DIRS}
         )
 		
 	target_compile_features(runProfiler PUBLIC cxx_std_14)
@@ -17,7 +17,7 @@ if (NOT DISABLE_V1)
     # Extra linking for the project.
     target_link_libraries(runProfiler
             msqlitecpp
-            ${SQLITE_LIB}
+            ${sqlite3_LIBRARIES}
             ${EXTRA_LIB}
             )
 

@@ -68,7 +68,7 @@ target_include_directories(msqlitecpp
         $<BUILD_INTERFACE:${CMAKE_CURRENT_BINARY_DIR}/../include>
         PRIVATE
         ${Boost_INCLUDE_DIRS}
-        ${SQLITE_INCLUDE_DIRS}
+        ${sqlite3_INCLUDE_DIRS}
         ${CMAKE_SOURCE_DIR}/src
         ${CMAKE_BINARY_DIR}/include
         )
@@ -88,7 +88,7 @@ target_compile_definitions(msqlitecpp PRIVATE BUILD_MSQLITECPP)
 
 target_link_libraries(msqlitecpp
         PRIVATE
-        ${SQLite3_LIBRARIES})
+        ${sqlite3_LIBRARIES})
 
 install(TARGETS msqlitecpp
         EXPORT msqlitecpp-export
