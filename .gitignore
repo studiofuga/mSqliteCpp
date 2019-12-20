@@ -123,3 +123,6 @@ tests/googletest
 # Debian
 
 debian/.debhelper
+
+### Conan
+test_package/build
