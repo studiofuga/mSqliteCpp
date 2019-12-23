@@ -6,6 +6,7 @@ conan_basic_setup()
 
 add_executable(ex_insert main.cpp)
 
+
 include_directories(${CONAN_INCLUDE_DIRS})
 target_link_libraries(ex_insert ${CONAN_LIBS})
 

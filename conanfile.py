@@ -15,27 +15,22 @@ class MsqlitecppConan(ConanFile):
     generators = "cmake_find_package"
     exports_sources = "*"
 
-    def build(self):
+    def _configure_cmake(self):
         cmake = CMake(self)
         cmake.configure(source_folder=".", args=["-DENABLE_TEST=OFF"])
-        cmake.build()
+        return cmake
 
-        # Explicit way:
-        # self.run('cmake %s/hello %s'
-        #          % (self.source_folder, cmake.command_line))
-        # self.run("cmake --build . %s" % cmake.build_config)
+    def build(self):
+        cmake = self._configure_cmake()
+        cmake.build()
 
     def build_requirements(self):
         self.build_requires("boost/[1.69.0]@conan/stable")
         self.build_requires("sqlite3/[3.21.0]@bincrafters/stable")
 
     def package(self):
-        self.copy("*.h", dst="include", src="include")
-        self.copy("*.lib", dst="lib", keep_path=False)
-        self.copy("*.dll", dst="bin", keep_path=False)
-        self.copy("*.so", dst="lib", keep_path=False)
-        self.copy("*.dylib", dst="lib", keep_path=False)
-        self.copy("*.a", dst="lib", keep_path=False)
+        cmake = self._configure_cmake()
+        cmake.install()
 
     def package_info(self):
         self.cpp_info.libs = ["msqlitecpp"]
