@@ -50,7 +50,7 @@ add_executable(runTests ${SOURCES})
 target_include_directories(runTests
         PRIVATE
         ${Boost_INCLUDE_DIRS}
-        ${sqlite3_INCLUDE_DIRS}
+        ${SQLite3_INCLUDE_DIRS}
         ${gtest_SOURCE_DIR}/include
         ${gtest_SOURCE_DIR}
         )
@@ -61,7 +61,7 @@ target_link_libraries(runTests
         msqlitecpp
         Boost::filesystem
         gtest gtest_main
-        ${sqlite3_LIBRARIES}
+        ${SQLite3_LIBRARIES}
         )
 
 add_custom_target(checkV1
