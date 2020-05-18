@@ -1,3 +1,9 @@
+msqlitecpp (1.99.4) bionic; urgency=medium
+
+  * Added versions strings that can be retrieved from code
+
+ -- Federico Fuga <happycactus@MintPad.studiofuga.local>  Fri, 07 Feb 2020 11:05:58 +0100
+
 msqlitecpp (1.99.3) bionic; urgency=medium
 
   * Fix a few bugs on opening files.
