@@ -1,5 +1,5 @@
 cmake_minimum_required(VERSION 3.8)
-project(msqlitecpp VERSION 1.99.4.0 LANGUAGES C CXX)
+project(msqlitecpp VERSION 1.99.5.0 LANGUAGES C CXX)
 
 set(msqlitecpp_DESCRIPTION "a Modern SQLite CPP library")
 
@@ -14,11 +14,11 @@ add_subdirectory(src)
 
 if (ENABLE_TEST)
     add_subdirectory(tests)
-endif(ENABLE_TEST)
+endif (ENABLE_TEST)
 
 if (ENABLE_PROFILER)
     add_subdirectory(profiler)
-endif(ENABLE_PROFILER)
+endif (ENABLE_PROFILER)
 
 if (DOXYGEN_FOUND)
     list(APPEND DOXYGEN_EXCLUDE_PATTERNS

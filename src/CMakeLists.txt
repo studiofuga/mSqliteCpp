@@ -29,6 +29,7 @@ if (NOT DISABLE_V1)
             v1/sqlitetable.cpp
             v1/sqlitetransaction.cpp
             v1/sqlitestatement.cpp
+            version.cpp
             )
 
     set(PUB_HEADERS ${PUB_HEADERS}
@@ -48,7 +49,8 @@ if (NOT DISABLE_V1)
             ../include/msqlitecpp/v1/sqlitetable.h
             ../include/msqlitecpp/v1/sqlitetransaction.h
             ../include/msqlitecpp/v1/updatestatement.h
-            ../include/msqlitecpp/v1/sqlconstants.h version.cpp)
+            ../include/msqlitecpp/v1/sqlconstants.h
+            )
 endif ()
 ## Target setup
 
@@ -95,6 +97,10 @@ install(TARGETS msqlitecpp
         RUNTIME DESTINATION ${CMAKE_INSTALL_BINDIR}
         LIBRARY DESTINATION ${CMAKE_INSTALL_LIBDIR}
         ARCHIVE DESTINATION ${CMAKE_INSTALL_LIBDIR}
+        )
+
+install(FILES "${CMAKE_BINARY_DIR}/include/msqlitecpp/version.h" # source directory
+        DESTINATION "${CMAKE_INSTALL_INCLUDEDIR}/msqlitecpp/" # target directory
         )
 
 install(DIRECTORY "${CMAKE_SOURCE_DIR}/include/msqlitecpp/v2" # source directory

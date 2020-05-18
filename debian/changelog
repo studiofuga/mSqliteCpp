@@ -1,3 +1,11 @@
+msqlitecpp (1.99.5) bionic; urgency=medium
+
+  * Added missing version.h file
+  * Added support for Conan
+  * Fix linking under MacOS
+
+ -- Federico Fuga <happycactus@MintPad.studiofuga.local>  Mon, 18 May 2020 17:40:12 +0200
+
 msqlitecpp (1.99.4) bionic; urgency=medium
 
   * Added versions strings that can be retrieved from code
