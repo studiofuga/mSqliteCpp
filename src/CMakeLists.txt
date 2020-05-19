@@ -54,16 +54,9 @@ if (NOT DISABLE_V1)
 endif ()
 ## Target setup
 
-add_library(msqlitecpp ${SOURCE_FILES} ${PUB_HEADERS})
+add_library(msqlitecpp_object OBJECT ${SOURCE_FILES} ${PUB_HEADERS})
 
-set_target_properties(msqlitecpp PROPERTIES
-        VERSION ${PROJECT_VERSION}
-        SOVERSION ${PROJECT_VERSION_MAJOR}
-        EXPORT_NAME msqlitecpp
-        PUBLIC_HEADER "${PUB_HEADERS}"
-        )
-
-target_include_directories(msqlitecpp
+target_include_directories(msqlitecpp_object
         PUBLIC
         $<INSTALL_INTERFACE:include>
         $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/../include>
@@ -76,23 +69,38 @@ target_include_directories(msqlitecpp
         )
 
 if (NOT WIN32)
-    target_compile_options(msqlitecpp PRIVATE -Werror)
+    target_compile_options(msqlitecpp_object PRIVATE -Werror)
 endif ()
 
 # Workaround the C1001 bug with microsoft compilers
 if (WIN32)
-    target_compile_options(msqlitecpp PUBLIC /permissive-)
+    target_compile_options(msqlitecpp_object PUBLIC /permissive-)
 endif ()
 
-target_compile_features(msqlitecpp PUBLIC cxx_std_14)
+target_compile_features(msqlitecpp_object PUBLIC cxx_std_14)
 
-target_compile_definitions(msqlitecpp PRIVATE BUILD_MSQLITECPP)
+target_compile_definitions(msqlitecpp_object PRIVATE BUILD_MSQLITECPP)
+
+add_library(msqlitecpp SHARED $<TARGET_OBJECTS:msqlitecpp_object>)
 
 target_link_libraries(msqlitecpp
         PRIVATE
         ${SQLITE3_LIBRARY})
 
-install(TARGETS msqlitecpp
+set_target_properties(msqlitecpp PROPERTIES
+        VERSION ${PROJECT_VERSION}
+        SOVERSION ${PROJECT_VERSION_MAJOR}
+        EXPORT_NAME msqlitecpp
+        PUBLIC_HEADER "${PUB_HEADERS}"
+        )
+
+add_library(msqlitecpp_static STATIC $<TARGET_OBJECTS:msqlitecpp_object>)
+
+target_link_libraries(msqlitecpp_static
+        PUBLIC
+        ${SQLite3_LIBRARIES})
+
+install(TARGETS msqlitecpp msqlitecpp_static
         EXPORT msqlitecpp-export
         RUNTIME DESTINATION ${CMAKE_INSTALL_BINDIR}
         LIBRARY DESTINATION ${CMAKE_INSTALL_LIBDIR}

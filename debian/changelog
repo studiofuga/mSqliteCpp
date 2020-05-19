@@ -1,3 +1,9 @@
+msqlitecpp (1.99.6) bionic; urgency=medium
+
+  * Added static library in -dev package
+
+ -- Federico Fuga <happycactus@MintPad.studiofuga.local>  Tue, 19 May 2020 11:32:19 +0200
+
 msqlitecpp (1.99.5) bionic; urgency=medium
 
   * Added missing version.h file

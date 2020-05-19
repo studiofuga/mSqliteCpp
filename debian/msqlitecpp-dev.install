@@ -3,4 +3,5 @@ usr/include/msqlitecpp/v2/*
 usr/include/msqlitecpp/utils/*
 usr/include/msqlitecpp/*
 usr/lib/*/lib*.so
+usr/lib/*/lib*.a
 usr/lib/*/cmake/*/*.cmake
