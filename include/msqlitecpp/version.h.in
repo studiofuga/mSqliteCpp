@@ -8,6 +8,7 @@
 
 #include <cstdint>
 #include <string>
+#include "msqlitecpp/v2/msqlitecpp.h"
 
 #define MSQLITECPP_VERSION "@PROJECT_VERSION@"
 
@@ -18,8 +19,8 @@
 
 namespace msqlitecpp {
 
-uint32_t version();
-std::string version_string();
+uint32_t EXPORT_MSQLITEV2 version();
+std::string EXPORT_MSQLITEV2 version_string();
 
 }
 
