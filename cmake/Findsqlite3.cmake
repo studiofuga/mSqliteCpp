@@ -19,13 +19,13 @@ Result variables
 
 This module will set the following variables if found:
 
-``SQLite3_INCLUDE_DIRS``
+``SQLITE3_INCLUDE_DIRS``
   where to find sqlite3.h, etc.
-``SQLite3_LIBRARIES``
+``SQLITE3_LIBRARY``
   the libraries to link against to use SQLite3.
-``SQLite3_VERSION``
+``SQLITE3_VERSION``
   version of the SQLite3 library found
-``SQLite3_FOUND``
+``SQLITE3_FOUND``
   TRUE if found
 
 #]=======================================================================]
@@ -55,12 +55,14 @@ find_package_handle_standard_args(SQLite3
 
 # Create the imported target
 if(SQLite3_FOUND)
-    set(SQLite3_INCLUDE_DIRS ${SQLite3_INCLUDE_DIR})
-    set(SQLite3_LIBRARIES ${SQLite3_LIBRARY})
+    set(SQLITE3_FOUND ${SQLite3_FOUND})
+    set(SQLITE3_VERSION ${SQLite3_VERSION})
+    set(SQLITE3_INCLUDE_DIRS ${SQLite3_INCLUDE_DIR})
+    set(SQLITE3_LIBRARY ${SQLite3_LIBRARY})
     if(NOT TARGET SQLite::SQLite3)
         add_library(SQLite::SQLite3 UNKNOWN IMPORTED)
         set_target_properties(SQLite::SQLite3 PROPERTIES
-                IMPORTED_LOCATION             "${SQLite3_LIBRARY}"
-                INTERFACE_INCLUDE_DIRECTORIES "${SQLite3_INCLUDE_DIR}")
+                IMPORTED_LOCATION             "${SQLITE3_LIBRARY}"
+                INTERFACE_INCLUDE_DIRECTORIES "${SQLITE3_INCLUDE_DIRS}")
     endif()
 endif()

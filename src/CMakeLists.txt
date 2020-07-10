@@ -90,7 +90,7 @@ target_compile_definitions(msqlitecpp PRIVATE BUILD_MSQLITECPP)
 
 target_link_libraries(msqlitecpp
         PRIVATE
-        ${SQLite3_LIBRARIES})
+        ${SQLITE3_LIBRARY})
 
 install(TARGETS msqlitecpp
         EXPORT msqlitecpp-export

@@ -12,7 +12,7 @@ class MsqlitecppConan(ConanFile):
     settings = "os", "compiler", "build_type", "arch"
     options = {"shared": [True, False]}
     default_options = {"shared": True}
-    generators = "cmake_find_package"
+    generators = ["cmake_find_package", "cmake"]
     exports_sources = "*"
 
     def _configure_cmake(self):

@@ -61,7 +61,7 @@ target_link_libraries(runTests
         msqlitecpp
         Boost::filesystem
         gtest gtest_main
-        ${SQLite3_LIBRARIES}
+        ${SQLITE3_LIBRARY}
         )
 
 add_custom_target(checkV1

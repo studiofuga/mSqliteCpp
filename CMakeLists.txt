@@ -1,7 +1,10 @@
 cmake_minimum_required(VERSION 3.8)
-project(msqlitecpp VERSION 1.99.5.0 LANGUAGES C CXX)
+project(msqlitecpp VERSION 1.99.5.1 LANGUAGES C CXX)
 
 set(msqlitecpp_DESCRIPTION "a Modern SQLite CPP library")
+
+include(${CMAKE_BINARY_DIR}/conanbuildinfo.cmake)
+conan_basic_setup()
 
 list(APPEND CMAKE_MODULE_PATH ${CMAKE_SOURCE_DIR}/cmake)
 
