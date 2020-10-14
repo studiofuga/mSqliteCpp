@@ -42,7 +42,7 @@ if (NOT DISABLE_V1)
             v1/NullsTest.cpp
             v1/StrongTypeTests.cpp
             v1/WhereOptTests.cpp
-            v1/TestForeignKeys.cpp)
+            v1/TestForeignKeys.cpp v1/ToString.cpp)
 endif ()
 
 add_executable(runTests ${SOURCES})

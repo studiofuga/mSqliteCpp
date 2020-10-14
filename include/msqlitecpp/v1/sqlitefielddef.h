@@ -103,8 +103,14 @@ public:
     std::string name() const
     { return fieldName; }
 
-    bool hasDefaultValue() const { return haveDefault; }
-    auto defaultValue() const { return defvalue; }
+    auto toString() const
+    { return name(); }
+
+    bool hasDefaultValue() const
+    { return haveDefault; }
+
+    auto defaultValue() const
+    { return defvalue; }
 
     inline std::string sqlType() const
     {

@@ -45,21 +45,25 @@ inline std::string toString(sqlite::FieldDef<Q> t)
 }
 
 #if defined(WITH_BOOST)
-template <typename F, typename T>
+
+template<typename F, typename T>
 inline std::string toString(const F &field, boost::optional<T> v)
 {
-    if (v)
+    if (v) {
         return toString(field);
+    }
     return std::string{};
 }
 
-template <typename T>
+template<typename T>
 inline std::string toString(boost::optional<T> v)
 {
-    if (v)
+    if (v) {
         return toString(v.value());
+    }
     return std::string{};
 }
+
 #endif
 
 template <typename T>
