@@ -21,3 +21,15 @@ Multi-Arch: same
 Depends: ${shlibs:Depends}, ${misc:Depends}
 Description: A modern SQLite C++ interface
  This library allows access to msqlite api using C++11.
+
+Package: msqlitecpp1-dbg
+Architecture: any
+Section: debug
+Priority: extra
+Depends:
+ msqlitecpp1 (= ${binary:Version}),
+ ${misc:Depends}
+Description: debugging symbols for msqlitecpp
+ msqlitecpp is a library that allow access to msqlite api using C++11.
+ .
+ This package contains the debugging symbols for msqlitecpp
