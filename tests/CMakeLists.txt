@@ -49,6 +49,8 @@ add_executable(runTests ${SOURCES})
 
 target_include_directories(runTests
         PRIVATE
+        ${CMAKE_SOURCE_DIR}/include
+        ${CMAKE_BINARY_DIR}/include
         ${Boost_INCLUDE_DIRS}
         ${SQLite3_INCLUDE_DIRS}
         ${gtest_SOURCE_DIR}/include
@@ -58,7 +60,7 @@ target_include_directories(runTests
 target_compile_features(runTests PUBLIC cxx_std_14)
 
 target_link_libraries(runTests
-        msqlitecpp_static
+        msqlitecpp
         Boost::filesystem
         gtest gtest_main
         ${SQLITE3_LIBRARY}
