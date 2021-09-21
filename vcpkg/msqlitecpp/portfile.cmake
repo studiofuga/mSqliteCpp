@@ -11,18 +11,26 @@
 #
 
 include(vcpkg_common_functions)
-set(SOURCE_PATH ${CURRENT_BUILDTREES_DIR}/src/mSqliteCpp-1.99.6.2)
+set(SOURCE_PATH ${CURRENT_BUILDTREES_DIR}/src/mSqliteCpp-1.99.3)
 vcpkg_download_distfile(ARCHIVE
-		URLS "https://github.com/studiofuga/mSqliteCpp/archive/v1.99.6.2.tar.gz"
-		FILENAME "mSqliteCpp-1.99.6.2.tar.gz"
-		SHA512 0
-		)
+		URLS "https://github.com/studiofuga/mSqliteCpp/archive/v1.99.3.tar.gz"
+		FILENAME "mSqliteCpp-1.99.3.tar.gz"
+		SHA512 d0cebd0908737f021c40a8423371f8e75d6b580218fe1181ad5d0f500e8f767f5f71726eea685ac0e7be8f6ec0fdd52e2d9b574921206817319acc5d3cc986b8
+)
 vcpkg_extract_source_archive(${ARCHIVE})
+
+#vcpkg_apply_patches(
+#	SOURCE_PATH ${SOURCE_PATH}
+#    PATCHES
+#        ${CMAKE_CURRENT_LIST_DIR}/0001-Windows-Fixes.patch
+#)
 
 vcpkg_configure_cmake(
     SOURCE_PATH ${SOURCE_PATH}
     PREFER_NINJA # Disable this option if project cannot be built with Ninja
     OPTIONS -DENABLE_TEST=OFF -DENABLE_PROFILER=OFF -DENABLE_SQLITE_AMALGAMATION=OFF -DENABLE_CODE_COVERAGE=OFF
+    # OPTIONS_RELEASE -DOPTIMIZE=1
+    # OPTIONS_DEBUG -DDEBUGGABLE=1
 )
 
 vcpkg_install_cmake()
