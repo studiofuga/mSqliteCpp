@@ -3,7 +3,7 @@ from conans import ConanFile, CMake, tools
 
 class MsqlitecppConan(ConanFile):
     name = "msqlitecpp"
-    version = "1.99.5"
+    version = "1.99.6.3"
     license = "BSD3"
     author = "Federico Fuga <fuga@studiofuga.com>"
     url = "https://github.com/studiofuga/mSqliteCpp"

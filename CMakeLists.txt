@@ -1,5 +1,5 @@
 cmake_minimum_required(VERSION 3.8)
-project(msqlitecpp VERSION 1.99.6.1 LANGUAGES C CXX)
+project(msqlitecpp VERSION 1.99.6.3 LANGUAGES C CXX)
 
 set(msqlitecpp_DESCRIPTION "a Modern SQLite CPP library")
 

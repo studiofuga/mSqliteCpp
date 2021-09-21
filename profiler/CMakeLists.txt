@@ -7,10 +7,11 @@ if (NOT DISABLE_V1)
     endif (UNIX AND NOT APPLE)
 
 	target_include_directories(runProfiler
-        PRIVATE
-        ${Boost_INCLUDE_DIRS}
-        ${SQLite3_INCLUDE_DIRS}
-        )
+            PRIVATE
+            ${CMAKE_SOURCE_DIR}/include
+            ${Boost_INCLUDE_DIRS}
+            ${SQLite3_INCLUDE_DIRS}
+            )
 		
 	target_compile_features(runProfiler PUBLIC cxx_std_14)
 

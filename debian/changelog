@@ -1,3 +1,9 @@
+msqlitecpp (1.99.6.3) focal; urgency=medium
+
+  * Fix installation of headers
+
+ -- Federico Fuga <fuga@studiofuga.com>  Tue, 21 Sep 2021 11:57:17 +0200
+
 msqlitecpp (1.99.6.1) focal; urgency=medium
 
   * Allow classes derived from FieldDef to be used in statements.

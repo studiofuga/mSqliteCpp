@@ -12,7 +12,7 @@ set(SOURCE_FILES
         utils/make_unique.h
         )
 
-set(PUB_HEADERS
+set(EXP_HEADERS
         ../include/msqlitecpp/v2/msqlitecpp.h
         ../include/msqlitecpp/v2/exceptions.h
         ../include/msqlitecpp/v2/storage.h
@@ -32,7 +32,7 @@ if (NOT DISABLE_V1)
             version.cpp
             )
 
-    set(PUB_HEADERS ${PUB_HEADERS}
+    set(EXP_HEADERS ${EXP_HEADERS}
             ../include/msqlitecpp/v1/clauses.h
             ../include/msqlitecpp/v1/createstatement.h
             ../include/msqlitecpp/v1/deletestatement.h
@@ -54,7 +54,7 @@ if (NOT DISABLE_V1)
 endif ()
 ## Target setup
 
-add_library(msqlitecpp_object OBJECT ${SOURCE_FILES} ${PUB_HEADERS})
+add_library(msqlitecpp_object OBJECT ${SOURCE_FILES} ${EXP_HEADERS})
 
 target_include_directories(msqlitecpp_object
         PUBLIC
@@ -91,7 +91,6 @@ set_target_properties(msqlitecpp PROPERTIES
         VERSION ${PROJECT_VERSION}
         SOVERSION ${PROJECT_VERSION_MAJOR}
         EXPORT_NAME msqlitecpp
-        PUBLIC_HEADER "${PUB_HEADERS}"
         )
 
 add_library(msqlitecpp_static STATIC $<TARGET_OBJECTS:msqlitecpp_object>)
