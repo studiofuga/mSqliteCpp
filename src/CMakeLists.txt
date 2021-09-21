@@ -107,30 +107,6 @@ install(TARGETS msqlitecpp msqlitecpp_static
         ARCHIVE DESTINATION ${CMAKE_INSTALL_LIBDIR}
         )
 
-install(FILES "${CMAKE_BINARY_DIR}/include/msqlitecpp/version.h" # source directory
-        DESTINATION "${CMAKE_INSTALL_INCLUDEDIR}/msqlitecpp/" # target directory
-        )
-
-install(DIRECTORY "${CMAKE_SOURCE_DIR}/include/msqlitecpp/v2" # source directory
-        DESTINATION "${CMAKE_INSTALL_INCLUDEDIR}/msqlitecpp/" # target directory
-        FILES_MATCHING # install only matched files
-        PATTERN "*.h" # select header files
-        )
-
-install(DIRECTORY "${CMAKE_SOURCE_DIR}/include/msqlitecpp/utils" # source directory
-        DESTINATION "${CMAKE_INSTALL_INCLUDEDIR}/msqlitecpp/" # target directory
-        FILES_MATCHING # install only matched files
-        PATTERN "*.h" # select header files
-        )
-
-if (NOT DISABLE_V1)
-    install(DIRECTORY "${CMAKE_SOURCE_DIR}/include/msqlitecpp/v1" # source directory
-            DESTINATION "${CMAKE_INSTALL_INCLUDEDIR}/msqlitecpp/" # target directory
-            FILES_MATCHING # install only matched files
-            PATTERN "*.h" # select header files
-            )
-endif ()
-
 install(EXPORT msqlitecpp-export
         FILE
         msqlitecppTargets.cmake
