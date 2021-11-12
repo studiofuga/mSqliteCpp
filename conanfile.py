@@ -12,7 +12,7 @@ class MsqlitecppConan(ConanFile):
     settings = "os", "compiler", "build_type", "arch"
     options = {"shared": [True, False]}
     default_options = {"shared": True}
-    generators = ["cmake_find_package", "cmake"]
+    generators = ["cmake_find_package"]
     exports_sources = "*"
 
     def _configure_cmake(self):
@@ -25,8 +25,8 @@ class MsqlitecppConan(ConanFile):
         cmake.build()
 
     def build_requirements(self):
-        self.build_requires("boost/[1.69.0]@conan/stable")
-        self.build_requires("sqlite3/[3.21.0]@bincrafters/stable")
+        self.build_requires("boost/[1.71.0]")
+        self.build_requires("sqlite3/[3.35.5]")
 
     def package(self):
         cmake = self._configure_cmake()

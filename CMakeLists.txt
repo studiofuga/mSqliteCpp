@@ -3,12 +3,11 @@ project(msqlitecpp VERSION 1.99.6.3 LANGUAGES C CXX)
 
 set(msqlitecpp_DESCRIPTION "a Modern SQLite CPP library")
 
-if (EXISTS "${CMAKE_BINARY_DIR}/conanbuildinfo.cmake")
-    include(${CMAKE_BINARY_DIR}/conanbuildinfo.cmake)
-    conan_basic_setup()
-endif ()
+list(APPEND CMAKE_MODULE_PATH "${CMAKE_BINARY_DIR}")
 
-list(APPEND CMAKE_MODULE_PATH ${CMAKE_SOURCE_DIR}/cmake)
+if (NOT EXISTS "${CMAKE_BINARY_DIR}/FindBoost.cmake")
+    list(APPEND CMAKE_MODULE_PATH "${CMAKE_SOURCE_DIR}/cmake/modules")
+endif()
 
 include(cmake/options.cmake)
 include(cmake/dependencies.cmake)

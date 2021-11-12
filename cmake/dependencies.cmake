@@ -6,7 +6,7 @@ if (Boost_FOUND)
     add_definitions(-DWITH_BOOST)
 endif(Boost_FOUND)
 
-find_package(sqlite3 REQUIRED)
+find_package(SQLite3 REQUIRED)
 
 if (${CMAKE_VERSION} VERSION_GREATER_EQUAL 3.8.99)
     find_package(Doxygen)
