@@ -18,7 +18,7 @@ if (NOT DISABLE_V1)
     # Extra linking for the project.
     target_link_libraries(runProfiler
             msqlitecpp
-            ${SQLITE3_LIBRARY}
+            SQLite::SQLite3
             ${EXTRA_LIB}
             )
 

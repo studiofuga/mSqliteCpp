@@ -85,7 +85,7 @@ add_library(msqlitecpp SHARED $<TARGET_OBJECTS:msqlitecpp_object>)
 
 target_link_libraries(msqlitecpp
         PRIVATE
-        ${SQLITE3_LIBRARY})
+        SQLite::SQLite3)
 
 set_target_properties(msqlitecpp PROPERTIES
         VERSION ${PROJECT_VERSION}
@@ -97,7 +97,7 @@ add_library(msqlitecpp_static STATIC $<TARGET_OBJECTS:msqlitecpp_object>)
 
 target_link_libraries(msqlitecpp_static
         PUBLIC
-        ${SQLite3_LIBRARIES})
+        SQLite::SQLite3)
 
 install(TARGETS msqlitecpp msqlitecpp_static
         EXPORT msqlitecpp-export
