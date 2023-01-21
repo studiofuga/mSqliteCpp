@@ -1,7 +1,7 @@
 Source: msqlitecpp
 Priority: optional
 Maintainer: Federico Fuga <fuga@studiofuga.com>
-Build-Depends: debhelper (>= 10), libboost-filesystem1.74-dev (>= 1.71)
+Build-Depends: debhelper (>= 10), libboost-filesystem1.74-dev (>= 1.71), libsqlite3-dev (>= 3.20)
 Standards-Version: 4.1.2
 Section: libs
 Homepage: https://github.com/studiofuga/mSqliteCpp
@@ -18,7 +18,7 @@ Description: A modern SQLite C++ interface
 Package: msqlitecpp1
 Architecture: any
 Multi-Arch: same
-Depends: ${shlibs:Depends}, ${misc:Depends}
+Depends: ${shlibs:Depends}, ${misc:Depends}, sqlite3 (>= 3.20)
 Description: A modern SQLite C++ interface
  This library allows access to msqlite api using C++11.
 

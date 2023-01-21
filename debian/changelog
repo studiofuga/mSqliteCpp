@@ -1,3 +1,9 @@
+msqlitecpp (1.99.6.3ubuntu1) UNRELEASED; urgency=medium
+
+  * Updated debian dependencies and build dependencies
+
+ -- Federico Fuga <fuga@studiofuga.com>  Sat, 21 Jan 2023 17:07:26 +0100
+
 msqlitecpp (1.99.6.3) focal; urgency=medium
 
   * Fix installation of headers
