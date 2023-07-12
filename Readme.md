@@ -3,7 +3,7 @@ _A modern SQLite C++ interface_
 
 ## Status
 
-![Build status](https://github.com/studiofuga/mSqliteCpp/actions/workflows/cmake.yml/badge.svg)
+![Build status](https://github.com/studiofuga/mSqliteCpp/actions/workflows/build.yml/badge.svg)
 
 ## Introduction
 Why this library?

@@ -124,6 +124,12 @@ tests/googletest
 # Debian
 
 debian/.debhelper
+debian/msqlitecpp*/
+debian/tmp/
+debian/files
+debian/*.log
+debian/debhelper-build-stamp
+debian/*.substvars
 
 ### Conan
 test_package/build
