@@ -1,6 +1,10 @@
 # mSqliteCpp {#mainpage}
 _A modern SQLite C++ interface_
 
+## Status
+
+![Build status](https://github.com/studiofuga/mSqliteCpp/actions/workflows/cmake.yml/badge.svg)
+
 ## Introduction
 Why this library?
 

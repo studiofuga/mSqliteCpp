@@ -1,7 +1,7 @@
 Source: msqlitecpp
 Priority: optional
 Maintainer: Federico Fuga <fuga@studiofuga.com>
-Build-Depends: debhelper (>= 10), libboost-filesystem1.74-dev (>= 1.71), libsqlite3-dev (>= 3.20)
+Build-Depends: debhelper (>= 10), libboost-filesystem1.74-dev (>= 1.71), libsqlite3-dev (>= 3.20), libgtest-dev (>= 1.11)
 Standards-Version: 4.1.2
 Section: libs
 Homepage: https://github.com/studiofuga/mSqliteCpp

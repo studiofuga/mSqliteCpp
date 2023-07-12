@@ -1,23 +1,3 @@
-# Fix problems linking on Windows
-set(gtest_force_shared_crt ON CACHE BOOL "" FORCE)
-
-if (NOT EXISTS ${CMAKE_SOURCE_DIR}/tests/googletest/CMakeLists.txt)
-    set(GTEST_URL https://github.com/google/googletest.git)
-    execute_process(
-            COMMAND git clone ${GTEST_URL}
-            WORKING_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}
-    )
-endif (NOT EXISTS ${CMAKE_SOURCE_DIR}/tests/googletest/CMakeLists.txt)
-
-# This adds another subdirectory, which has 'project(gtest)'.
-add_subdirectory(googletest EXCLUDE_FROM_ALL)
-
-enable_testing()
-
-##############
-# Testing
-##############
-
 set(SOURCES
         version_test.cpp
         v2/storage.cpp
@@ -62,7 +42,7 @@ target_compile_features(runTests PUBLIC cxx_std_14)
 target_link_libraries(runTests
         msqlitecpp
         Boost::filesystem
-        gtest gtest_main
+        GTest::GTest GTest::Main
         ${SQLITE3_LIBRARY}
         )
 
@@ -81,4 +61,5 @@ if (ENABLE_CODECOVERAGE)
             )
 endif (ENABLE_CODECOVERAGE)
 
-add_test(UnitTests runTests)
+add_test(NAME runUnitTests
+        COMMAND runTests)

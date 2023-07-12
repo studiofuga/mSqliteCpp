@@ -29,3 +29,5 @@ if (ENABLE_CODECOVERAGE)
         message(FATAL_ERROR "genhtml not found" )
     endif(NOT GENHTML_PATH)
 endif (ENABLE_CODECOVERAGE)
+
+find_package(GTest REQUIRED)
