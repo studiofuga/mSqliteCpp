@@ -18,7 +18,7 @@ jobs:
     - name: Install Prerequisites
       run: |
         sudo apt update
-        sudo apt install libboost-dev libboost-filesystem-dev libsqlite3-dev libgtest-dev
+        sudo apt install -qqy libboost-dev libboost-filesystem-dev libsqlite3-dev libgtest-dev
 
     - uses: actions/checkout@v3
 

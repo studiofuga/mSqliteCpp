@@ -1,0 +1,29 @@
+name: Package Debian
+
+on:
+  push:
+    tags:
+      - '**'    # triggers on ANY tag including hierarchical ones like stable/v2
+
+env:
+  BUILD_TYPE: Release
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Install Prerequisites
+        run: |
+          sudo apt update
+          sudo apt install -qqy debhelper cmake libboost-dev libboost-filesystem-dev libsqlite3-dev libgtest-dev
+
+      - uses: actions/checkout@v3
+      - uses: jtdor/build-deb-action@v1
+        id: package
+        with:
+          buildpackage-opts: --build=binary --no-sign
+
+      - uses: actions/upload-artifact@v3
+        with:
+          path: debian/artifacts/

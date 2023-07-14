@@ -3,11 +3,11 @@ Upstream-Name: msqlitecpp
 Source: https://github.com/studiofuga/mSqliteCpp
 
 Files: *
-Copyright: 2019 Federico Fuga <fuga@studiofuga.com>
+Copyright: 2019-2023 Federico Fuga <fuga@studiofuga.com>
 License: BSD-3-Clause
 
 Files: debian/*
-Copyright: 2019 Federico Fuga <fuga@studiofuga.com>
+Copyright: 2019-2023 Federico Fuga <fuga@studiofuga.com>
 License: BSD-3-Clause
 
 License: BSD-3-Clause
