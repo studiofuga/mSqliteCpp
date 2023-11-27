@@ -1,8 +1,9 @@
-msqlitecpp (1.99.6.3ubuntu1) UNRELEASED; urgency=medium
+msqlitecpp (1.99.7.0) UNRELEASED; urgency=medium
 
   * Updated debian dependencies and build dependencies
+  * Added conflict resolution clauses to table constraints
 
- -- Federico Fuga <fuga@studiofuga.com>  Sat, 21 Jan 2023 17:07:26 +0100
+ -- Federico Fuga <fuga@studiofuga.com>  Mon, 27 Nov 2023 19:12:24 +0100
 
 msqlitecpp (1.99.6.3) focal; urgency=medium
 
