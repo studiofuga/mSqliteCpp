@@ -1,6 +1,7 @@
 name: Package Debian
 
 on:
+  workflow_dispatch:
   push:
     tags:
       - '**'    # triggers on ANY tag including hierarchical ones like stable/v2
