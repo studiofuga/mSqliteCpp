@@ -218,11 +218,31 @@ TEST(V1SqlFormatting, UniqueAndPrimaryKey)
     sqlite::statements::CreateTable::TableConstraint::Unique c2("u", fldId, fldName);
     ASSERT_EQ(c2.toString(), "CONSTRAINT u UNIQUE (id,name)");
 
+    sqlite::statements::CreateTable::TableConstraint::Unique c3("u", fldId, fldName);
+    c3.onConflict(sqlite::statements::CreateTable::TableConstraint::OnConflict::Replace {});
+    ASSERT_EQ(c3.toString(), "CONSTRAINT u UNIQUE (id,name) ON CONFLICT REPLACE");
+
+    sqlite::statements::CreateTable::TableConstraint::Unique c4("u", fldId, fldName);
+    c4.onConflict(sqlite::statements::CreateTable::TableConstraint::OnConflict::Abort {});
+    ASSERT_EQ(c4.toString(), "CONSTRAINT u UNIQUE (id,name) ON CONFLICT ABORT");
+
+    sqlite::statements::CreateTable::TableConstraint::Unique c5("u", fldId, fldName);
+    c5.onConflict(sqlite::statements::CreateTable::TableConstraint::OnConflict::Fail {});
+    ASSERT_EQ(c5.toString(), "CONSTRAINT u UNIQUE (id,name) ON CONFLICT FAIL");
+
+    sqlite::statements::CreateTable::TableConstraint::Unique c6("u", fldId, fldName);
+    c6.onConflict(sqlite::statements::CreateTable::TableConstraint::OnConflict::Ignore {});
+    ASSERT_EQ(c6.toString(), "CONSTRAINT u UNIQUE (id,name) ON CONFLICT IGNORE");
+
     sqlite::statements::CreateTable::TableConstraint::PrimaryKey p1("pk", fldId);
     ASSERT_EQ(p1.toString(), "CONSTRAINT pk PRIMARY KEY (id)");
 
     sqlite::statements::CreateTable::TableConstraint::PrimaryKey p2("pk", fldId, fldName);
     ASSERT_EQ(p2.toString(), "CONSTRAINT pk PRIMARY KEY (id,name)");
+
+    sqlite::statements::CreateTable::TableConstraint::PrimaryKey p3("pk", fldId, fldName);
+    p3.onConflict(sqlite::statements::CreateTable::TableConstraint::OnConflict::Rollback {});
+    ASSERT_EQ(p3.toString(), "CONSTRAINT pk PRIMARY KEY (id,name) ON CONFLICT ROLLBACK");
 }
 
 TEST(V1SqlFormatting, createTableStatement)

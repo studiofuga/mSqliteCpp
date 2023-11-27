@@ -529,6 +529,29 @@ public:
     }
 
     struct TableConstraint {
+        struct OnConflict {
+            struct Rollback {
+                [[nodiscard]] const char *toString() const { return " ON CONFLICT ROLLBACK"; }
+            };
+            struct Abort {
+                [[nodiscard]] const char *toString() const { return " ON CONFLICT ABORT"; }
+            };
+            struct Fail {
+                [[nodiscard]] const char *toString() const { return " ON CONFLICT FAIL"; }
+            };
+            struct Ignore {
+                [[nodiscard]] const char *toString() const { return " ON CONFLICT IGNORE"; }
+            };
+            struct Replace {
+                [[nodiscard]] const char *toString() const { return " ON CONFLICT REPLACE"; }
+            };
+
+            template<typename T>
+            static const char *toString(T t) {
+                return t.toString();
+            }
+        };
+
         class ForeignKey {
             std::string statement;
             std::string actionString;
@@ -596,6 +619,7 @@ public:
 
         class Unique {
             std::string statement;
+            std::string conflictClause;
         public:
             template<typename ...FLDS>
             explicit
@@ -607,16 +631,22 @@ public:
                    << ")";
                 statement = ss.str();
             }
-            std::string toString() const
+            [[nodiscard]] std::string toString() const
             {
                 std::ostringstream ss;
-                ss << statement;
+                ss << statement << conflictClause;
                 return ss.str();
+            }
+
+            template <typename T>
+            void onConflict(T t) {
+                conflictClause = statements::CreateTable::TableConstraint::OnConflict::toString(t);
             }
         };
 
         class PrimaryKey {
             std::string statement;
+            std::string conflictClause;
         public:
             template<typename ...FLDS>
             explicit
@@ -628,11 +658,16 @@ public:
                    << ")";
                 statement = ss.str();
             }
-            std::string toString() const
+            [[nodiscard]] std::string toString() const
             {
                 std::ostringstream ss;
-                ss << statement;
+                ss << statement << conflictClause;
                 return ss.str();
+            }
+
+            template <typename T>
+            void onConflict(T t) {
+                conflictClause = statements::CreateTable::TableConstraint::OnConflict::toString(t);
             }
         };
     };
