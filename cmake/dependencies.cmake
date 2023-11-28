@@ -30,4 +30,6 @@ if (ENABLE_CODECOVERAGE)
     endif(NOT GENHTML_PATH)
 endif (ENABLE_CODECOVERAGE)
 
-find_package(GTest REQUIRED)
+if (ENABLE_TEST)
+    find_package(GTest REQUIRED)
+endif (ENABLE_TEST)

@@ -15,7 +15,9 @@ include(cmake/dependencies.cmake)
 include(cmake/compileropts.cmake)
 include(cmake/install.cmake)
 
-enable_testing()
+if (ENABLE_TEST)
+    enable_testing()
+endif(ENABLE_TEST)
 
 add_subdirectory(src)
 
