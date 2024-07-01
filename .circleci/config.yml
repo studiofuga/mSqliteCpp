@@ -10,9 +10,6 @@ jobs:
     environment:
       BUILD_TYPE: Release
     steps:
-      - run:
-          name: Preparation
-          command: sudo apt update && sudo apt install -qqy libboost-dev libboost-filesystem-dev libsqlite3-dev libgtest-dev
       - checkout
       - run:
           name: Configure cmake
