@@ -1,7 +1,7 @@
 version: 2.1
 
 jobs:
-  preparation:
+  build-and-test:
     machine:
       image: ubuntu-2204:current
     environment:
@@ -21,3 +21,8 @@ jobs:
           name: Run Unit tests
           command: ctest -C ${BUILD_TYPE}
           working_directory: ${CIRCLE_WORKING_DIRECTORY}/build
+
+workflows:
+  Build-and-test:
+    jobs:
+      - build-and-test
