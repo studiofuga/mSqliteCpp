@@ -2,8 +2,11 @@ version: 2.1
 
 jobs:
   build-and-test:
-    machine:
-      image: ubuntu-2204:current
+    docker:
+      - image: docker.studiofuga.com/msqlitecpp-build:1
+        auth:
+          username: $MY_DOCKER_USER  # can specify string literal values
+          password: $MY_DOCKER_PASSWORD  # or project environment variable reference
     environment:
       BUILD_TYPE: Release
     steps:
@@ -25,4 +28,5 @@ jobs:
 workflows:
   Build-and-test:
     jobs:
-      - build-and-test
+      - build-and-test:
+          context: private-docker
