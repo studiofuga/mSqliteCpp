@@ -1,4 +1,10 @@
-msqlitecpp (1.99.7.0) UNRELEASED; urgency=medium
+msqlitecpp (1.99.7.1ubuntu1) jammy; urgency=medium
+
+  * Fix memory leak in some statement
+
+ -- Federico Fuga <fuga@studiofuga.com>  Wed, 31 Jul 2024 18:16:02 +0200
+
+msqlitecpp (1.99.7.0) focal; urgency=medium
 
   * Updated debian dependencies and build dependencies
   * Added conflict resolution clauses to table constraints
