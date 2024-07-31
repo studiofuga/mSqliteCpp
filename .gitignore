@@ -133,3 +133,4 @@ debian/*.substvars
 
 ### Conan
 test_package/build
+/obj-x86_64-linux-gnu

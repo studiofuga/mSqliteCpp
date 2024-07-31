@@ -1,0 +1,29 @@
+version: 2.1
+
+jobs:
+  build-and-test:
+    docker:
+      - image: docker.studiofuga.com/msqlitecpp-build:1
+        auth:
+          username: $MY_DOCKER_USER  # can specify string literal values
+          password: $MY_DOCKER_PASSWORD  # or project environment variable reference
+    environment:
+      BUILD_TYPE: Release
+    steps:
+      - checkout
+      - run:
+          name: Configure cmake
+          command: cmake -B ${CIRCLE_WORKING_DIRECTORY}/build -DCMAKE_BUILD_TYPE=${BUILD_TYPE}
+      - run:
+          name: Build
+          command: cmake --build ${CIRCLE_WORKING_DIRECTORY}/build --config ${BUILD_TYPE}
+      - run:
+          name: Run Unit tests
+          command: ctest -C ${BUILD_TYPE}
+          working_directory: ${CIRCLE_WORKING_DIRECTORY}/build
+
+workflows:
+  Build-and-test:
+    jobs:
+      - build-and-test:
+          context: private-docker
