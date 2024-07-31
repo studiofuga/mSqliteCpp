@@ -52,6 +52,10 @@ public:
 
     SQLiteStatement &operator=(SQLiteStatement &&);
 
+    /* Copy constructor/operator are deleted, because of internal sqlite3 structures. */
+    SQLiteStatement(SQLiteStatement const &) = delete;
+    SQLiteStatement &operator=(SQLiteStatement const &) = delete;
+
     ~SQLiteStatement();
 
     void attach(std::shared_ptr<SQLiteStorage> dbm);

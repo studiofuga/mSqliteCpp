@@ -36,6 +36,7 @@ bool SQLiteTable::createFromSQLString(std::string query)
         throw SQLiteException(db->handle());
     }
 
+    sqlite3_finalize(s);
     return true;
 }
 

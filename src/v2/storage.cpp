@@ -60,6 +60,8 @@ void Storage::open()
                              openFlags,
                              nullptr);
     if (r != SQLITE_OK) {
+        sqlite3_close(p->mDb);
+        p->mDb = nullptr;
         throw Exception(p->mDb);
     }
     sqlite3_busy_timeout(p->mDb, 1000);

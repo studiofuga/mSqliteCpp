@@ -36,6 +36,13 @@ struct Statement::Impl {
 
     }
 
+    ~Impl()
+    {
+        if (stmt) {
+            sqlite3_finalize(stmt);
+        }
+    }
+
     void prepareIfNecessary()
     {
         if (stmt == nullptr) {
@@ -52,6 +59,9 @@ struct Statement::Impl {
             db = dbp;
         }
 
+        if (stmt) {
+            sqlite3_finalize(stmt);
+        }
         auto r = sqlite3_prepare_v2(db, sqlStatement.c_str(), -1, &stmt, nullptr);
         if (r != SQLITE_OK) {
             throw Exception(db, sqlStatement);
