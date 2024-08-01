@@ -19,12 +19,12 @@ jobs:
           sudo apt update
           sudo apt install -qqy debhelper cmake libboost-dev libboost-filesystem-dev libsqlite3-dev libgtest-dev
 
-      - uses: actions/checkout@v3
+      - uses: actions/checkout@v4
       - uses: jtdor/build-deb-action@v1
         id: package
         with:
           buildpackage-opts: --build=binary --no-sign
 
-      - uses: actions/upload-artifact@v3
+      - uses: actions/upload-artifact@v4
         with:
           path: debian/artifacts/
