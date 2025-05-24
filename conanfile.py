@@ -47,3 +47,10 @@ class SparseppConan(ConanFile):
 
     def package_info(self):
         self.cpp_info.libs = ["msqlitecpp"]
+        self.cpp_info.set_property("cmake_file_name", "msqlitecpp")
+        self.cpp_info.set_property("cmake_target_name", "msqlitecpp::msqlitecpp")
+
+        self.cpp_info.builddirs.append(os.path.join("lib", "cmake", self.name))
+
+        self.cpp_info.names["cmake_find_package"] = "msqlitecpp"
+        self.cpp_info.names["cmake_find_package_multi"] = "msqlitecpp"

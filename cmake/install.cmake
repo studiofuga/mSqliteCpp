@@ -14,5 +14,5 @@ endif ()
 
 
 if (WIN32)
-    set (INSTALL_EXPORTS_DIR share/msqlitecpp)
+    set (INSTALL_EXPORTS_DIR lib/cmake)
 endif(WIN32)
