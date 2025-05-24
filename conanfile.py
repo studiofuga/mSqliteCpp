@@ -25,6 +25,8 @@ class SparseppConan(ConanFile):
     default_options = {"shared": True,
                        "fPIC": True}
 
+    test_requires = "gtest/1.16.0"
+
     def config_options(self):
         if self.settings.os == "Windows":
             del self.options.fPIC
