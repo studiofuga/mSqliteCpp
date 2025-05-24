@@ -8,7 +8,7 @@ import os
 
 class SparseppConan(ConanFile):
     name = "msqlitecpp"
-    version = "1.99.6.3"
+    version = "1.99.7.1"
     license = "BSD3"
     author = "Federico Fuga <fuga@studiofuga.com>"
     url = "https://github.com/studiofuga/mSqliteCpp"
@@ -25,15 +25,12 @@ class SparseppConan(ConanFile):
     default_options = {"shared": True,
                        "fPIC": True}
 
+    requires =["sqlite3/[>=3.49.0]", "boost/[>=1.71.0]"]
     test_requires = "gtest/1.16.0"
 
     def config_options(self):
         if self.settings.os == "Windows":
             del self.options.fPIC
-
-    def build_requirements(self):
-        self.build_requires("boost/[>=1.71.0]")
-        self.build_requires("sqlite3/[>=3.35.5]")
 
     def layout(self):
         cmake_layout(self)
