@@ -4,10 +4,7 @@ project(msqlitecpp VERSION 1.99.7.1 LANGUAGES C CXX)
 set(msqlitecpp_DESCRIPTION "a Modern SQLite CPP library")
 
 list(APPEND CMAKE_MODULE_PATH "${CMAKE_BINARY_DIR}")
-
-if (NOT EXISTS "${CMAKE_BINARY_DIR}/FindBoost.cmake")
-    list(APPEND CMAKE_MODULE_PATH "${CMAKE_SOURCE_DIR}/cmake/modules")
-endif()
+list(APPEND CMAKE_MODULE_PATH "${CMAKE_SOURCE_DIR}/cmake/modules")
 
 include(cmake/options.cmake)
 include(cmake/dependencies.cmake)

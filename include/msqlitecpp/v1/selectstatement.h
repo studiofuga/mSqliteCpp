@@ -35,7 +35,7 @@ private:
      * @return The returned value as from SQLiteStatement::get<T>(I);
      */
     template<std::size_t I>
-    auto getValues()
+    decltype(std::get<I>(fields).rawType()) getValues()
     {
         auto &field = std::get<I>(fields);
         if (field.hasDefaultValue() && statement.isNull(I))
