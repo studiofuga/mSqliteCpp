@@ -1,7 +1,12 @@
-from conans import ConanFile, CMake, tools
+#!/usr/bin/env python
+# -*- coding: utf-8 -*-
 
+from conan import ConanFile, tools
+from conan.tools.files import get,copy
+from conan.tools.cmake import CMake, CMakeDeps, CMakeToolchain, cmake_layout
+import os
 
-class MsqlitecppConan(ConanFile):
+class SparseppConan(ConanFile):
     name = "msqlitecpp"
     version = "1.99.6.3"
     license = "BSD3"
@@ -9,27 +14,35 @@ class MsqlitecppConan(ConanFile):
     url = "https://github.com/studiofuga/mSqliteCpp"
     description = "A modern SQLite C++ interface"
     topics = ("sqlite3", "c++")
-    settings = "os", "compiler", "build_type", "arch"
-    options = {"shared": [True, False]}
-    default_options = {"shared": True}
-    generators = ["cmake_find_package"]
+
     exports_sources = "*"
+    settings = "os", "compiler", "build_type", "arch"
+    generators = "CMakeDeps", "CMakeToolchain"
 
-    def _configure_cmake(self):
-        cmake = CMake(self)
-        cmake.configure(source_folder=".", args=["-DENABLE_TEST=OFF"])
-        return cmake
+    options = {"shared": [True, False],
+               "fPIC": [True, False]}
 
-    def build(self):
-        cmake = self._configure_cmake()
-        cmake.build()
+    default_options = {"shared": True,
+                       "fPIC": True}
+
+    def config_options(self):
+        if self.settings.os == "Windows":
+            del self.options.fPIC
 
     def build_requirements(self):
-        self.build_requires("boost/[1.71.0]")
-        self.build_requires("sqlite3/[3.35.5]")
+        self.build_requires("boost/[>=1.71.0]")
+        self.build_requires("sqlite3/[>=3.35.5]")
+
+    def layout(self):
+        cmake_layout(self)
+
+    def build(self):
+        cmake = CMake(self)
+        cmake.configure()
+        cmake.build()
 
     def package(self):
-        cmake = self._configure_cmake()
+        cmake = CMake(self)
         cmake.install()
 
     def package_info(self):

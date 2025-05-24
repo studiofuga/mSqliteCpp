@@ -1,12 +1,12 @@
 # Manage dependencies, find paths, etc
 
-find_package(Boost REQUIRED filesystem)
+find_package(Boost 1.71.0 REQUIRED COMPONENTS filesystem)
 
 if (Boost_FOUND)
     add_definitions(-DWITH_BOOST)
 endif(Boost_FOUND)
 
-find_package(SQLite3 REQUIRED)
+find_package(SQLite3 3.35.0 REQUIRED)
 
 if (${CMAKE_VERSION} VERSION_GREATER_EQUAL 3.8.99)
     find_package(Doxygen)

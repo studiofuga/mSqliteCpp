@@ -104,5 +104,25 @@ The default is On
 
 - DISABLE_LEGACY_CODE: Compile only the V2 API, default is Off (for the moment)
 
+## Prerequisites on Windows
+
+The project depends on SQLite3. On Windows it is strongly suggested to use sqlite amalgamation binaries.
+
+In that case, there's an articulated procedure to install.
+
+First [download sqlite_amalgamation sources and binaries](https://www.sqlite.org/download.html), then extract them 
+into a folder, for example in `./extra`. You'll have, among others, 3 files: the header file (`sqlite3.h`), the dll
+(`sqlite3.dll`) and a library definition file (`sqlite3.def`). You'll need to produce the import library, using
+the visual studio lib tool.
+
+Open a development prompt and from the `extra` foldeer, run
+
+```
+lib /DEF:sqlite3.def /OUT:sqlite3.lib /MACHINE:x64
+```
+
+Check [this post](https://discourse.cmake.org/t/correct-usage-of-findsqlite3-module-in-windows/174/5) and the 
+[original instructions](https://gist.github.com/zeljic/d8b542788b225b1bcb5fce169ee28c55).  
+
 ## License
 The library is released under the BSD 3-Clause license. See the LICENSE file for details.
