@@ -3,10 +3,10 @@
 
 #include "msqlitecpp/v1/msqlitecpp.h"
 
-#include <sstream>
-#include <stdint.h>
+#include <cstdint>
 #include <string>
 #include <vector>
+#include <sstream>
 
 namespace sqlite {
 

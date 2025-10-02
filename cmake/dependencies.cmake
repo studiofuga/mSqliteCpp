@@ -31,5 +31,7 @@ if (ENABLE_CODECOVERAGE)
 endif (ENABLE_CODECOVERAGE)
 
 if (ENABLE_TEST)
-    find_package(GTest REQUIRED)
+    include(cmake/googletest.cmake)
+#    message("Try: ${CMAKE_SOURCE_DIR}/googletest")
+#    find_package(GTest REQUIRED HINTSw ${CMAKE_SOURCE_DIR}/googletest/googletest)
 endif (ENABLE_TEST)

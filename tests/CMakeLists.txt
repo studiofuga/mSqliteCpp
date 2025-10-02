@@ -1,3 +1,6 @@
+
+enable_testing()
+
 set(SOURCES
         version_test.cpp
         v2/storage.cpp
@@ -33,8 +36,6 @@ target_include_directories(runTests
         ${CMAKE_BINARY_DIR}/include
         ${Boost_INCLUDE_DIRS}
         ${SQLite3_INCLUDE_DIRS}
-        ${gtest_SOURCE_DIR}/include
-        ${gtest_SOURCE_DIR}
         )
 
 target_compile_features(runTests PUBLIC cxx_std_14)
@@ -42,7 +43,7 @@ target_compile_features(runTests PUBLIC cxx_std_14)
 target_link_libraries(runTests
         msqlitecpp
         Boost::filesystem
-        GTest::GTest GTest::Main
+        GTest::gtest_main
         ${SQLITE3_LIBRARY}
         )
 
