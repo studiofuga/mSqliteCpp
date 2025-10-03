@@ -26,7 +26,11 @@ TEST(InsertStatement, simple)
 
     auto insertStatement = makeInsertStatement(db, "t", colI, colT, colR);
 
-    ASSERT_NO_THROW(insertStatement.insert(1, "one", 1.0));
-    ASSERT_NO_THROW(insertStatement.insert(2, "two", 2.0));
-    ASSERT_NO_THROW(insertStatement.insert(3, "three", 3.0));
+    long long rowId = 0;
+    ASSERT_NO_THROW(rowId = insertStatement.insert(1, "one", 1.0));
+    EXPECT_EQ(rowId, 1);
+    ASSERT_NO_THROW(rowId = insertStatement.insert(2, "two", 2.0));
+    EXPECT_EQ(rowId, 2);
+    ASSERT_NO_THROW(rowId = insertStatement.insert(3, "three", 3.0));
+    EXPECT_EQ(rowId, 3);
 }
