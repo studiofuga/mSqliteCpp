@@ -27,11 +27,16 @@ public:
         statement.set(format(tablename, fields));
     }
 
-    template<typename ...VALUES_TYPES>
-    void insert(VALUES_TYPES ... values)
+    template<typename... VALUES_TYPES>
+    long long insert(VALUES_TYPES... values)
     {
         statement.bind(std::make_tuple(values...));
-        statement.execute();
+        long long rowId = 0;
+        statement.execute([this, &rowId]() {
+            rowId = statement.getLongValue(0);
+            return true;
+        });
+        return rowId;
     }
 
     std::string toString() const
@@ -44,10 +49,9 @@ private:
     {
         std::ostringstream ss;
 
-        ss << "INSERT INTO " << tablename << "("
-           << unpackFieldNames(fields) << ") VALUES("
-           << unpackFieldPlaceholders(fields) << ")";
-
+        ss << "INSERT INTO " << tablename << "(" << unpackFieldNames(fields) << ") VALUES("
+           << unpackFieldPlaceholders(fields) << ")"
+           << " RETURNING ROWID";
         return ss.str();
     }
 };
