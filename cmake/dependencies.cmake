@@ -1,5 +1,8 @@
 # Manage dependencies, find paths, etc
 
+# FindBoost is provided by boost, not by cmake.
+cmake_policy(SET CMP0167 NEW)
+
 find_package(Boost 1.71.0 REQUIRED COMPONENTS filesystem)
 
 if (Boost_FOUND)
@@ -31,7 +34,5 @@ if (ENABLE_CODECOVERAGE)
 endif (ENABLE_CODECOVERAGE)
 
 if (ENABLE_TEST)
-    include(cmake/googletest.cmake)
-#    message("Try: ${CMAKE_SOURCE_DIR}/googletest")
-#    find_package(GTest REQUIRED HINTSw ${CMAKE_SOURCE_DIR}/googletest/googletest)
+    find_package(GTest REQUIRED)
 endif (ENABLE_TEST)
