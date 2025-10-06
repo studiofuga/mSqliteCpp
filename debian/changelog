@@ -1,3 +1,10 @@
+msqlitecpp (1.99.8.0ubuntu1) jammy; urgency=medium
+
+  * Return RowID from v2 insert statements
+  * A few minor fixes
+
+ -- Federico Fuga <fuga@studiofuga.com>  Mon, 06 Oct 2025 16:22:21 +0200
+
 msqlitecpp (1.99.7.1ubuntu1) jammy; urgency=medium
 
   * Fix memory leak in some statement
