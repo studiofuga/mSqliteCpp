@@ -2,7 +2,11 @@
 
 # FindBoost is provided by boost, not by cmake.
 if(POLICY CMP0167)
-    cmake_policy(SET CMP0167 NEW)
+    if(CMAKE_CROSSCOMPILING)
+        cmake_policy(SET CMP0167 OLD)
+    else()
+        cmake_policy(SET CMP0167 NEW)
+    endif()
 endif()
 
 find_package(Boost 1.71.0 REQUIRED COMPONENTS filesystem)
