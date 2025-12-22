@@ -80,6 +80,12 @@ private:
     std::unique_ptr<SQLiteStatement> mBeginTransaction, mCommitTransaction, mAbortTransaction;
 
     std::set<Flags> mFlags;
+    std::set<sqlite3_stmt*> mActiveStatements;
+
+    void registerStatement(sqlite3_stmt* stmt, bool trackForCleanup = true);
+    void unregisterStatement(sqlite3_stmt* stmt);
+
+    friend class SQLiteStatement;
 public:
 
     explicit SQLiteStorage(std::string path);

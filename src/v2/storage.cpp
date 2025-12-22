@@ -77,8 +77,10 @@ void Storage::open()
 
 void Storage::close()
 {
-    sqlite3_close_v2(p->mDb);
-    p->mDb = nullptr;
+    if (p->mDb != nullptr) {
+        sqlite3_close_v2(p->mDb);
+        p->mDb = nullptr;
+    }
 }
 
 void Storage::updateFlags()

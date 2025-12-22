@@ -35,8 +35,14 @@ sqlite::SQLiteStatement::SQLiteStatement(std::shared_ptr<SQLiteStorage> db, cons
 
 sqlite::SQLiteStatement::~SQLiteStatement()
 {
-    if (p != nullptr && p->stmt != nullptr)
+    if (p != nullptr && p->stmt != nullptr) {
+        auto db = p->mDb.lock();
+        if (db) {
+            db->unregisterStatement(p->stmt);
+        }
         sqlite3_finalize(p->stmt);
+        p->stmt = nullptr;
+    }
 }
 
 sqlite::SQLiteStatement::SQLiteStatement(SQLiteStatement &&) = default;
@@ -81,11 +87,15 @@ void SQLiteStatement::prepare(std::string sql)
 {
     auto db = p->mDb.lock();
     if (p->stmt) {
+        db->unregisterStatement(p->stmt);
         sqlite3_finalize(p->stmt);
+        p->stmt = nullptr;
     }
     auto r = sqlite3_prepare_v2(db->handle(), sql.c_str(), -1, &p->stmt, nullptr);
     if (r != SQLITE_OK)
         throw SQLiteException(db->handle(), sql);
+
+    db->registerStatement(p->stmt, mTrackForCleanup);
 }
 
 void SQLiteStatement::bind(size_t idx, std::string value)
@@ -245,5 +255,14 @@ bool SQLiteStatement::execute(std::function<bool()> function)
 bool SQLiteStatement::execute()
 {
     return execute([]() { return true; });
+}
+
+void SQLiteStatement::disableTracking()
+{
+    auto db = p->mDb.lock();
+    if (db && p->stmt) {
+        db->unregisterStatement(p->stmt);
+    }
+    mTrackForCleanup = false;
 }
 

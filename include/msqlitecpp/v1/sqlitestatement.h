@@ -23,6 +23,7 @@ class EXPORT SQLiteStatement {
     struct Impl;
 
     std::unique_ptr<Impl> p;
+    bool mTrackForCleanup = true;
 
     void init(std::shared_ptr<SQLiteStorage> db);
 
@@ -132,6 +133,9 @@ public:
     bool execute(std::function<bool()> function);
 
     bool execute();
+
+    // Disable tracking of this statement for cleanup (used for internal statements)
+    void disableTracking();
 };
 
 template<>

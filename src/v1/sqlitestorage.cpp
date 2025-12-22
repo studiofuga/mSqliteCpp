@@ -18,7 +18,26 @@ SQLiteStorage::SQLiteStorage(std::string path)
 SQLiteStorage::~SQLiteStorage() noexcept
 {
     if (mDb != nullptr) {
+        // Finalize all external active statements before closing the database
+        // (the internal transaction statements will be finalized by their destructors)
+        {
+            std::unique_lock<std::mutex> l(mMutex);
+            for (auto* stmt : mActiveStatements) {
+                if (stmt != nullptr) {
+                    sqlite3_finalize(stmt);
+                }
+            }
+            mActiveStatements.clear();
+        }
+
+        // Now reset transaction statements (they won't be in mActiveStatements)
+        mBeginTransaction.reset();
+        mCommitTransaction.reset();
+        mAbortTransaction.reset();
+
+        // Finally close the database with close_v2
         sqlite3_close_v2(mDb);
+        mDb = nullptr;
     }
 }
 
@@ -34,6 +53,11 @@ bool SQLiteStorage::open()
     mBeginTransaction = utils::make_unique<SQLiteStatement>(shared_from_this(), "BEGIN TRANSACTION;");
     mCommitTransaction = utils::make_unique<SQLiteStatement>(shared_from_this(), "COMMIT TRANSACTION;");
     mAbortTransaction = utils::make_unique<SQLiteStatement>(shared_from_this(), "ROLLBACK TRANSACTION;");
+
+    // Disable tracking for internal transaction statements
+    mBeginTransaction->disableTracking();
+    mCommitTransaction->disableTracking();
+    mAbortTransaction->disableTracking();
 
     for (auto &flag : mFlags) {
         switch (flag) {
@@ -52,8 +76,27 @@ bool SQLiteStorage::open()
 
 bool SQLiteStorage::close()
 {
-    sqlite3_close_v2(mDb);
-    mDb = nullptr;
+    if (mDb != nullptr) {
+        // Finalize all external active statements before closing the database
+        {
+            std::unique_lock<std::mutex> l(mMutex);
+            for (auto* stmt : mActiveStatements) {
+                if (stmt != nullptr) {
+                    sqlite3_finalize(stmt);
+                }
+            }
+            mActiveStatements.clear();
+        }
+
+        // Reset transaction statements
+        mBeginTransaction.reset();
+        mCommitTransaction.reset();
+        mAbortTransaction.reset();
+
+        // Finally close the database with close_v2
+        sqlite3_close_v2(mDb);
+        mDb = nullptr;
+    }
     return true;
 }
 
@@ -127,4 +170,20 @@ size_t SQLiteStorage::getLastRowId()
 void SQLiteStorage::setFlag(SQLiteStorage::Flags flag)
 {
     mFlags.insert(flag);
+}
+
+void SQLiteStorage::registerStatement(sqlite3_stmt* stmt, bool trackForCleanup)
+{
+    if (stmt != nullptr && trackForCleanup) {
+        std::unique_lock<std::mutex> l(mMutex);
+        mActiveStatements.insert(stmt);
+    }
+}
+
+void SQLiteStorage::unregisterStatement(sqlite3_stmt* stmt)
+{
+    if (stmt != nullptr) {
+        std::unique_lock<std::mutex> l(mMutex);
+        mActiveStatements.erase(stmt);
+    }
 }
