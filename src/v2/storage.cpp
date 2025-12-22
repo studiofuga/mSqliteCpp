@@ -35,7 +35,8 @@ Storage::Storage(std::string path, OpenMode openMode, CreateFlag createFlag)
 Storage::~Storage() noexcept
 {
     if (p->mDb != nullptr) {
-        sqlite3_close(p->mDb);
+        sqlite3_close_v2(p->mDb);
+        p->mDb = nullptr;
     }
 }
 
@@ -56,6 +57,11 @@ void Storage::open()
         openFlags |= SQLITE_OPEN_CREATE;
     }
 
+    if (p->mDb)
+    {
+        throw std::logic_error("DB already opened!");
+    }
+
     auto r = sqlite3_open_v2(p->dbPath.c_str(), &p->mDb,
                              openFlags,
                              nullptr);
@@ -71,7 +77,7 @@ void Storage::open()
 
 void Storage::close()
 {
-    sqlite3_close(p->mDb);
+    sqlite3_close_v2(p->mDb);
     p->mDb = nullptr;
 }
 

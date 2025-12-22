@@ -53,3 +53,28 @@ TEST(Statements, executeWithBind)
     ASSERT_NO_THROW(statement.bind(std::make_tuple(200, 1.3, "anothersample")));
     ASSERT_NO_THROW(statement.execute(db));
 }
+
+TEST(Statements, executeWithBindAndNames)
+{
+    auto crstr = "CREATE TABLE t (i INTEGER, t TEXT, r REAL, x INTEGER, y INTEGER);";
+
+    auto db = Storage::inMemory();
+
+    ASSERT_NO_THROW(db.open());
+
+    auto create_statement = Statement(db, crstr);
+
+    ASSERT_TRUE(create_statement.execute(db));
+
+    auto str = "INSERT INTO t(i,r,t,x,y) VALUES (:i,:r,:t,:i,:i);";
+
+    auto statement = Statement(db, str);
+
+    ASSERT_NO_THROW(statement.bind(1, 100));
+    ASSERT_NO_THROW(statement.bind(2, 1.5));
+    ASSERT_NO_THROW(statement.bind(3, "sample"));
+    ASSERT_NO_THROW(statement.execute(db));
+
+    ASSERT_NO_THROW(statement.bind(std::make_tuple(200, 1.3, "anothersample")));
+    ASSERT_NO_THROW(statement.execute(db));
+}

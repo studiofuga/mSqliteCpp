@@ -18,7 +18,7 @@ SQLiteStorage::SQLiteStorage(std::string path)
 SQLiteStorage::~SQLiteStorage() noexcept
 {
     if (mDb != nullptr) {
-        sqlite3_close(mDb);
+        sqlite3_close_v2(mDb);
     }
 }
 
@@ -52,7 +52,7 @@ bool SQLiteStorage::open()
 
 bool SQLiteStorage::close()
 {
-    sqlite3_close(mDb);
+    sqlite3_close_v2(mDb);
     mDb = nullptr;
     return true;
 }
