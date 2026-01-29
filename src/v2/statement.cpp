@@ -87,13 +87,7 @@ Statement::Statement(Storage &db, char const *sql)
 
 }
 
-Statement::~Statement()
-{
-    if (p != nullptr && p->stmt != nullptr) {
-        sqlite3_finalize(p->stmt);
-        p->stmt = nullptr;
-    }
-}
+Statement::~Statement() = default;
 
 void Statement::bind(size_t idx, std::string value)
 {
