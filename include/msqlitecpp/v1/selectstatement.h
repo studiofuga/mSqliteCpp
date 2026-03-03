@@ -153,6 +153,30 @@ public:
         return *this;
     }
 
+    SelectStatement<Fs...> &limit(int n)
+    {
+        sql.limit(n);
+        return *this;
+    }
+
+    SelectStatement<Fs...> &limit()
+    {
+        sql.limit();
+        return *this;
+    }
+
+    SelectStatement<Fs...> &offset(int n)
+    {
+        sql.offset(n);
+        return *this;
+    }
+
+    SelectStatement<Fs...> &offset()
+    {
+        sql.offset();
+        return *this;
+    }
+
     SQLiteStatement *getStatement()
     {
         return &statement;

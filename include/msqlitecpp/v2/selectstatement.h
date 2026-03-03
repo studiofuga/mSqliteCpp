@@ -24,6 +24,8 @@ class SelectStatement {
     std::tuple<FIELDS...> fields;
 
     std::string whereClause;
+    std::string limitClause;
+    std::string offsetClause;
 
     template<std::size_t I>
     decltype(std::get<I>(fields).rawType()) getValues()
@@ -74,6 +76,30 @@ public:
         formatStatement();
     }
 
+    void limit(int n)
+    {
+        limitClause = " LIMIT " + std::to_string(n);
+        formatStatement();
+    }
+
+    void limit()
+    {
+        limitClause.clear();
+        formatStatement();
+    }
+
+    void offset(int n)
+    {
+        offsetClause = " OFFSET " + std::to_string(n);
+        formatStatement();
+    }
+
+    void offset()
+    {
+        offsetClause.clear();
+        formatStatement();
+    }
+
     template<typename ...VALUES_TYPES>
     void bind(VALUES_TYPES ... values)
     {
@@ -96,6 +122,13 @@ private:
         if (!whereClause.empty()) {
             ss << " WHERE " << whereClause;
         }
+
+        if (!limitClause.empty()) {
+            ss << limitClause;
+        } else if (!offsetClause.empty()) {
+            ss << " LIMIT -1";
+        }
+        ss << offsetClause;
 
         return ss.str();
     }

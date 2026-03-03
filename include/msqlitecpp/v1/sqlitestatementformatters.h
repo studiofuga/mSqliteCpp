@@ -410,6 +410,8 @@ class Select : public StatementFormatter {
     std::string mWhere;
     std::string mGroupBy;
     std::string mOrderBy;
+    std::string mLimit;
+    std::string mOffset;
 public:
     Select() = default;
 
@@ -455,6 +457,30 @@ public:
         return *this;
     }
 
+    Select &limit(int n)
+    {
+        mLimit = " LIMIT " + std::to_string(n);
+        return *this;
+    }
+
+    Select &limit()
+    {
+        mLimit = "";
+        return *this;
+    }
+
+    Select &offset(int n)
+    {
+        mOffset = " OFFSET " + std::to_string(n);
+        return *this;
+    }
+
+    Select &offset()
+    {
+        mOffset = "";
+        return *this;
+    }
+
     Select &orderBy(Ordering ordering)
     {
         if (mOrderBy.empty()) {
@@ -485,7 +511,13 @@ public:
     std::string string() const override
     {
         std::ostringstream ss;
-        ss << mSelectOp << mSelectBase << mWhere << mGroupBy << mOrderBy << "";
+        ss << mSelectOp << mSelectBase << mWhere << mGroupBy << mOrderBy;
+        if (!mLimit.empty()) {
+            ss << mLimit;
+        } else if (!mOffset.empty()) {
+            ss << " LIMIT -1";
+        }
+        ss << mOffset;
         return ss.str();
     }
 

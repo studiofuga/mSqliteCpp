@@ -153,6 +153,62 @@ TEST(V1SqlFormatting, selectOrdering)
     }
 }
 
+TEST(V1SqlFormatting, selectLimit)
+{
+    auto fldId = sqlite::makeFieldDef("id", sqlite::FieldType::Integer());
+    auto fldName = sqlite::makeFieldDef("name", sqlite::FieldType::Text());
+
+    sqlite::statements::Select select("tbl", fldId, fldName);
+    select.limit(5);
+    EXPECT_EQ(select.string(), "SELECT id,name FROM tbl LIMIT 5");
+}
+
+TEST(V1SqlFormatting, selectOffset)
+{
+    auto fldId = sqlite::makeFieldDef("id", sqlite::FieldType::Integer());
+    auto fldName = sqlite::makeFieldDef("name", sqlite::FieldType::Text());
+
+    sqlite::statements::Select select("tbl", fldId, fldName);
+    select.offset(10);
+    EXPECT_EQ(select.string(), "SELECT id,name FROM tbl LIMIT -1 OFFSET 10");
+}
+
+TEST(V1SqlFormatting, selectLimitOffset)
+{
+    auto fldId = sqlite::makeFieldDef("id", sqlite::FieldType::Integer());
+    auto fldName = sqlite::makeFieldDef("name", sqlite::FieldType::Text());
+
+    sqlite::statements::Select select("tbl", fldId, fldName);
+    select.limit(5).offset(10);
+    EXPECT_EQ(select.string(), "SELECT id,name FROM tbl LIMIT 5 OFFSET 10");
+}
+
+TEST(V1SqlFormatting, selectLimitReset)
+{
+    auto fldId = sqlite::makeFieldDef("id", sqlite::FieldType::Integer());
+    auto fldName = sqlite::makeFieldDef("name", sqlite::FieldType::Text());
+
+    sqlite::statements::Select select("tbl", fldId, fldName);
+    select.limit(5).offset(10);
+    EXPECT_EQ(select.string(), "SELECT id,name FROM tbl LIMIT 5 OFFSET 10");
+
+    select.limit();
+    EXPECT_EQ(select.string(), "SELECT id,name FROM tbl LIMIT -1 OFFSET 10");
+
+    select.offset();
+    EXPECT_EQ(select.string(), "SELECT id,name FROM tbl");
+}
+
+TEST(V1SqlFormatting, selectLimitWithOrderBy)
+{
+    auto fldId = sqlite::makeFieldDef("id", sqlite::FieldType::Integer());
+    auto fldName = sqlite::makeFieldDef("name", sqlite::FieldType::Text());
+
+    sqlite::statements::Select select("tbl", fldId, fldName);
+    select.where(sqlite::op::eq(fldId)).orderBy(fldName).limit(5).offset(10);
+    EXPECT_EQ(select.string(), "SELECT id,name FROM tbl WHERE id = ? ORDER BY name LIMIT 5 OFFSET 10");
+}
+
 TEST(V1SqlFormatting, insert)
 {
     auto fldId = sqlite::makeFieldDef("id", sqlite::FieldType::Integer());

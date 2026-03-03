@@ -12,6 +12,9 @@
 
 #include <gtest/gtest.h>
 
+#include <vector>
+#include <string>
+
 using namespace msqlitecpp::v2;
 
 class SelectStatements : public testing::Test {
@@ -103,4 +106,98 @@ TEST_F(SelectStatements, whereReuse)
 
     ASSERT_NO_THROW(select.where());
     ASSERT_EQ(count(select), 5);
+}
+
+TEST_F(SelectStatements, selectWithLimit)
+{
+    auto select = makeSelectStatement(db, tableName, int1, int2, text);
+
+    select.limit(3);
+    std::vector<std::string> results;
+    select.execute([&results](int, int, std::string t) {
+        results.push_back(t);
+        return true;
+    });
+    ASSERT_EQ(results.size(), 3u);
+    EXPECT_EQ(results[0], "1-1");
+    EXPECT_EQ(results[1], "1-2");
+    EXPECT_EQ(results[2], "2-1");
+}
+
+TEST_F(SelectStatements, selectWithOffset)
+{
+    auto select = makeSelectStatement(db, tableName, int1, int2, text);
+
+    select.offset(2);
+    std::vector<std::string> results;
+    select.execute([&results](int, int, std::string t) {
+        results.push_back(t);
+        return true;
+    });
+    ASSERT_EQ(results.size(), 3u);
+    EXPECT_EQ(results[0], "2-1");
+    EXPECT_EQ(results[1], "2-2");
+    EXPECT_EQ(results[2], "3-0");
+}
+
+TEST_F(SelectStatements, selectWithLimitAndOffset)
+{
+    auto select = makeSelectStatement(db, tableName, int1, int2, text);
+
+    select.limit(2);
+    select.offset(1);
+    std::vector<std::string> results;
+    select.execute([&results](int, int, std::string t) {
+        results.push_back(t);
+        return true;
+    });
+    ASSERT_EQ(results.size(), 2u);
+    EXPECT_EQ(results[0], "1-2");
+    EXPECT_EQ(results[1], "2-1");
+}
+
+TEST_F(SelectStatements, selectLimitReset)
+{
+    auto select = makeSelectStatement(db, tableName, int1, int2, text);
+
+    select.limit(2);
+    std::vector<std::string> results;
+    select.execute([&results](int, int, std::string t) {
+        results.push_back(t);
+        return true;
+    });
+    ASSERT_EQ(results.size(), 2u);
+    EXPECT_EQ(results[0], "1-1");
+    EXPECT_EQ(results[1], "1-2");
+
+    select.limit();
+    results.clear();
+    select.execute([&results](int, int, std::string t) {
+        results.push_back(t);
+        return true;
+    });
+    ASSERT_EQ(results.size(), 5u);
+}
+
+TEST_F(SelectStatements, selectOffsetReset)
+{
+    auto select = makeSelectStatement(db, tableName, int1, int2, text);
+
+    select.offset(3);
+    std::vector<std::string> results;
+    select.execute([&results](int, int, std::string t) {
+        results.push_back(t);
+        return true;
+    });
+    ASSERT_EQ(results.size(), 2u);
+    EXPECT_EQ(results[0], "2-2");
+    EXPECT_EQ(results[1], "3-0");
+
+    select.offset();
+    results.clear();
+    select.execute([&results](int, int, std::string t) {
+        results.push_back(t);
+        return true;
+    });
+    ASSERT_EQ(results.size(), 5u);
 }
