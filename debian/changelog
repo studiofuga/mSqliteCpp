@@ -1,3 +1,9 @@
+msqlitecpp (1.99.10.0ubuntu1) jammy; urgency=medium
+
+  * Add support for OFFSET and LIMIT to SELECT statements
+
+ -- Federico Fuga <fuga@studiofuga.com>  Tue, 02 Mar 2026 11:31:00 +0200
+
 msqlitecpp (1.99.9.0ubuntu1) jammy; urgency=medium
 
   * Fix a few memory leaks on v1 and v2, open and close functions.
