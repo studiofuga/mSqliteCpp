@@ -202,6 +202,12 @@ SQLiteStatement::QueryResult SQLiteStatement::executeStep(std::function<bool()> 
     if (r == SQLITE_DONE) {
         return QueryResult::Completed;
     } else if (r != SQLITE_ROW) {
+        char *expanded = sqlite3_expanded_sql(p->stmt);
+        if (expanded != nullptr) {
+            std::string details{expanded};
+            sqlite3_free(expanded);
+            throw SQLiteException(db->handle(), std::move(details));
+        }
         SQLiteException::throwIfNotOk(r, db->handle());
     }
 

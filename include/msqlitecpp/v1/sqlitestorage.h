@@ -55,10 +55,20 @@ public:
         return mCode;
     }
 
+    /// Constructs from a known return code, using sqlite3_errstr() for a
+    /// thread-safe error message that does not depend on the connection state.
+    explicit SQLiteException(int returnCode, sqlite3 *db) : std::runtime_error("")
+    {
+        std::ostringstream ss;
+        ss << sqlite3_errstr(returnCode) << " (" << sqlite3_errmsg(db) << ")";
+        mErrmsg = ss.str();
+        mCode = returnCode;
+    }
+
     static void throwIfNotOk(int returnCode, sqlite3 *db)
     {
         if (returnCode != SQLITE_OK) {
-            throw SQLiteException(db);
+            throw SQLiteException(returnCode, db);
         }
     }
 };
